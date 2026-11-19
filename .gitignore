@@ -1,0 +1,24 @@
+# Dependencies & virtual environments
+node_modules/
+apps/web/node_modules/
+services/ai-tutor/.venv/
+__pycache__/
+*.py[cod]
+
+# Build outputs
+apps/web/.next/
+apps/web/out/
+services/core-api/bin/
+*.exe
+
+# Environment & secrets
+.env
+.env.*
+!.env.example
+
+# OS & IDE files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log
