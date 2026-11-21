@@ -49,6 +49,11 @@ export function Footer() {
             </h3>
             <ul className="space-y-2 text-xs text-slate-400">
               <li>
+                <Link href="/khoa-hoc" className="font-semibold text-amber-300 hover:text-white transition">
+                  Khóa học Trực tuyến &amp; Đánh giá 5★
+                </Link>
+              </li>
+              <li>
                 <Link href="/tai-lieu" className="hover:text-white transition">
                   Kho Tài liệu GDPT 2018
                 </Link>

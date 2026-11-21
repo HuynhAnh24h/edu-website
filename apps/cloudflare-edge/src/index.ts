@@ -13,6 +13,7 @@ import { handleAuthSecurityRoutes, issueSessionTokens } from "./auth-security";
 import { handleCodingRoutes } from "./coding";
 import { handleSocialRoutes } from "./social";
 import { handleSafetyAndChatRoutes } from "./safety";
+import { handleCourseRoutes } from "./courses";
 import { RealtimeHub } from "./realtime";
 
 export { RealtimeHub };
@@ -300,6 +301,22 @@ export default {
         forwardUrl.searchParams.set("name", claims?.name || "Khách");
         forwardUrl.searchParams.set("role", claims?.role || "guest");
         return stub.fetch(new Request(forwardUrl.toString(), request));
+      }
+
+      // === CỔNG KHÓA HỌC TRỰC TUYẾN & ĐÁNH GIÁ 5 SAO REAL-TIME ===
+      if (path.startsWith("/api/v1/courses")) {
+        const claims = await getClaims(request, env);
+        const courseResp = await handleCourseRoutes(
+          request,
+          env.DB,
+          path,
+          method,
+          url,
+          claims,
+          jsonRes,
+          env.REALTIME_HUB
+        );
+        if (courseResp) return courseResp;
       }
 
       // === MẠNG XÃ HỘI GIÁO VIÊN & KIỂM DUYỆT CỘNG ĐỒNG ===

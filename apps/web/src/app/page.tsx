@@ -191,6 +191,12 @@ export default function LandingPage() {
               ) : (
                 <>
                   <Link
+                    href="/khoa-hoc"
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-amber-500 px-4 py-2.5 text-xs font-extrabold text-slate-950 shadow hover:bg-amber-400 transition"
+                  >
+                    <GraduationCap className="h-4 w-4" /> Khóa học 5★
+                  </Link>
+                  <Link
                     href="/lop-hoc"
                     className="inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2.5 text-xs font-extrabold text-white shadow hover:bg-indigo-500 transition"
                   >

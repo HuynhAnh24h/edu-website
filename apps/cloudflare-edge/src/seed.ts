@@ -65,6 +65,9 @@ export async function ensureSeeded(db: D1Database): Promise<void> {
     db.prepare(`CREATE TABLE IF NOT EXISTS student_submission_reviews (id TEXT PRIMARY KEY, submission_id TEXT NOT NULL, teacher_id TEXT NOT NULL, teacher_name TEXT NOT NULL, score REAL NOT NULL DEFAULT 9.0, badge TEXT NOT NULL DEFAULT 'Xuất sắc', feedback TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT (datetime('now')))`),
     db.prepare(`CREATE TABLE IF NOT EXISTS safety_incidents (id TEXT PRIMARY KEY, incident_code TEXT UNIQUE NOT NULL, category TEXT NOT NULL, severity TEXT NOT NULL DEFAULT 'high', status TEXT NOT NULL DEFAULT 'open', source_type TEXT NOT NULL, source_id TEXT DEFAULT '', suspect_user_id TEXT NOT NULL, suspect_name TEXT NOT NULL, suspect_email TEXT DEFAULT '', suspect_role TEXT DEFAULT 'student', reporter_id TEXT DEFAULT 'safety_bot', reporter_name TEXT DEFAULT 'BOT Quét An toàn EduK12', matched_keywords TEXT DEFAULT '', content_snapshot TEXT NOT NULL, context_json TEXT DEFAULT '{}', admin_note TEXT DEFAULT '', penalty_action TEXT DEFAULT '', escalated_at TEXT, created_at TEXT NOT NULL DEFAULT (datetime('now')), updated_at TEXT NOT NULL DEFAULT (datetime('now')))`),
     db.prepare(`CREATE TABLE IF NOT EXISTS user_notifications (id TEXT PRIMARY KEY, user_id TEXT NOT NULL, type TEXT NOT NULL DEFAULT 'info', title TEXT NOT NULL, message TEXT NOT NULL, link TEXT DEFAULT '', is_read INTEGER NOT NULL DEFAULT 0, created_at TEXT NOT NULL DEFAULT (datetime('now')))`),
+    db.prepare(`CREATE TABLE IF NOT EXISTS courses (id TEXT PRIMARY KEY, teacher_id TEXT NOT NULL, teacher_name TEXT NOT NULL, teacher_school TEXT DEFAULT '', title TEXT NOT NULL, subject_name TEXT NOT NULL, grade_label TEXT NOT NULL DEFAULT 'Lớp 12', level TEXT NOT NULL DEFAULT 'Cơ bản → Nâng cao', cover_theme TEXT NOT NULL DEFAULT 'indigo', summary TEXT NOT NULL, modules_json TEXT NOT NULL DEFAULT '[]', status TEXT NOT NULL DEFAULT 'published', created_at TEXT NOT NULL DEFAULT (datetime('now')))`),
+    db.prepare(`CREATE TABLE IF NOT EXISTS course_enrollments (course_id TEXT NOT NULL, user_id TEXT NOT NULL, completed_lessons_json TEXT NOT NULL DEFAULT '[]', enrolled_at TEXT NOT NULL DEFAULT (datetime('now')), PRIMARY KEY (course_id, user_id))`),
+    db.prepare(`CREATE TABLE IF NOT EXISTS course_reviews (id TEXT PRIMARY KEY, course_id TEXT NOT NULL, user_id TEXT NOT NULL, user_name TEXT NOT NULL, user_role TEXT NOT NULL DEFAULT 'student', rating INTEGER NOT NULL, comment TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT (datetime('now')), updated_at TEXT NOT NULL DEFAULT (datetime('now')), UNIQUE(course_id, user_id))`),
   ]);
 
   // Luôn đảm bảo có sẵn 2 lớp học mẫu nếu bảng classrooms chưa có dữ liệu
@@ -428,6 +431,190 @@ export async function ensureSeeded(db: D1Database): Promise<void> {
           "Nguyễn Minh Anh",
           "student",
           "Đúng rồi em nhé! Bước 1 luôn phải tìm tập xác định D, sau đó đánh dấu gạch đôi tại điểm không xác định trên bảng biến thiên để tránh kết luận nhầm khoảng đồng biến."
+        ),
+    ]);
+  }
+
+  // Seed 3 Khóa học trực tuyến mẫu kèm bài giảng & đánh giá 5 sao
+  const courseRow = await db.prepare("SELECT COUNT(*) as cnt FROM courses").first<{ cnt: number }>();
+  if (!courseRow || courseRow.cnt === 0) {
+    const c1Modules = [
+      {
+        id: "m1",
+        title: "Bài 1: Xét dấu đạo hàm & Tính đơn điệu chuẩn 2025+",
+        duration: "20 phút",
+        video_url: "",
+        content:
+          "1. Tìm tập xác định D của hàm số.\n2. Tính đạo hàm f'(x) và tìm các điểm làm f'(x) = 0 hoặc không xác định.\n3. Lập bảng biến thiên xét dấu f'(x): khoảng nào f'(x) > 0 hàm đồng biến, f'(x) < 0 hàm nghịch biến.\n\nMẹo tránh bẫy đề Đúng/Sai: Không bao giờ gộp 2 khoảng đồng biến rời nhau bằng dấu hợp (∪), phải ghi 'và'!",
+      },
+      {
+        id: "m2",
+        title: "Bài 2: Cực trị hàm số & Đọc nhanh đồ thị f'(x)",
+        duration: "25 phút",
+        video_url: "",
+        content:
+          "Quy tắc vàng đọc đồ thị đạo hàm f'(x):\n- Số điểm cực trị = số nghiệm ĐƠN (cắt trục hoành, đổi dấu) của f'(x) = 0.\n- Đổi dấu từ (+) sang (-) -> Cực đại.\n- Đổi dấu từ (-) sang (+) -> Cực tiểu.\n- Tiếp xúc trục hoành nhưng không xuyên qua -> KHÔNG phải cực trị.",
+      },
+      {
+        id: "m3",
+        title: "Bài 3: Bài toán Thực tế Tối ưu (Dạng Trả lời ngắn mới)",
+        duration: "30 phút",
+        video_url: "",
+        content:
+          "4 bước giải bài toán tối ưu chi phí / diện tích / lợi nhuận:\n1. Đặt ẩn x và tìm điều kiện ràng buộc [a; b].\n2. Biểu diễn đại lượng cần tối ưu thành hàm f(x).\n3. Tính f'(x) = 0, so sánh các giá trị tại nghiệm và 2 đầu mút.\n4. Kết luận và làm tròn đúng theo yêu cầu đề bài.",
+      },
+    ];
+
+    const c2Modules = [
+      {
+        id: "m1",
+        title: "Bài 1: Giải mã ngữ liệu ngoài SGK trong 5 phút",
+        duration: "18 phút",
+        video_url: "",
+        content:
+          "Cách đọc nhanh văn bản mới không bị choáng:\n- Đọc câu hỏi trước để định vị từ khóa cần tìm.\n- Gạch chân các biện pháp tu từ, luận điểm chính ở câu đầu và câu cuối mỗi đoạn.\n- Tóm gọn thông điệp tác giả thành 1 câu ngắn trước khi đặt bút viết.",
+      },
+      {
+        id: "m2",
+        title: "Bài 2: Công thức 3 tầng lập luận cho bài Nghị luận Xã hội 9+",
+        duration: "22 phút",
+        video_url: "",
+        content:
+          "Tầng 1: Giải thích ngắn gọn bản chất vấn đề.\nTầng 2: Phân tích 2 mặt + 1 dẫn chứng đời sống cập nhật (từ 2023–2026).\nTầng 3: Phản đề sắc sảo & Liên hệ hành động cụ thể của người trẻ hôm nay.",
+      },
+      {
+        id: "m3",
+        title: "Bài 3: Luyện viết Mở bài & Kết bài ấn tượng không văn mẫu",
+        duration: "20 phút",
+        video_url: "",
+        content:
+          "Tránh các mẫu mở bài sáo rỗng. Hãy bắt đầu bằng một câu hỏi gợi suy ngẫm, một nghịch lý đời thường hoặc một số liệu thực tế gắn trực tiếp với đề bài.",
+      },
+    ];
+
+    const c3Modules = [
+      {
+        id: "m1",
+        title: "Bài 1: Cấu trúc trang Web chuẩn với HTML5 Semantic",
+        duration: "20 phút",
+        video_url: "",
+        content:
+          "Làm quen các thẻ ngữ nghĩa hiện đại: <header>, <nav>, <main>, <section>, <article>, <footer>. Thực hành xây dựng trang hồ sơ cá nhân đầu tiên ngay tại mục Lập trình của EduK12.",
+      },
+      {
+        id: "m2",
+        title: "Bài 2: Bố cục Responsive hiện đại với CSS Flexbox & Grid",
+        duration: "25 phút",
+        video_url: "",
+        content:
+          "Hiểu rõ display: flex, justify-content, align-items và CSS Grid để trang web hiển thị đẹp cả trên máy tính lẫn điện thoại.",
+      },
+      {
+        id: "m3",
+        title: "Bài 3: Thêm tương tác sống động với JavaScript & Đẩy sản phẩm cho Thầy Cô chấm",
+        duration: "30 phút",
+        video_url: "",
+        content:
+          "Sử dụng DOM Event, localStorage để làm ứng dụng Flashcard hoặc To-Do List, sau đó đăng vào mục Sản phẩm Học sinh trên /cong-dong để thầy cô chấm điểm góp ý!",
+      },
+    ];
+
+    await db.batch([
+      db
+        .prepare(
+          `INSERT OR IGNORE INTO courses (id, teacher_id, teacher_name, teacher_school, title, subject_name, grade_label, level, cover_theme, summary, modules_json, status)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'published')`
+        )
+        .bind(
+          "course-toan12-daoham",
+          "u-teacher-1",
+          "Thầy Nguyễn Văn Minh (GV Toán)",
+          "THPT Chuyên KHTN",
+          "Làm chủ Ứng dụng Đạo hàm & Khảo sát Hàm số — Toán 12 (Chuẩn 2025+)",
+          "Toán học",
+          "Lớp 12",
+          "Luyện thi THPT",
+          "indigo",
+          "Khóa học cô đọng giúp học sinh nắm chắc toàn bộ dạng bài Đơn điệu, Cực trị và Bài toán Tối ưu thực tế theo đúng cấu trúc đề mới 3 phần.",
+          JSON.stringify(c1Modules)
+        ),
+      db
+        .prepare(
+          `INSERT OR IGNORE INTO courses (id, teacher_id, teacher_name, teacher_school, title, subject_name, grade_label, level, cover_theme, summary, modules_json, status)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'published')`
+        )
+        .bind(
+          "course-van12-nghiluan",
+          "u-teacher-2",
+          "Cô Trần Thị Lan (GV Ngữ văn)",
+          "THPT Chuyên Lê Hồng Phong",
+          "Chinh phục Nghị luận Xã hội 9+ (Tư duy mới — Không học thuộc văn mẫu)",
+          "Ngữ văn",
+          "Lớp 11–12",
+          "Nâng cao kỹ năng viết",
+          "rose",
+          "Rèn tư duy lập luận chặt chẽ, xử lý mượt ngữ liệu ngoài sách giáo khoa và cách chọn dẫn chứng thực tế ghi trọn điểm giám khảo.",
+          JSON.stringify(c2Modules)
+        ),
+      db
+        .prepare(
+          `INSERT OR IGNORE INTO courses (id, teacher_id, teacher_name, teacher_school, title, subject_name, grade_label, level, cover_theme, summary, modules_json, status)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'published')`
+        )
+        .bind(
+          "course-web-starter",
+          "u-teacher-3",
+          "Thầy Lê Hoàng Nam (GV Tin học)",
+          "THPT Gia Định",
+          "Xây dựng Website Đầu Tiên với HTML, CSS & JavaScript từ con số 0",
+          "Lập trình Web",
+          "THCS & THPT",
+          "Người mới bắt đầu",
+          "emerald",
+          "Lộ trình thực hành trực quan dành cho học sinh yêu thích công nghệ: học xong tự tay tạo được website hoàn chỉnh để nộp dự thi sáng tạo trẻ.",
+          JSON.stringify(c3Modules)
+        ),
+      db.prepare(
+        "INSERT OR IGNORE INTO course_enrollments (course_id, user_id, completed_lessons_json) VALUES ('course-toan12-daoham', 'u-student-1', '[\"m1\"]')"
+      ),
+      db
+        .prepare(
+          "INSERT OR IGNORE INTO course_reviews (id, course_id, user_id, user_name, user_role, rating, comment) VALUES (?, ?, ?, ?, ?, ?, ?)"
+        )
+        .bind(
+          "crev-seed-1",
+          "course-toan12-daoham",
+          "u-student-1",
+          "Nguyễn Minh Anh",
+          "student",
+          5,
+          "Thầy Minh giảng siêu dễ hiểu luôn ạ! Nhờ mẹo đọc đồ thị f'(x) trong Bài 2 mà em không còn bị nhầm câu Đúng/Sai nữa. 5 sao xứng đáng!"
+        ),
+      db
+        .prepare(
+          "INSERT OR IGNORE INTO course_reviews (id, course_id, user_id, user_name, user_role, rating, comment) VALUES (?, ?, ?, ?, ?, ?, ?)"
+        )
+        .bind(
+          "crev-seed-2",
+          "course-van12-nghiluan",
+          "u-student-1",
+          "Nguyễn Minh Anh",
+          "student",
+          5,
+          "Công thức 3 tầng lập luận của cô Lan giúp em viết bài mạch lạc hơn hẳn, không bị bí ý khi gặp đề mới!"
+        ),
+      db
+        .prepare(
+          "INSERT OR IGNORE INTO course_reviews (id, course_id, user_id, user_name, user_role, rating, comment) VALUES (?, ?, ?, ?, ?, ?, ?)"
+        )
+        .bind(
+          "crev-seed-3",
+          "course-web-starter",
+          "u-student-1",
+          "Nguyễn Minh Anh",
+          "student",
+          5,
+          "Khóa học thực chiến rất hay, học xong em đã tự làm được web học từ vựng Tiếng Anh luôn!"
         ),
     ]);
   }

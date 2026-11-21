@@ -132,20 +132,20 @@ export function Navbar() {
   const mainLinks = isTeacher
     ? [
         { href: "/cong-dong", label: "MXH Giáo viên", icon: Users },
+        { href: "/khoa-hoc", label: "Khóa học", icon: BookOpen },
         { href: "/tin-nhan", label: "Tin nhắn", icon: MessageCircle },
         { href: "/lop-hoc", label: "Lớp dạy", icon: Radio },
-        { href: "/tai-lieu", label: "Kho 1–12", icon: BookOpen },
       ]
     : isAdmin
       ? [
           { href: "/cong-dong", label: "MXH Giáo viên", icon: Users },
+          { href: "/khoa-hoc", label: "Khóa học", icon: BookOpen },
           { href: "/tin-nhan", label: "Tin nhắn", icon: MessageCircle },
           { href: "/lop-hoc", label: "Lớp Live", icon: Radio },
-          { href: "/tai-lieu", label: "Kho 1–12", icon: BookOpen },
         ]
       : [
           { href: "/", label: "Trang chủ" },
-          { href: "/tai-lieu", label: "Lớp 1–12", icon: BookOpen },
+          { href: "/khoa-hoc", label: "Khóa học", icon: BookOpen },
           { href: "/lap-trinh", label: "Lập trình", icon: Code2 },
           { href: "/cong-dong", label: user ? "Góc Thầy Cô" : "MXH Giáo viên", icon: Users },
           { href: "/tin-nhan", label: "Chat Thầy Cô", icon: MessageCircle },
@@ -226,6 +226,7 @@ export function Navbar() {
                   <div className="fixed inset-0 z-10" onClick={() => setMoreOpen(false)} />
                   <div className="absolute right-0 z-20 mt-2 w-64 overflow-hidden rounded-2xl border border-slate-200 bg-white p-1.5 shadow-xl">
                     {[
+                      { href: "/tai-lieu", label: "Kho Tài liệu 1–12", desc: "Bài giảng chuẩn theo chương", icon: BookOpen },
                       { href: "/lop-hoc", label: "Lớp học & Phòng Live", desc: "Học trực tiếp & điểm danh", icon: Radio },
                       ...STUDENT_MORE_LINKS,
                     ].map((m) => {
