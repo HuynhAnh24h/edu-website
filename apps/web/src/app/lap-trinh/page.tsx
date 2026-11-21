@@ -221,21 +221,39 @@ function CodingAcademyInner() {
           </p>
         </div>
 
-        <div className="flex items-center gap-3 rounded-2xl bg-white/10 px-4 py-3 ring-1 ring-white/15">
-          <Trophy className="h-7 w-7 text-amber-400" />
-          <div>
-            <p className="text-[11px] font-semibold text-slate-300">
-              Tiến độ {user ? user.full_name : "Cộng đồng"}
-            </p>
-            <p className="text-lg font-extrabold text-white">
-              {totalPassedAllTracks} / {totalLessonsAllTracks} bài đã vượt qua
-            </p>
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            type="button"
+            onClick={() =>
+              window.dispatchEvent(
+                new CustomEvent("eduk12:mascot-tour", {
+                  detail: {
+                    tour: "coding",
+                    banner: "Hú hú! Để Cú Bông bay chỉ bạn cách code & mở khóa bài nhé!",
+                  },
+                })
+              )
+            }
+            className="inline-flex items-center gap-1.5 rounded-2xl bg-amber-400 px-4 py-2.5 text-xs font-extrabold text-slate-950 shadow hover:bg-amber-300 transition"
+          >
+            <Sparkles className="h-4 w-4" /> Cú Bông bay chỉ đường
+          </button>
+          <div className="flex items-center gap-3 rounded-2xl bg-white/10 px-4 py-3 ring-1 ring-white/15">
+            <Trophy className="h-7 w-7 text-amber-400" />
+            <div>
+              <p className="text-[11px] font-semibold text-slate-300">
+                Tiến độ {user ? user.full_name : "Cộng đồng"}
+              </p>
+              <p className="text-lg font-extrabold text-white">
+                {totalPassedAllTracks} / {totalLessonsAllTracks} bài đã vượt qua
+              </p>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Bộ chọn 8 Khóa học Lập trình */}
-      <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4 lg:grid-cols-8">
+      <div data-tour="coding-tracks" className="grid grid-cols-2 gap-2.5 sm:grid-cols-4 lg:grid-cols-8">
         {CODING_TRACKS.map((t) => {
           const passedInTrack = t.lessons.filter((l) => passedMap[l.id]).length;
           const active = t.id === activeTrackId;
@@ -434,6 +452,7 @@ function CodingAcademyInner() {
 
           {/* HỆ THỐNG GỢI MỞ TƯ DUY 3 TẦNG (CHỐNG COPY ĐÁP ÁN) */}
           <div
+            data-tour="coding-hints"
             onCopy={(e) => e.preventDefault()}
             className="select-none rounded-2xl border border-amber-200 bg-amber-50/50 p-4 space-y-3"
           >
@@ -542,7 +561,7 @@ function CodingAcademyInner() {
 
         {/* CỘT PHẢI: TRÌNH SOẠN THẢO CODE + XEM TRƯỚC + CHẤM TEST TỰ ĐỘNG */}
         <div className="space-y-4 lg:col-span-7">
-          <div className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-950 shadow-lg">
+          <div data-tour="coding-editor" className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-950 shadow-lg">
             {/* Thanh công cụ Editor */}
             <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 bg-slate-900 px-4 py-2.5 text-xs">
               <div className="flex items-center gap-2">
@@ -605,6 +624,7 @@ function CodingAcademyInner() {
             <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-800 bg-slate-900 px-4 py-3">
               <button
                 type="button"
+                data-tour="coding-run-btn"
                 disabled={running}
                 onClick={() => void handleRunCode()}
                 className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-xs font-extrabold text-white shadow hover:bg-indigo-500 disabled:opacity-50 transition"

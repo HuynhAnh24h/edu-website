@@ -17,3 +17,73 @@ body {
   overflow-y: hidden;
   padding: 0.5rem 0;
 }
+
+/* Hiệu ứng linh thú Cú Bông Edu bay bay, vỗ cánh & chỉ đường hào hứng */
+@keyframes owlFloat {
+  0%, 100% {
+    transform: translateY(0px) rotate(-1.5deg);
+  }
+  50% {
+    transform: translateY(-9px) rotate(2deg);
+  }
+}
+
+@keyframes owlWingLeft {
+  0%, 100% {
+    transform: rotate(12deg);
+  }
+  50% {
+    transform: rotate(36deg);
+  }
+}
+
+@keyframes owlWingRight {
+  0%, 100% {
+    transform: rotate(-12deg);
+  }
+  50% {
+    transform: rotate(-42deg);
+  }
+}
+
+@keyframes owlPointBounce {
+  0%, 100% {
+    transform: translateX(0px);
+  }
+  50% {
+    transform: translateX(6px);
+  }
+}
+
+@keyframes spotlightRing {
+  0%, 100% {
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.45), 0 0 24px rgba(245, 158, 11, 0.45);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(99, 102, 241, 0.25), 0 0 36px rgba(245, 158, 11, 0.65);
+  }
+}
+
+.animate-owl-float {
+  animation: owlFloat 2.1s ease-in-out infinite;
+}
+
+.animate-owl-wing-l {
+  transform-box: fill-box;
+  transform-origin: right center;
+  animation: owlWingLeft 0.55s ease-in-out infinite;
+}
+
+.animate-owl-wing-r {
+  transform-box: fill-box;
+  transform-origin: left center;
+  animation: owlWingRight 0.55s ease-in-out infinite;
+}
+
+.animate-owl-point {
+  animation: owlPointBounce 0.9s ease-in-out infinite;
+}
+
+.animate-spotlight-ring {
+  animation: spotlightRing 1.6s ease-in-out infinite;
+}

@@ -59,19 +59,21 @@ export async function handleClassroomRoutes(
 ): Promise<Response | null> {
   // === 1. DANH SÁCH LỚP HỌC CÔNG KHAI (Cho học sinh khám phá & đăng ký) ===
   if (path === "/api/v1/classrooms" && method === "GET") {
-    const g = Number(url.searchParams.get("grade") || 0);
+    const gradeParam = url.searchParams.get("grade");
     const sub = url.searchParams.get("subject") || "";
     let sql = `
       SELECT c.*,
         (SELECT COUNT(*) FROM classroom_members m WHERE m.classroom_id = c.id AND m.status = 'active') as student_count,
-        (SELECT COUNT(*) FROM classroom_assignments a WHERE a.classroom_id = c.id AND a.item_type = 'lesson') as lesson_count,
+        (SELECT COUNT(*) FROM classroom_assignments a WHERE a.classroom_id = c.id AND a.item_type IN ('lesson', 'coding')) as lesson_count,
         (SELECT COUNT(*) FROM classroom_assignments a WHERE a.classroom_id = c.id AND a.item_type = 'exam') as exam_count
       FROM classrooms c WHERE 1=1
     `;
     const binds: unknown[] = [];
-    if (g > 0) {
+    if (gradeParam === "coding") {
+      sql += " AND c.grade_id = 0";
+    } else if (gradeParam && Number(gradeParam) > 0) {
       sql += " AND c.grade_id = ?";
-      binds.push(g);
+      binds.push(Number(gradeParam));
     }
     if (sub && sub !== "all") {
       sql += " AND c.subject_code = ?";
@@ -115,14 +117,14 @@ export async function handleClassroomRoutes(
     const sql = isStaff
       ? `SELECT c.*,
            (SELECT COUNT(*) FROM classroom_members m WHERE m.classroom_id = c.id AND m.status = 'active') as student_count,
-           (SELECT COUNT(*) FROM classroom_assignments a WHERE a.classroom_id = c.id AND a.item_type = 'lesson') as lesson_count,
+           (SELECT COUNT(*) FROM classroom_assignments a WHERE a.classroom_id = c.id AND a.item_type IN ('lesson', 'coding')) as lesson_count,
            (SELECT COUNT(*) FROM classroom_assignments a WHERE a.classroom_id = c.id AND a.item_type = 'exam') as exam_count
          FROM classrooms c
          ${claims.role === "super_admin" ? "" : "WHERE c.teacher_id = ?"}
          ORDER BY c.created_at DESC`
       : `SELECT c.*,
            (SELECT COUNT(*) FROM classroom_members m WHERE m.classroom_id = c.id AND m.status = 'active') as student_count,
-           (SELECT COUNT(*) FROM classroom_assignments a WHERE a.classroom_id = c.id AND a.item_type = 'lesson') as lesson_count,
+           (SELECT COUNT(*) FROM classroom_assignments a WHERE a.classroom_id = c.id AND a.item_type IN ('lesson', 'coding')) as lesson_count,
            (SELECT COUNT(*) FROM classroom_assignments a WHERE a.classroom_id = c.id AND a.item_type = 'exam') as exam_count
          FROM classrooms c
          JOIN classroom_members cm ON cm.classroom_id = c.id
@@ -566,10 +568,10 @@ export async function handleClassroomRoutes(
         allow_self_enroll?: boolean;
       };
       if (!b.name?.trim()) return jsonRes({ error: "Vui lòng nhập tên lớp học" }, 400);
-      const gradeId = b.grade_id || 12;
+      const gradeId = b.grade_id === 0 ? 0 : b.grade_id || 12;
       const sub = b.subject_code || "toan";
       const id = `cls-${crypto.randomUUID().slice(0, 8)}`;
-      const code = genJoinCode(sub, gradeId);
+      const code = gradeId === 0 ? genJoinCode("CODE", Math.floor(10 + Math.random() * 89)) : genJoinCode(sub, gradeId);
       const allow = b.allow_self_enroll === false ? 0 : 1;
 
       await db
@@ -630,13 +632,13 @@ export async function handleClassroomRoutes(
       return jsonRes({ status: "removed" });
     }
 
-    // Giáo viên giao Giáo án (lesson) hoặc Bài kiểm tra trực tuyến (exam) cho lớp
+    // Giáo viên giao Giáo án (lesson), Bài lập trình (coding) hoặc Bài kiểm tra trực tuyến (exam) cho lớp
     const addAsgMatch = path.match(/^\/api\/v1\/cms\/classrooms\/([^/]+)\/assignments$/);
     if (addAsgMatch && method === "POST") {
       const classId = decodeURIComponent(addAsgMatch[1]);
       const b = (await request.json()) as { item_type?: string; item_id?: string; item_title?: string; due_at?: string };
-      if (!b.item_id || !b.item_title || !["lesson", "exam"].includes(b.item_type || "")) {
-        return jsonRes({ error: "Dữ liệu giao giáo án / bài kiểm tra không hợp lệ" }, 400);
+      if (!b.item_id || !b.item_title || !["lesson", "exam", "coding"].includes(b.item_type || "")) {
+        return jsonRes({ error: "Dữ liệu giao giáo án / lập trình / bài kiểm tra không hợp lệ" }, 400);
       }
       const asgId = `asg-${crypto.randomUUID().slice(0, 8)}`;
       await db

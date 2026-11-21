@@ -58,7 +58,7 @@ interface AttendanceItem {
 
 interface AssignmentShortcut {
   id: string;
-  item_type: "lesson" | "exam";
+  item_type: "lesson" | "exam" | "coding";
   item_id: string;
   item_title: string;
 }

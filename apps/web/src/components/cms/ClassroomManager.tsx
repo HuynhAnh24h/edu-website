@@ -7,6 +7,7 @@ import {
   Calendar,
   Check,
   ClipboardCheck,
+  Code2,
   Copy,
   Globe,
   GraduationCap,
@@ -24,6 +25,7 @@ import {
 } from "lucide-react";
 import { CORE_API_URL, ExamSummary, Lesson } from "@/lib/api";
 import { getSubjectMeta } from "@/lib/subjects";
+import { CODING_TRACKS } from "@/lib/codingCurriculum";
 import { LiveClassroomStudio, LiveSessionInfo } from "@/components/LiveClassroomStudio";
 
 interface Subject {
@@ -63,7 +65,7 @@ interface StudentMember {
 
 interface AssignmentItem {
   id: string;
-  item_type: "lesson" | "exam";
+  item_type: "lesson" | "exam" | "coding";
   item_id: string;
   item_title: string;
   due_at: string;
@@ -121,18 +123,20 @@ export function ClassroomManager({
     setSubTab(initialSubTab);
   }, [initialSubTab]);
 
-  // Form tạo lớp mới
+  // Form tạo lớp mới (Hỗ trợ cả Lớp Phổ thông 1-12 & Lớp Lập trình Cộng đồng)
+  const [newClassKind, setNewClassKind] = useState<"k12" | "coding">("coding");
   const [newName, setNewName] = useState("");
   const [newGrade, setNewGrade] = useState(12);
-  const [newSubject, setNewSubject] = useState("toan");
+  const [newSubject, setNewSubject] = useState("javascript");
   const [newDesc, setNewDesc] = useState("");
   const [newSelfEnroll, setNewSelfEnroll] = useState(true);
 
-  // Form thêm học sinh & giao giáo án/kiểm tra
+  // Form thêm học sinh & giao giáo án / lập trình / kiểm tra
   const [studentEmail, setStudentEmail] = useState("");
   const [availableLessons, setAvailableLessons] = useState<Lesson[]>([]);
   const [availableExams, setAvailableExams] = useState<ExamSummary[]>([]);
   const [pickedLessonId, setPickedLessonId] = useState("");
+  const [pickedCodingTrack, setPickedCodingTrack] = useState("javascript");
   const [pickedExamId, setPickedExamId] = useState("");
   const [examDueAt, setExamDueAt] = useState("2026-12-30");
 
@@ -217,7 +221,7 @@ export function ClassroomManager({
       },
       body: JSON.stringify({
         name: newName.trim(),
-        grade_id: newGrade,
+        grade_id: newClassKind === "coding" ? 0 : newGrade,
         subject_code: newSubject,
         description: newDesc.trim(),
         allow_self_enroll: newSelfEnroll,
@@ -298,7 +302,7 @@ export function ClassroomManager({
     }
   };
 
-  const handleAssignItem = async (type: "lesson" | "exam") => {
+  const handleAssignItem = async (type: "lesson" | "exam" | "coding") => {
     if (!accessToken || !detail) return;
     let itemId = "";
     let itemTitle = "";
@@ -307,6 +311,11 @@ export function ClassroomManager({
       if (!found) return;
       itemId = found.id;
       itemTitle = `${found.chapter} — ${found.title}`;
+    } else if (type === "coding") {
+      const found = CODING_TRACKS.find((t) => t.id === pickedCodingTrack);
+      if (!found) return;
+      itemId = found.id;
+      itemTitle = `Khóa Thực hành ${found.name} (${found.lessons.length} bài có chấm test)`;
     } else {
       const found = availableExams.find((e) => e.id === pickedExamId);
       if (!found) return;
@@ -333,7 +342,11 @@ export function ClassroomManager({
     if (res.ok) {
       onNotify(
         "ok",
-        type === "lesson" ? "Đã thêm bài giảng vào giáo án của lớp!" : "Đã giao bài kiểm tra trực tuyến cho lớp!"
+        type === "lesson"
+          ? "Đã thêm bài giảng vào giáo án của lớp!"
+          : type === "coding"
+            ? "Đã giao Khóa Lập trình Thực hành cho lớp!"
+            : "Đã giao bài kiểm tra trực tuyến cho lớp!"
       );
       await loadDetail(detail.classroom.id);
       await loadMyClassrooms();
@@ -400,6 +413,7 @@ export function ClassroomManager({
   };
 
   const lessonAssignments = detail?.assignments.filter((a) => a.item_type === "lesson") || [];
+  const codingAssignments = detail?.assignments.filter((a) => a.item_type === "coding") || [];
   const examAssignments = detail?.assignments.filter((a) => a.item_type === "exam") || [];
 
   return (
@@ -429,7 +443,40 @@ export function ClassroomManager({
           onSubmit={handleCreateClassroom}
           className="rounded-2xl border border-indigo-200 bg-indigo-50/40 p-5 space-y-4"
         >
-          <h3 className="text-sm font-bold text-indigo-900">Thông tin Lớp học mới</h3>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h3 className="text-sm font-bold text-indigo-900">Mở Lớp học mới</h3>
+            <div className="flex gap-1.5 rounded-xl bg-white p-1 ring-1 ring-slate-200">
+              <button
+                type="button"
+                onClick={() => {
+                  setNewClassKind("coding");
+                  setNewSubject("javascript");
+                }}
+                className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition ${
+                  newClassKind === "coding"
+                    ? "bg-indigo-600 text-white shadow-xs"
+                    : "text-slate-600 hover:bg-slate-100"
+                }`}
+              >
+                <Code2 className="h-3.5 w-3.5" /> Lớp Lập trình Cộng đồng
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setNewClassKind("k12");
+                  setNewSubject("toan");
+                }}
+                className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition ${
+                  newClassKind === "k12"
+                    ? "bg-indigo-600 text-white shadow-xs"
+                    : "text-slate-600 hover:bg-slate-100"
+                }`}
+              >
+                <School className="h-3.5 w-3.5" /> Lớp Phổ thông (1–12)
+              </button>
+            </div>
+          </div>
+
           <div className="grid gap-3 sm:grid-cols-4">
             <div className="sm:col-span-2">
               <label className="mb-1 block text-xs font-bold text-slate-700">Tên lớp học *</label>
@@ -437,32 +484,61 @@ export function ClassroomManager({
                 required
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
-                placeholder="VD: Lớp Hóa học 12A2 — Luyện thi THPT"
+                placeholder={
+                  newClassKind === "coding"
+                    ? "VD: Lớp Thực chiến Golang & PostgreSQL Cộng đồng K01"
+                    : "VD: Lớp Hóa học 12A2 — Luyện thi THPT"
+                }
                 className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm"
               />
             </div>
+
+            {newClassKind === "k12" ? (
+              <div>
+                <label className="mb-1 block text-xs font-bold text-slate-700">Khối lớp</label>
+                <select
+                  value={newGrade}
+                  onChange={(e) => setNewGrade(Number(e.target.value))}
+                  className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-semibold"
+                >
+                  {Array.from({ length: 12 }, (_, i) => i + 1).map((g) => (
+                    <option key={g} value={g}>
+                      Lớp {g}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ) : (
+              <div>
+                <label className="mb-1 block text-xs font-bold text-slate-700">Đối tượng</label>
+                <div className="rounded-xl border border-indigo-200 bg-indigo-50 px-3 py-2 text-sm font-bold text-indigo-700">
+                  Cộng đồng (Mọi lứa tuổi)
+                </div>
+              </div>
+            )}
+
             <div>
-              <label className="mb-1 block text-xs font-bold text-slate-700">Khối lớp</label>
-              <select
-                value={newGrade}
-                onChange={(e) => setNewGrade(Number(e.target.value))}
-                className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-semibold"
-              >
-                {Array.from({ length: 12 }, (_, i) => i + 1).map((g) => (
-                  <option key={g} value={g}>Lớp {g}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="mb-1 block text-xs font-bold text-slate-700">Môn học</label>
+              <label className="mb-1 block text-xs font-bold text-slate-700">
+                {newClassKind === "coding" ? "Công nghệ chính" : "Môn học"}
+              </label>
               <select
                 value={newSubject}
                 onChange={(e) => setNewSubject(e.target.value)}
                 className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-semibold"
               >
-                {(subjects.length ? subjects : [{ id: 1, code: "toan", name: "Toán học" }]).map((s) => (
-                  <option key={s.code} value={s.code}>{s.name}</option>
-                ))}
+                {newClassKind === "coding"
+                  ? CODING_TRACKS.map((t) => (
+                      <option key={t.id} value={t.id}>
+                        {t.name}
+                      </option>
+                    ))
+                  : (subjects.length ? subjects : [{ id: 1, code: "toan", name: "Toán học" }]).map(
+                      (s) => (
+                        <option key={s.code} value={s.code}>
+                          {s.name}
+                        </option>
+                      )
+                    )}
               </select>
             </div>
           </div>
@@ -526,7 +602,7 @@ export function ClassroomManager({
               <div className="flex items-center justify-between gap-2">
                 <span className={`inline-flex items-center gap-1.5 rounded-lg px-2 py-0.5 text-[11px] font-bold ${meta.badgeBg}`}>
                   <SubIcon className="h-3.5 w-3.5" />
-                  Lớp {cls.grade_id} • {cls.subject_name}
+                  {cls.grade_id === 0 ? "Lập trình" : `Lớp ${cls.grade_id}`} • {cls.subject_name}
                 </span>
                 <div className="flex items-center gap-1.5">
                   {cls.is_live && (
@@ -833,9 +909,63 @@ export function ClassroomManager({
               </div>
             )}
 
-            {/* SUBTAB 1: GIAO GIÁO ÁN & BÀI KIỂM TRA TRỰC TUYẾN */}
+            {/* SUBTAB 1: GIAO GIÁO ÁN, KHÓA LẬP TRÌNH & BÀI KIỂM TRA TRỰC TUYẾN */}
             {subTab === "curriculum" && (
-              <div className="grid gap-6 lg:grid-cols-2">
+              <div className="space-y-6">
+                {/* Khối Giao Khóa Thực hành Lập trình (HTML, CSS, JS, TS, Go, Py, MongoDB, PostgreSQL) */}
+                <div className="space-y-3 rounded-2xl border border-indigo-200 bg-indigo-50/35 p-4">
+                  <h4 className="flex items-center gap-1.5 text-sm font-bold text-indigo-950">
+                    <Code2 className="h-4 w-4 text-indigo-600" />
+                    Khóa Thực hành Lập trình trên trình duyệt đã giao ({codingAssignments.length} khóa)
+                  </h4>
+                  <div className="flex flex-wrap gap-2">
+                    <select
+                      value={pickedCodingTrack}
+                      onChange={(e) => setPickedCodingTrack(e.target.value)}
+                      className="min-w-[240px] flex-1 rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-semibold"
+                    >
+                      {CODING_TRACKS.map((t) => (
+                        <option key={t.id} value={t.id}>
+                          [{t.category}] {t.name} ({t.lessons.length} bài chấm test)
+                        </option>
+                      ))}
+                    </select>
+                    <button
+                      type="button"
+                      onClick={() => void handleAssignItem("coding")}
+                      className="shrink-0 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-bold text-white hover:bg-indigo-500"
+                    >
+                      + Giao khóa Code
+                    </button>
+                  </div>
+
+                  {codingAssignments.length > 0 && (
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      {codingAssignments.map((a) => (
+                        <div
+                          key={a.id}
+                          className="flex items-center justify-between gap-2 rounded-xl bg-white p-3 ring-1 ring-indigo-200"
+                        >
+                          <div className="min-w-0">
+                            <span className="text-[10px] font-bold uppercase text-indigo-600">
+                              Thực hành Code • {a.item_id.toUpperCase()}
+                            </span>
+                            <p className="truncate text-xs font-bold text-slate-900">{a.item_title}</p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => void handleDeleteAssignment(a.id)}
+                            className="rounded-lg p-1.5 text-rose-500 hover:bg-rose-50"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="grid gap-6 lg:grid-cols-2">
                 {/* Cột Giáo án bài giảng */}
                 <div className="space-y-3 rounded-2xl border border-slate-200 bg-slate-50/50 p-4">
                   <h4 className="flex items-center gap-1.5 text-sm font-bold text-slate-900">
@@ -954,6 +1084,7 @@ export function ClassroomManager({
                       ))
                     )}
                   </div>
+                </div>
                 </div>
               </div>
             )}

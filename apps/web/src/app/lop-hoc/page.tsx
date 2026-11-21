@@ -9,6 +9,7 @@ import {
   Calendar,
   CheckCircle2,
   ClipboardCheck,
+  Code2,
   KeyRound,
   LogIn,
   Play,
@@ -43,7 +44,7 @@ interface ClassroomSummary {
 
 interface AssignmentItem {
   id: string;
-  item_type: "lesson" | "exam";
+  item_type: "lesson" | "exam" | "coding";
   item_id: string;
   item_title: string;
   due_at: string;
@@ -60,7 +61,7 @@ interface GradeRow {
 export default function ClassroomsPage() {
   const { user, accessToken } = useAuth();
   const [tab, setTab] = useState<"explore" | "mine">("explore");
-  const [gradeFilter, setGradeFilter] = useState<number>(0);
+  const [gradeFilter, setGradeFilter] = useState<string>("all");
   const [classrooms, setClassrooms] = useState<ClassroomSummary[]>([]);
   const [joinCode, setJoinCode] = useState("");
   const [toast, setToast] = useState<{ type: "ok" | "err"; msg: string } | null>(null);
@@ -94,7 +95,7 @@ export default function ClassroomsPage() {
       return;
     }
 
-    const q = gradeFilter > 0 ? `?grade=${gradeFilter}` : "";
+    const q = gradeFilter !== "all" ? `?grade=${encodeURIComponent(gradeFilter)}` : "";
     const res = await fetch(`${CORE_API_URL}/api/v1/classrooms${q}`, { headers });
     if (res.ok) {
       const d = await res.json();
@@ -165,6 +166,7 @@ export default function ClassroomsPage() {
   // === MÀN HÌNH CHI TIẾT LỚP HỌC (GIÁO ÁN + BÀI KIỂM TRA TRỰC TUYẾN) ===
   if (activeClassId && classDetail) {
     const lessons = classDetail.assignments.filter((a) => a.item_type === "lesson");
+    const codingTasks = classDetail.assignments.filter((a) => a.item_type === "coding");
     const exams = classDetail.assignments.filter((a) => a.item_type === "exam");
     const meta = getSubjectMeta(classDetail.classroom.subject_code, classDetail.classroom.subject_name);
     const SubIcon = meta.icon;
@@ -255,7 +257,10 @@ export default function ClassroomsPage() {
               <div className="flex flex-wrap items-center gap-2 text-xs font-bold">
                 <span className="inline-flex items-center gap-1 rounded-full bg-white/15 px-3 py-0.5 text-indigo-200">
                   <SubIcon className="h-3.5 w-3.5" />
-                  Lớp {classDetail.classroom.grade_id} • {classDetail.classroom.subject_name}
+                  {classDetail.classroom.grade_id === 0
+                    ? "Lớp Lập trình Cộng đồng"
+                    : `Lớp ${classDetail.classroom.grade_id}`}{" "}
+                  • {classDetail.classroom.subject_name}
                 </span>
                 <span className="rounded-full bg-emerald-500/20 px-2.5 py-0.5 font-mono text-emerald-300">
                   Mã lớp: {classDetail.classroom.code}
@@ -281,8 +286,37 @@ export default function ClassroomsPage() {
         </div>
 
         <div className="grid gap-6 lg:grid-cols-12">
-          {/* CỘT TRÁI: LỘ TRÌNH GIÁO ÁN + BÀI KIỂM TRA */}
+          {/* CỘT TRÁI: KHÓA CODE + LỘ TRÌNH GIÁO ÁN + BÀI KIỂM TRA */}
           <div className="space-y-5 lg:col-span-5">
+            {/* Bài Thực hành Lập trình trong lớp (nếu có) */}
+            {codingTasks.length > 0 && (
+              <div className="rounded-2xl border border-indigo-200 bg-indigo-50/40 p-5 shadow-xs space-y-3">
+                <h2 className="flex items-center gap-2 text-base font-bold text-indigo-950">
+                  <Code2 className="h-5 w-5 text-indigo-600" />
+                  Thực hành Lập trình trên trình duyệt ({codingTasks.length} khóa)
+                </h2>
+                <div className="space-y-2">
+                  {codingTasks.map((c) => (
+                    <Link
+                      key={c.id}
+                      href={`/lap-trinh?track=${encodeURIComponent(c.item_id)}`}
+                      className="flex items-center justify-between gap-2 rounded-xl border border-indigo-200 bg-white p-3.5 hover:border-indigo-500 hover:bg-indigo-50/50 transition"
+                    >
+                      <div className="min-w-0">
+                        <span className="text-[10px] font-extrabold uppercase text-indigo-600">
+                          {c.item_id.toUpperCase()} • Chấm test tự động
+                        </span>
+                        <p className="mt-0.5 text-sm font-bold text-slate-900">{c.item_title}</p>
+                      </div>
+                      <span className="shrink-0 rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-bold text-white">
+                        Code ngay →
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Giáo án của lớp */}
             <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs space-y-3">
               <h2 className="flex items-center gap-2 text-base font-bold text-slate-900">
@@ -419,6 +453,7 @@ export default function ClassroomsPage() {
         </div>
 
         <form
+          data-tour="join-code-input"
           onSubmit={(e) => {
             e.preventDefault();
             if (joinCode.trim()) void handleJoin({ code: joinCode.trim() });
@@ -492,13 +527,17 @@ export default function ClassroomsPage() {
 
         {tab === "explore" && (
           <select
+            data-tour="classroom-filter"
             value={gradeFilter}
-            onChange={(e) => setGradeFilter(Number(e.target.value))}
+            onChange={(e) => setGradeFilter(e.target.value)}
             className="rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-bold text-slate-700"
           >
-            <option value={0}>Tất cả Lớp 1–12</option>
+            <option value="all">Tất cả (Lập trình &amp; Lớp 1–12)</option>
+            <option value="coding">Lớp Lập trình Cộng đồng</option>
             {Array.from({ length: 12 }, (_, i) => i + 1).map((g) => (
-              <option key={g} value={g}>Lớp {g}</option>
+              <option key={g} value={String(g)}>
+                Lớp {g}
+              </option>
             ))}
           </select>
         )}
@@ -517,7 +556,7 @@ export default function ClassroomsPage() {
           </Link>
         </div>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div data-tour="classroom-grid" className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {classrooms.map((cls) => {
             const meta = getSubjectMeta(cls.subject_code, cls.subject_name);
             const SubIcon = meta.icon;
@@ -530,7 +569,7 @@ export default function ClassroomsPage() {
                   <div className="flex items-center justify-between gap-2">
                     <span className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-bold ${meta.badgeBg}`}>
                       <SubIcon className="h-3.5 w-3.5" />
-                      Lớp {cls.grade_id} • {cls.subject_name}
+                      {cls.grade_id === 0 ? "Lập trình" : `Lớp ${cls.grade_id}`} • {cls.subject_name}
                     </span>
                     <div className="flex items-center gap-1.5">
                       {cls.is_live && (

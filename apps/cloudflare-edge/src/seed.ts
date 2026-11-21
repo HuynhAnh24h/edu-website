@@ -11,6 +11,14 @@ export const SUBJECT_NAMES: Record<string, string> = {
   "lich-su": "Lịch sử",
   "dia-ly": "Địa lý",
   "tin-hoc": "Tin học",
+  html: "Lập trình HTML5",
+  css: "Thiết kế CSS3",
+  javascript: "Lập trình JavaScript",
+  typescript: "Lập trình TypeScript",
+  python: "Lập trình Python",
+  golang: "Lập trình Golang",
+  mongodb: "Cơ sở dữ liệu MongoDB",
+  postgresql: "Cơ sở dữ liệu PostgreSQL",
 };
 
 export function slugify(s: string): string {
@@ -113,6 +121,53 @@ export async function ensureSeeded(db: D1Database): Promise<void> {
       );
     });
     await db.batch(clsStmts);
+  }
+
+  // Luôn đảm bảo có sẵn 2 Lớp Lập trình Cộng đồng mẫu (grade_id = 0) để học sinh & giáo viên thử ngay
+  const codeClsRow = await db
+    .prepare("SELECT COUNT(*) as cnt FROM classrooms WHERE grade_id = 0")
+    .first<{ cnt: number }>();
+  if (!codeClsRow || codeClsRow.cnt === 0) {
+    await db.batch([
+      db
+        .prepare(
+          "INSERT OR IGNORE INTO classrooms (id, code, name, grade_id, subject_code, subject_name, teacher_id, teacher_name, description, allow_self_enroll) VALUES (?, ?, ?, 0, 'javascript', 'Lập trình JavaScript', 'u-teacher-1', 'Thầy Nguyễn Văn Minh (Mentor Dev)', ?, 1)"
+        )
+        .bind(
+          "cls-code-web",
+          "CODE-JS01",
+          "Lớp Lập trình Web Cộng đồng — HTML, CSS, JavaScript & TypeScript",
+          "Thực hành code trực tiếp trên trình duyệt có chấm test tự động, học Livestream cùng mentor và hỗ trợ tư duy 3 tầng."
+        ),
+      db
+        .prepare(
+          "INSERT OR IGNORE INTO classrooms (id, code, name, grade_id, subject_code, subject_name, teacher_id, teacher_name, description, allow_self_enroll) VALUES (?, ?, ?, 0, 'golang', 'Lập trình Golang', 'u-teacher-1', 'Thầy Nguyễn Văn Minh (Mentor Dev)', ?, 1)"
+        )
+        .bind(
+          "cls-code-be",
+          "CODE-GO01",
+          "Lớp Backend Thực chiến — Golang, Python, MongoDB & PostgreSQL",
+          "Xây dựng tư duy Backend & Database thực tế: biên dịch Go thật, chạy Python WebAssembly và truy vấn SQL/NoSQL ngay trên web."
+        ),
+      db.prepare(
+        "INSERT OR IGNORE INTO classroom_assignments (id, classroom_id, item_type, item_id, item_title, display_order) VALUES ('asg-code-html', 'cls-code-web', 'coding', 'html', 'Khóa Thực hành HTML5 (3 bài có chấm test)', 1)"
+      ),
+      db.prepare(
+        "INSERT OR IGNORE INTO classroom_assignments (id, classroom_id, item_type, item_id, item_title, display_order) VALUES ('asg-code-css', 'cls-code-web', 'coding', 'css', 'Khóa Thực hành CSS3 Flexbox & Grid (3 bài)', 2)"
+      ),
+      db.prepare(
+        "INSERT OR IGNORE INTO classroom_assignments (id, classroom_id, item_type, item_id, item_title, display_order) VALUES ('asg-code-js', 'cls-code-web', 'coding', 'javascript', 'Khóa Thực hành JavaScript ES6+ (3 bài)', 3)"
+      ),
+      db.prepare(
+        "INSERT OR IGNORE INTO classroom_assignments (id, classroom_id, item_type, item_id, item_title, display_order) VALUES ('asg-code-go', 'cls-code-be', 'coding', 'golang', 'Khóa Thực hành Golang Compiler (3 bài)', 1)"
+      ),
+      db.prepare(
+        "INSERT OR IGNORE INTO classroom_assignments (id, classroom_id, item_type, item_id, item_title, display_order) VALUES ('asg-code-py', 'cls-code-be', 'coding', 'python', 'Khóa Thực hành Python WebAssembly (3 bài)', 2)"
+      ),
+      db.prepare(
+        "INSERT OR IGNORE INTO classroom_assignments (id, classroom_id, item_type, item_id, item_title, display_order) VALUES ('asg-code-pg', 'cls-code-be', 'coding', 'postgresql', 'Khóa Thực hành PostgreSQL & JOIN (3 bài)', 3)"
+      ),
+    ]);
   }
 
   const row = await db.prepare("SELECT COUNT(*) as cnt FROM lessons").first<{ cnt: number }>();

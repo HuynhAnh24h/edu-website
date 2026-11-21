@@ -172,7 +172,12 @@ function AuthPageInner() {
         if (!res.ok) {
           setError(res.error || "Đăng ký thất bại");
         } else {
-          router.push(role === "teacher" ? "/quan-tri" : "/");
+          // Kích hoạt Cú Bông Edu bay ra hào hứng dẫn đường ngay cho người mới đăng ký!
+          localStorage.setItem(
+            "eduk12_pending_tour",
+            role === "teacher" ? "teacher" : "student-classroom"
+          );
+          router.push(role === "teacher" ? "/quan-tri" : "/lop-hoc");
         }
       }
     } finally {

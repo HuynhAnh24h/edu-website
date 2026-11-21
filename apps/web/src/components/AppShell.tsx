@@ -6,15 +6,20 @@ import { Navbar } from "@/components/Navbar";
 import { MascotGuide } from "@/components/MascotGuide";
 
 /**
- * Tách biệt hoàn toàn giao diện Dashboard Quản trị (/quan-tri)
- * khỏi khung website Học sinh (Navbar + MascotGuide).
+ * Tách biệt giao diện Dashboard Quản trị (/quan-tri) khỏi khung Navbar Học sinh,
+ * nhưng vẫn cho phép Linh thú Cú Bông Edu bay hướng dẫn giáo viên mới đăng ký!
  */
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isAdminDashboard = pathname.startsWith("/quan-tri");
 
   if (isAdminDashboard) {
-    return <div className="min-h-screen bg-slate-100">{children}</div>;
+    return (
+      <div className="min-h-screen bg-slate-100">
+        {children}
+        <MascotGuide />
+      </div>
+    );
   }
 
   return (

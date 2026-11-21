@@ -634,6 +634,7 @@ export default function CMSAdminPage() {
                     <button
                       key={item.id}
                       type="button"
+                      data-tour={`sidebar-${item.id}`}
                       onClick={() => {
                         setActiveTab(item.id);
                         setSidebarOpen(false);
@@ -725,12 +726,25 @@ export default function CMSAdminPage() {
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <span className="hidden items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-[11px] font-bold text-emerald-700 sm:inline-flex">
-              <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-              Cloudflare Edge • ONLINE
-            </span>
             <button
               type="button"
+              onClick={() =>
+                window.dispatchEvent(
+                  new CustomEvent("eduk12:mascot-tour", {
+                    detail: {
+                      tour: "teacher",
+                      banner: "Hú hú! Cú Bông sẽ bay chỉ từng tính năng cho Thầy/Cô nhé!",
+                    },
+                  })
+                )
+              }
+              className="inline-flex items-center gap-1.5 rounded-xl border border-indigo-200 bg-indigo-50 px-3 py-1.5 text-xs font-bold text-indigo-700 hover:bg-indigo-100 transition"
+            >
+              <Sparkles className="h-3.5 w-3.5" /> Cú Bông dẫn đường
+            </button>
+            <button
+              type="button"
+              data-tour="header-live-btn"
               onClick={() => setActiveTab("live")}
               className="inline-flex items-center gap-1.5 rounded-xl bg-rose-600 px-3 py-1.5 text-xs font-bold text-white shadow-xs hover:bg-rose-500 transition"
             >
