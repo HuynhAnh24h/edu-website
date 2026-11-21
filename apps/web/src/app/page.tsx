@@ -187,6 +187,7 @@ export default function HomePage() {
             <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
               {subjectsInSelectedGrade.map((row) => {
                 const meta = getSubjectMeta(row.subject_code, row.subject_name);
+                const SubjectIcon = meta.icon;
                 return (
                   <Link
                     key={row.subject_code}
@@ -195,8 +196,8 @@ export default function HomePage() {
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-center gap-3">
-                        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white text-2xl shadow-xs">
-                          {meta.emoji}
+                        <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white shadow-xs ${meta.iconBoxBg.split(" ")[1]}`}>
+                          <SubjectIcon className="h-5 w-5" strokeWidth={2.2} />
                         </span>
                         <div>
                           <h3 className="text-base font-bold text-slate-900">

@@ -13,6 +13,7 @@ import {
   FileText,
   FolderOpen,
   Layers,
+  LayoutGrid,
   PlayCircle,
   Search,
 } from "lucide-react";
@@ -223,19 +224,21 @@ function MaterialsTreeContent() {
             </span>
             <button
               onClick={() => setSelectedSubject("all")}
-              className={`rounded-lg px-3 py-1 text-xs font-bold transition ${
+              className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1 text-xs font-bold transition ${
                 selectedSubject === "all"
                   ? "bg-slate-900 text-white"
                   : "bg-slate-100 text-slate-700 hover:bg-slate-200"
               }`}
             >
-              📚 Tất cả các môn ({subjectsForGrade.reduce((a, b) => a + b.lesson_count, 0) || lessonIndex.length} bài)
+              <LayoutGrid className="h-3.5 w-3.5" />
+              Tất cả các môn ({subjectsForGrade.reduce((a, b) => a + b.lesson_count, 0) || lessonIndex.length} bài)
             </button>
           </div>
 
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-5">
             {subjectsForGrade.map((sub) => {
               const meta = getSubjectMeta(sub.subject_code, sub.subject_name);
+              const SubjectIcon = meta.icon;
               const isSelected = selectedSubject === sub.subject_code;
               return (
                 <button
@@ -246,7 +249,13 @@ function MaterialsTreeContent() {
                     isSelected ? meta.activeRing : meta.cardBg
                   }`}
                 >
-                  <span className="text-xl leading-none">{meta.emoji}</span>
+                  <span
+                    className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${
+                      isSelected ? "bg-white/20 text-white" : `bg-white shadow-2xs ${meta.iconBoxBg.split(" ")[1]}`
+                    }`}
+                  >
+                    <SubjectIcon className="h-4 w-4" strokeWidth={2.2} />
+                  </span>
                   <div className="min-w-0">
                     <p className={`truncate text-xs font-bold ${isSelected ? "text-white" : "text-slate-900"}`}>
                       {sub.subject_name}
