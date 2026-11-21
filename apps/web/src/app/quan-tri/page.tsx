@@ -41,6 +41,7 @@ import { CommunityModerationPanel } from "@/components/cms/CommunityModerationPa
 import { SafetyCenterPanel } from "@/components/cms/SafetyCenterPanel";
 import { ExamLevelControlPanel } from "@/components/cms/ExamLevelControlPanel";
 import { TeacherVerificationPanel } from "@/components/cms/TeacherVerificationPanel";
+import { StorageQuotaPanel, StorageStatsPayload } from "@/components/cms/StorageQuotaPanel";
 import { CuBongLogoMark } from "@/components/BrandLogo";
 import {
   createEmptyDraftQuestion,
@@ -94,6 +95,7 @@ type DashboardTab =
   | "exam_levels"
   | "verifications"
   | "safety"
+  | "storage"
   | "community"
   | "users";
 
@@ -137,6 +139,10 @@ const TAB_META: Record<DashboardTab, { title: string; subtitle: string }> = {
   safety: {
     title: "Trung tâm An toàn & BOT Quét Vi phạm",
     subtitle: "Xử lý cảnh báo bạo lực, quấy rối tình dục, kẻ mạo danh giáo viên, giáo án kém chất lượng — khóa acc & xuất hồ sơ bằng chứng cho Công an.",
+  },
+  storage: {
+    title: "Kho Lưu trữ & Dung lượng Tài liệu",
+    subtitle: "Theo dõi dung lượng thực tế (khóa trần an toàn 0đ), kiểm soát tệp đề thi PDF/Word/Ảnh và xóa giải phóng bộ nhớ.",
   },
   community: {
     title: "Kiểm duyệt Mạng Xã Hội Giáo Viên",
@@ -200,6 +206,7 @@ export default function CMSAdminPage() {
   const [totalExams, setTotalExams] = useState<number>(0);
   const [totalGraded, setTotalGraded] = useState<number>(0);
   const [openSafetyCount, setOpenSafetyCount] = useState<number>(0);
+  const [storageSummary, setStorageSummary] = useState<StorageStatsPayload | null>(null);
   const [myClassrooms, setMyClassrooms] = useState<DashboardClassroom[]>([]);
 
   // === Tab: Soạn Bài giảng kiểu Word + Câu hỏi đính kèm trực quan ===
@@ -279,12 +286,20 @@ export default function CMSAdminPage() {
         setTotalGraded(Number(d.total_graded || 0));
       }
       if (isAdmin) {
-        const safRes = await fetch(`${CORE_API_URL}/api/v1/admin/safety/incidents`, {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        });
+        const [safRes, stoRes] = await Promise.all([
+          fetch(`${CORE_API_URL}/api/v1/admin/safety/incidents`, {
+            headers: { Authorization: `Bearer ${accessToken}` },
+          }),
+          fetch(`${CORE_API_URL}/api/v1/admin/storage/stats`, {
+            headers: { Authorization: `Bearer ${accessToken}` },
+          }),
+        ]);
         if (safRes.ok) {
           const sd = await safRes.json();
           setOpenSafetyCount(Number(sd.summary?.open_count || 0));
+        }
+        if (stoRes.ok) {
+          setStorageSummary((await stoRes.json()) as StorageStatsPayload);
         }
       }
     } catch {
@@ -618,6 +633,14 @@ export default function CMSAdminPage() {
                 icon: ShieldAlert,
               },
               {
+                id: "storage" as DashboardTab,
+                label: "Kho Lưu trữ & Dung lượng",
+                desc: storageSummary
+                  ? `${storageSummary.used_mb} MB / ${storageSummary.safety_cap_gb} GB`
+                  : "Theo dõi hạn mức 0đ & tệp",
+                icon: Database,
+              },
+              {
                 id: "community" as DashboardTab,
                 label: "Kiểm duyệt MXH Giáo viên",
                 desc: "Ghim bài hay & duyệt nội dung",
@@ -867,6 +890,35 @@ export default function CMSAdminPage() {
                   </div>
                 </div>
               </div>
+
+              {/* Thanh theo dõi Dung lượng Kho Tài liệu trực tiếp cho Admin */}
+              {isAdmin && storageSummary && (
+                <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-emerald-200 bg-white p-4 shadow-xs">
+                  <div className="flex-1 min-w-[240px] space-y-1.5">
+                    <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+                      <span className="font-extrabold text-slate-900">
+                        Kho Lưu trữ Đề thi &amp; Tài liệu ({storageSummary.backend === "r2_10gb_free" ? "R2 10 GB Free" : "KV 1 GB Free"})
+                      </span>
+                      <span className="font-bold text-emerald-700">
+                        {storageSummary.used_mb} MB / {storageSummary.safety_cap_gb} GB ({storageSummary.percent_used}%) • {storageSummary.total_files} tệp
+                      </span>
+                    </div>
+                    <div className="h-2 overflow-hidden rounded-full bg-slate-100">
+                      <div
+                        className="h-full rounded-full bg-emerald-500 transition-all"
+                        style={{ width: `${Math.max(storageSummary.used_bytes > 0 ? 2 : 0, storageSummary.percent_used)}%` }}
+                      />
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("storage")}
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-slate-900 px-4 py-2 text-xs font-bold text-white hover:bg-indigo-600 transition"
+                  >
+                    <Database className="h-3.5 w-3.5" /> Quản lý Kho tệp →
+                  </button>
+                </div>
+              )}
 
               {/* 4 KPI Cards */}
               <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -1587,6 +1639,15 @@ export default function CMSAdminPage() {
               accessToken={accessToken}
               onToast={showToast}
               onSummaryChange={setOpenSafetyCount}
+            />
+          )}
+
+          {/* === TAB 6A2: KHO LƯU TRỮ & DUNG LƯỢNG TÀI LIỆU (ADMIN) === */}
+          {activeTab === "storage" && isAdmin && (
+            <StorageQuotaPanel
+              accessToken={accessToken}
+              onToast={showToast}
+              onStatsLoaded={setStorageSummary}
             />
           )}
 

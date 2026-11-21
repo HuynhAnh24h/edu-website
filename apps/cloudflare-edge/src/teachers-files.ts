@@ -75,26 +75,58 @@ export async function handleTeachersAndFilesRoutes(
   r2?: R2Bucket
 ): Promise<Response | null> {
   // =========================================================================
-  // 0. THỐNG KÊ DUNG LƯỢNG LƯU TRỮ TÀI LIỆU & ĐỀ THI (ADMIN)
+  // 0. THỐNG KÊ DUNG LƯỢNG & QUẢN LÝ TỆP ĐỀ THI / TÀI LIỆU (ADMIN)
   // =========================================================================
   if (path === "/api/v1/admin/storage/stats" && method === "GET") {
     if (!claims || !isAdminRole(claims.role)) {
       return jsonRes({ error: "Chỉ Quản trị viên mới được xem thống kê dung lượng" }, 403);
     }
-    const agg = await db
-      .prepare("SELECT COUNT(*) as total_files, COALESCE(SUM(size_bytes), 0) as total_bytes FROM uploaded_files")
-      .first<{ total_files: number; total_bytes: number }>();
+    const [agg, recentRes] = await Promise.all([
+      db
+        .prepare("SELECT COUNT(*) as total_files, COALESCE(SUM(size_bytes), 0) as total_bytes FROM uploaded_files")
+        .first<{ total_files: number; total_bytes: number }>(),
+      db
+        .prepare(
+          "SELECT id, uploader_id, uploader_name, filename, mime_type, size_bytes, purpose, created_at FROM uploaded_files ORDER BY created_at DESC LIMIT 80"
+        )
+        .all<Record<string, unknown>>(),
+    ]);
     const usedBytes = Number(agg?.total_bytes || 0);
     const capBytes = r2 ? R2_FREE_SAFETY_CAP_BYTES : KV_FREE_SAFETY_CAP_BYTES;
     return jsonRes({
       backend: r2 ? "r2_10gb_free" : "kv_1gb_free",
+      max_file_mb: r2 ? 20 : 5,
       total_files: Number(agg?.total_files || 0),
       used_bytes: usedBytes,
       used_mb: Math.round((usedBytes / (1024 * 1024)) * 100) / 100,
       safety_cap_gb: r2 ? 9.5 : 0.9,
       free_tier_gb: r2 ? 10 : 1,
       percent_used: Math.min(100, Math.round((usedBytes / capBytes) * 10000) / 100),
+      files: recentRes.results.map((f) => ({
+        id: String(f.id),
+        uploader_name: String(f.uploader_name || ""),
+        filename: String(f.filename || ""),
+        mime_type: String(f.mime_type || ""),
+        size_bytes: Number(f.size_bytes || 0),
+        purpose: String(f.purpose || "general"),
+        created_at: String(f.created_at || ""),
+        url: `/api/v1/files/${String(f.id)}`,
+      })),
     });
+  }
+
+  const delFileMatch = path.match(/^\/api\/v1\/admin\/storage\/files\/([^/]+)$/);
+  if (delFileMatch && method === "DELETE") {
+    if (!claims || !isAdminRole(claims.role)) {
+      return jsonRes({ error: "Chỉ Quản trị viên mới được xóa tệp lưu trữ" }, 403);
+    }
+    const fileId = decodeURIComponent(delFileMatch[1]);
+    await Promise.all([
+      r2 ? r2.delete(`materials/${fileId}`).catch(() => {}) : Promise.resolve(),
+      kv.delete(`file:${fileId}`).catch(() => {}),
+      db.prepare("DELETE FROM uploaded_files WHERE id = ?").bind(fileId).run(),
+    ]);
+    return jsonRes({ ok: true, message: "Đã xóa tệp và giải phóng dung lượng kho tài liệu!" });
   }
 
   // =========================================================================
