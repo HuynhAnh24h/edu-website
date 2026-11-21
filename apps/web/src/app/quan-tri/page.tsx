@@ -37,6 +37,7 @@ import { BulkImportPanel } from "@/components/cms/BulkImportPanel";
 import { ClassroomManager } from "@/components/cms/ClassroomManager";
 import { RichWordEditor } from "@/components/cms/RichWordEditor";
 import { UserManagementPanel } from "@/components/cms/UserManagementPanel";
+import { CuBongLogoMark } from "@/components/BrandLogo";
 import {
   createEmptyDraftQuestion,
   DraftQuestion,
@@ -597,9 +598,7 @@ export default function CMSAdminPage() {
         {/* Brand Header */}
         <div className="flex items-center justify-between border-b border-slate-800/80 px-5 py-4">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white shadow-md">
-              <GraduationCap className="h-5 w-5" />
-            </div>
+            <CuBongLogoMark className="h-9 w-9 shadow-md" />
             <div>
               <p className="text-sm font-extrabold tracking-tight text-white">
                 EduK12 <span className="text-indigo-400">Studio</span>

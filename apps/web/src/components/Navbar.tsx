@@ -9,7 +9,6 @@ import {
   CheckSquare,
   ChevronDown,
   Code2,
-  GraduationCap,
   LayoutDashboard,
   LogIn,
   LogOut,
@@ -20,6 +19,7 @@ import {
   X,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { CuBongLogoMark } from "@/components/BrandLogo";
 
 const MAIN_LINKS = [
   { href: "/", label: "Trang chủ" },
@@ -44,13 +44,11 @@ export function Navbar() {
   const isMoreActive = MORE_LINKS.some((l) => pathname.startsWith(l.href));
 
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/90 backdrop-blur-md">
+    <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/85 shadow-[0_1px_12px_rgba(15,23,42,0.04)] backdrop-blur-lg">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
-        {/* Logo gọn gàng */}
-        <Link href="/" className="flex shrink-0 items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 text-white shadow-sm">
-            <GraduationCap className="h-5 w-5" />
-          </div>
+        {/* Logo Cú Bông Edu tinh tế */}
+        <Link href="/" className="group flex shrink-0 items-center gap-2.5">
+          <CuBongLogoMark className="h-10 w-10 shadow-sm transition-transform duration-200 group-hover:scale-105" />
           <div className="leading-none">
             <span className="text-base font-extrabold tracking-tight text-slate-900">
               EduK12 <span className="text-indigo-600">Open</span>
