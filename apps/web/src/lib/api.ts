@@ -1,7 +1,7 @@
 export const CORE_API_URL =
-  process.env.NEXT_PUBLIC_CORE_API_URL || "http://localhost:8080";
+  process.env.NEXT_PUBLIC_CORE_API_URL ?? "http://localhost:8080";
 export const AI_API_URL =
-  process.env.NEXT_PUBLIC_AI_API_URL || "http://localhost:8001";
+  process.env.NEXT_PUBLIC_AI_API_URL ?? "http://localhost:8001";
 
 export interface Grade {
   id: number;

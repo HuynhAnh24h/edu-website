@@ -1,13 +1,14 @@
 import json
 import time
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator
+from typing import AsyncGenerator, List
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
+from app.exam_parser import parse_raw_exam_text
 from app.rag_store import (
     add_knowledge_chunk,
     init_pgvector_store,
@@ -95,6 +96,50 @@ async def ingest_knowledge(req: IngestKnowledgeRequest):
     if not chunk_id:
         raise HTTPException(status_code=400, detail="Không thể nạp tri thức vào pgvector (kiểm tra mã môn học).")
     return {"id": chunk_id, "status": "indexed_in_pgvector"}
+
+
+class BulkKnowledgeRequest(BaseModel):
+    items: List[IngestKnowledgeRequest]
+
+
+@app.post("/api/v1/ai/knowledge/bulk")
+async def bulk_ingest_knowledge(req: BulkKnowledgeRequest):
+    indexed = 0
+    for item in req.items:
+        try:
+            cid = add_knowledge_chunk(
+                grade_id=item.grade_id,
+                subject_code=item.subject_code,
+                textbook=item.textbook,
+                citation=item.citation,
+                content=item.content,
+            )
+            if cid:
+                indexed += 1
+        except Exception:
+            continue
+    return {"total": len(req.items), "indexed": indexed, "status": "bulk_indexed_in_pgvector"}
+
+
+class ParseExamRequest(BaseModel):
+    raw_text: str = Field(min_length=10)
+    grade_id: int = Field(ge=1, le=12, default=12)
+    subject_code: str = Field(default="toan")
+    topic: str = Field(default="Đề thi tổng hợp")
+
+
+@app.post("/api/v1/ai/parse-exam")
+async def parse_exam(req: ParseExamRequest):
+    questions = parse_raw_exam_text(
+        raw_text=req.raw_text,
+        grade_id=req.grade_id,
+        subject_code=req.subject_code,
+        default_topic=req.topic,
+    )
+    return {
+        "count": len(questions),
+        "questions": questions,
+    }
 
 
 def sse_event(event_name: str, data: dict) -> str:

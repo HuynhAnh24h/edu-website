@@ -1,0 +1,91 @@
+name: CI/CD — Build, Test & Publish Production Images
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  verify-go:
+    name: Verify Go Core/Exam API
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: services/core-api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.26"
+      - run: go build ./...
+
+  verify-python:
+    name: Verify Python AI Tutor & Exam Parser
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: services/ai-tutor
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - run: |
+          python -c "
+          from app.exam_parser import parse_raw_exam_text
+          qs = parse_raw_exam_text('Câu 1. 1+1=?\nA. 1\nB. 2\nC. 3\nD. 4\nĐáp án: B', 12, 'toan')
+          assert len(qs) == 1 and qs[0]['answer_single'] == 'B'
+          print('Parser CI check OK')
+          "
+
+  verify-web:
+    name: Verify Next.js Production Build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm ci
+      - run: npm run build
+        env:
+          NEXT_PUBLIC_CORE_API_URL: ""
+          NEXT_PUBLIC_AI_API_URL: ""
+
+  publish-docker:
+    name: Publish Production Docker Images (GHCR)
+    needs: [verify-go, verify-python, verify-web]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - name: web
+            context: apps/web
+          - name: core-api
+            context: services/core-api
+          - name: ai-tutor
+            context: services/ai-tutor
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.context }}
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/edu-website/${{ matrix.name }}:latest
+            ghcr.io/${{ github.repository_owner }}/edu-website/${{ matrix.name }}:${{ github.sha }}

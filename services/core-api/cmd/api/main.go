@@ -389,6 +389,48 @@ func main() {
 		writeJSON(w, http.StatusCreated, map[string]any{"exam": ex})
 	}))
 
+	// === BULK IMPORT PRODUCTION (Nhập hàng loạt Bài giảng 1-12 & Đề thi chuẩn) ===
+	mux.HandleFunc("POST /api/v1/cms/import/lessons", requireStaff(func(w http.ResponseWriter, r *http.Request) {
+		var req struct {
+			Lessons []db.CreateLessonInput `json:"lessons"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil || len(req.Lessons) == 0 {
+			writeJSON(w, http.StatusBadRequest, map[string]string{"error": "cần truyền mảng 'lessons' hợp lệ"})
+			return
+		}
+		report := repo.BulkImportLessonsCMS(r.Context(), req.Lessons)
+		writeJSON(w, http.StatusOK, report)
+	}))
+
+	mux.HandleFunc("POST /api/v1/cms/import/exams", requireStaff(func(w http.ResponseWriter, r *http.Request) {
+		var req struct {
+			Exams []db.BulkExamImportInput `json:"exams"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil || len(req.Exams) == 0 {
+			writeJSON(w, http.StatusBadRequest, map[string]string{"error": "cần truyền mảng 'exams' hợp lệ"})
+			return
+		}
+		staffID := auth.ClaimsFromContext(r.Context()).UserID
+		created := make([]models.ExamSummary, 0, len(req.Exams))
+		var errs []string
+		for idx, exIn := range req.Exams {
+			exIn.CreatedBy = staffID
+			ex, err := repo.BulkImportExamWithQuestionsCMS(r.Context(), exIn)
+			if err != nil {
+				errs = append(errs, "Đề #"+strconv.Itoa(idx+1)+" ("+exIn.Title+"): "+err.Error())
+				continue
+			}
+			_ = examEngine.BuildAndCacheEncryptedBundle(r.Context(), ex.ID)
+			created = append(created, ex)
+		}
+		writeJSON(w, http.StatusOK, map[string]any{
+			"total":    len(req.Exams),
+			"imported": len(created),
+			"exams":    created,
+			"errors":   errs,
+		})
+	}))
+
 	mux.HandleFunc("GET /api/v1/admin/users", requireAdmin(func(w http.ResponseWriter, r *http.Request) {
 		users, err := repo.ListUsers(r.Context())
 		if err != nil {

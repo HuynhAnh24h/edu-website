@@ -1,0 +1,251 @@
+{
+  "lessons": [
+    {
+      "grade_id": 1,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 1: Các số từ 0 đến 10",
+      "title": "Đếm, đọc, viết và so sánh các số trong phạm vi 10",
+      "summary": "Nhận biết số lượng đồ vật, so sánh lớn hơn (>), bé hơn (<), bằng nhau (=).",
+      "content_mdx": "### 1. Thứ tự các số từ 0 đến 10\n$$0 < 1 < 2 < 3 < 4 < 5 < 6 < 7 < 8 < 9 < 10$$\n\n### 2. Mẹo nhớ dấu lớn hơn và bé hơn\n- Đầu nhọn luôn chỉ về phía **số bé hơn**: $3 < 7$, $9 > 5$.\n- Hai số giống nhau dùng dấu bằng: $6 = 6$.",
+      "duration_min": 15,
+      "materials": [
+        { "title": "Phiếu luyện tập nhận biết số 0–10 (PDF)", "type": "pdf", "url": "#cdn-r2-toan1-ch1", "is_free": true }
+      ]
+    },
+    {
+      "grade_id": 1,
+      "subject_code": "ngu-van",
+      "textbook": "kntt",
+      "chapter": "Chủ đề 1: Làm quen với chữ cái và thanh điệu",
+      "title": "6 Thanh điệu tiếng Việt và ghép vần cơ bản",
+      "summary": "Phân biệt thanh ngang, huyền, sắc, hỏi, ngã, nặng qua hình ảnh trực quan.",
+      "content_mdx": "### 1. Sáu thanh điệu trong tiếng Việt\n- **Thanh ngang:** `ba`, `ca`, `me`\n- **Thanh huyền (`\\`):** `bà`, `cà`, `mè`\n- **Thanh sắc (`/`):** `bá`, `cá`, `mé`\n- **Thanh hỏi (`?`):** `bả`, `cả`, `mẻ`\n- **Thanh ngã (`~`):** `bã`, `cã`, `mẽ`\n- **Thanh nặng (`.`):** `bạ`, `cạ`, `mẹ`",
+      "duration_min": 15,
+      "materials": [
+        { "title": "Bảng ghép vần lớp 1 in màu", "type": "pdf", "url": "#cdn-r2-tv1-ch1", "is_free": true }
+      ]
+    },
+    {
+      "grade_id": 2,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 2: Phép cộng, phép trừ có nhớ trong phạm vi 100",
+      "title": "Phép cộng có nhớ dạng 28 + 15 và giải toán có lời văn",
+      "summary": "Đặt tính thẳng hàng đơn vị, hàng chục và cộng có nhớ sang hàng chục.",
+      "content_mdx": "### Quy tắc đặt tính rồi tính\n1. Viết số hạng thứ hai dưới số hạng thứ nhất sao cho **hàng đơn vị thẳng hàng đơn vị**, **hàng chục thẳng hàng chục**.\n2. Cộng từ phải sang trái:\n$$28 + 15 = (20 + 10) + (8 + 5) = 30 + 13 = 43$$",
+      "duration_min": 20,
+      "materials": [
+        { "title": "50 bài cộng trừ có nhớ lớp 2", "type": "pdf", "url": "#cdn-r2-toan2-ch2", "is_free": true }
+      ]
+    },
+    {
+      "grade_id": 3,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 3: Biểu thức số và thứ tự thực hiện phép tính",
+      "title": "Tính giá trị biểu thức có dấu ngoặc và nhân chia trước",
+      "summary": "Quy tắc vàng tính giá trị biểu thức số cho học sinh lớp 3.",
+      "content_mdx": "### 3 Quy tắc bắt buộc nhớ\n1. Biểu thức chỉ có `+`, `-` (hoặc chỉ có `×`, `:`): tính từ **trái sang phải**.\n2. Biểu thức có đủ `+`, `-`, `×`, `:`: thực hiện **nhân, chia trước; cộng, trừ sau**.\n3. Biểu thức có dấu ngoặc `(...)`: tính **trong ngoặc trước**.\n\n**Ví dụ:** $(12 + 8) \\times 3 = 20 \\times 3 = 60$.",
+      "duration_min": 20,
+      "materials": [
+        { "title": "Chuyên đề Tính giá trị biểu thức lớp 3", "type": "pdf", "url": "#cdn-r2-toan3-ch3", "is_free": true }
+      ]
+    },
+    {
+      "grade_id": 3,
+      "subject_code": "tieng-anh",
+      "textbook": "general",
+      "chapter": "Unit 1: Hello & Classroom Language",
+      "title": "Chào hỏi, giới thiệu tên tuổi và đánh vần bảng chữ cái",
+      "summary": "Mẫu câu giao tiếp cơ bản: What's your name? How old are you?",
+      "content_mdx": "### Mẫu câu trọng tâm\n- **Hỏi tên:** *What's your name?* → *My name is Minh.*\n- **Hỏi tuổi:** *How old are you?* → *I'm eight years old.*\n- **Chào tạm biệt:** *Goodbye! See you again.*",
+      "duration_min": 15,
+      "materials": [
+        { "title": "Flashcard 30 từ vựng Tiếng Anh 3", "type": "flashcard", "url": "#cdn-r2-en3-u1", "is_free": true }
+      ]
+    },
+    {
+      "grade_id": 4,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 4: Hai bài toán điển hình (Tổng - Hiệu & Trung bình cộng)",
+      "title": "Tìm hai số khi biết Tổng và Hiệu của hai số đó",
+      "summary": "Công thức giải nhanh bài toán Tổng - Hiệu lớp 4 và ứng dụng.",
+      "content_mdx": "### Công thức cốt lõi\nKhi biết **Tổng** và **Hiệu** của hai số:\n$$\\text{Số lớn} = \\frac{\\text{Tổng} + \\text{Hiệu}}{2}, \\qquad \\text{Số bé} = \\frac{\\text{Tổng} - \\text{Hiệu}}{2}$$\n\n### Ví dụ\nTổng hai số là $40$, hiệu hai số là $10$.\n- Số lớn $= (40 + 10) : 2 = 25$.\n- Số bé $= (40 - 10) : 2 = 15$.",
+      "duration_min": 20,
+      "materials": [
+        { "title": "30 bài toán Tổng - Hiệu chọn lọc lớp 4", "type": "pdf", "url": "#cdn-r2-toan4-th", "is_free": true }
+      ]
+    },
+    {
+      "grade_id": 5,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 6: Toán chuyển động đều",
+      "title": "Vận tốc, Quãng đường, Thời gian (Ôn thi vào lớp 6 CLC)",
+      "summary": "Ba công thức chuyển động đều và bài toán hai xe đi ngược chiều, cùng chiều.",
+      "content_mdx": "### 1. Bộ ba công thức chuyển động\n$$v = \\frac{s}{t}, \\qquad s = v \\times t, \\qquad t = \\frac{s}{v}$$\n\n### 2. Hai vật chuyển động gặp nhau\n- **Đi ngược chiều:** $t_{\\text{gặp}} = \\dfrac{s}{v_1 + v_2}$\n- **Đi cùng chiều (đuổi kịp):** $t_{\\text{đuổi kịp}} = \\dfrac{s}{v_1 - v_2}$ (với $v_1 > v_2$).",
+      "duration_min": 25,
+      "materials": [
+        { "title": "Chuyên đề Toán chuyển động ôn thi lớp 6", "type": "pdf", "url": "#cdn-r2-toan5-cd", "is_free": true }
+      ]
+    },
+    {
+      "grade_id": 6,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 3: Số nguyên",
+      "title": "Tập hợp số nguyên Z, quy tắc cộng trừ và dấu ngoặc",
+      "summary": "Làm quen số nguyên âm, trục số nguyên và quy tắc phá ngoặc lớp 6.",
+      "content_mdx": "### 1. Tập hợp số nguyên\n$$\\mathbb{Z} = \\{\\dots, -3, -2, -1, 0, 1, 2, 3, \\dots\\}$$\n\n### 2. Quy tắc dấu ngoặc\n- Trước ngoặc là dấu **$(+)$**: giữ nguyên dấu các số hạng trong ngoặc.\n- Trước ngoặc là dấu **$(-)$**: đổi dấu **tất cả** các số hạng trong ngoặc (`+` thành `-`, `-` thành `+`).",
+      "duration_min": 25,
+      "materials": [
+        { "title": "Bài tập Số nguyên lớp 6 có lời giải", "type": "pdf", "url": "#cdn-r2-toan6-z", "is_free": true }
+      ]
+    },
+    {
+      "grade_id": 6,
+      "subject_code": "khtn",
+      "textbook": "kntt",
+      "chapter": "Chương 1: Mở đầu về Khoa học tự nhiên & Đo lường",
+      "title": "Các phép đo chiều dài, khối lượng, thời gian và nhiệt độ",
+      "summary": "Đơn vị đo chuẩn SI, giới hạn đo (GHĐ) và độ chia nhỏ nhất (ĐCNN).",
+      "content_mdx": "### Đơn vị chuẩn hệ SI\n- Chiều dài: mét ($\\text{m}$)\n- Khối lượng: kilôgam ($\\text{kg}$)\n- Thời gian: giây ($\\text{s}$)\n- Nhiệt độ: Kelvin ($\\text{K}$) hoặc độ Celsius ($^\\circ\\text{C}$): $T(\\text{K}) = t(^\\circ\\text{C}) + 273$.",
+      "duration_min": 20,
+      "materials": [
+        { "title": "Sơ đồ tư duy KHTN 6 Chương 1", "type": "mindmap", "url": "#cdn-r2-khtn6-1", "is_free": true }
+      ]
+    },
+    {
+      "grade_id": 7,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 1: Số hữu tỉ",
+      "title": "Lũy thừa với số mũ tự nhiên của một số hữu tỉ",
+      "summary": "5 công thức lũy thừa cực kỳ quan trọng dùng suốt THCS và THPT.",
+      "content_mdx": "### 5 Công thức lũy thừa cần thuộc lòng\n1. $x^m \\cdot x^n = x^{m+n}$\n2. $x^m : x^n = x^{m-n}$ ($x \\neq 0, m \\ge n$)\n3. $(x^m)^n = x^{m \\cdot n}$\n4. $(x \\cdot y)^n = x^n \\cdot y^n$\n5. $\\left(\\dfrac{x}{y}\\right)^n = \\dfrac{x^n}{y^n}$ ($y \\neq 0$).",
+      "duration_min": 25,
+      "materials": [
+        { "title": "Phiếu luyện tập Lũy thừa Toán 7", "type": "pdf", "url": "#cdn-r2-toan7-lt", "is_free": true }
+      ]
+    },
+    {
+      "grade_id": 8,
+      "subject_code": "khtn",
+      "textbook": "kntt",
+      "chapter": "Chương 1: Phản ứng hóa học & Mol",
+      "title": "Định luật bảo toàn khối lượng, Mol và Tỉ khối chất khí",
+      "summary": "Cân bằng phương trình hóa học và 4 công thức tính số mol cốt lõi.",
+      "content_mdx": "### 1. Định luật bảo toàn khối lượng\n$$m_{\\text{chất tham gia}} = m_{\\text{sản phẩm}}$$\n\n### 2. Công thức tính số mol ($n$)\n- Từ khối lượng: $n = \\dfrac{m}{M}$\n- Từ thể tích khí ở điều kiện chuẩn ($25^\\circ\\text{C}, 1\\text{ bar}$): $n = \\dfrac{V}{24{,}79}$\n- Từ nồng độ mol: $n = C_M \\cdot V_{\\text{dd}}$.",
+      "duration_min": 25,
+      "materials": [
+        { "title": "Bảng Hóa trị & Công thức Mol KHTN 8 (GDPT 2018)", "type": "pdf", "url": "#cdn-r2-khtn8-mol", "is_free": true }
+      ]
+    },
+    {
+      "grade_id": 9,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 4: Hệ thức lượng trong tam giác vuông",
+      "title": "Tỉ số lượng giác của góc nhọn (sin, cos, tan, cot)",
+      "summary": "Mẹo nhớ nhanh tỉ số lượng giác và ứng dụng đo chiều cao thực tế thi vào 10.",
+      "content_mdx": "### Công thức chuẩn trong tam giác vuông\n- $\\sin \\alpha = \\dfrac{\\text{Đối}}{\\text{Huyền}}$\n- $\\cos \\alpha = \\dfrac{\\text{Kề}}{\\text{Huyền}}$\n- $\\tan \\alpha = \\dfrac{\\text{Đối}}{\\text{Kề}}$\n- $\\cot \\alpha = \\dfrac{\\text{Kề}}{\\text{Đối}}$\n\n### Hệ thức cơ bản\n$$\\sin^2 \\alpha + \\cos^2 \\alpha = 1, \\qquad \\tan \\alpha \\cdot \\cot \\alpha = 1$$",
+      "duration_min": 30,
+      "materials": [
+        { "title": "20 bài toán thực tế Lượng giác thi vào 10", "type": "pdf", "url": "#cdn-r2-toan9-lg", "is_free": true }
+      ]
+    },
+    {
+      "grade_id": 9,
+      "subject_code": "ngu-van",
+      "textbook": "kntt",
+      "chapter": "Chuyên đề: Đọc hiểu & Nghị luận xã hội (Thi vào 10)",
+      "title": "Phương pháp viết đoạn văn Nghị luận xã hội 200 chữ đạt điểm tối đa",
+      "summary": "Cấu trúc 5 bước viết đoạn văn sắc bén, có dẫn chứng thực tế thuyết phục.",
+      "content_mdx": "### Công thức 5 bước viết đoạn văn 200 chữ\n1. **Mở đoạn (1–2 câu):** Nêu trực diện vấn đề nghị luận.\n2. **Giải thích (2 câu):** Cắt nghĩa ngắn gọn khái niệm cốt lõi.\n3. **Bàn luận & Chứng minh (5–6 câu):** Phân tích ý nghĩa + 1 dẫn chứng tiêu biểu, xác thực.\n4. **Phản đề (1–2 câu):** Phê phán biểu hiện trái ngược.\n5. **Bài học nhận thức & hành động (2 câu):** Liên hệ bản thân thế hệ trẻ.",
+      "duration_min": 25,
+      "materials": [
+        { "title": "Bộ 30 dẫn chứng Nghị luận xã hội cập nhật", "type": "pdf", "url": "#cdn-r2-van9-nlxh", "is_free": true }
+      ]
+    },
+    {
+      "grade_id": 10,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 4: Vectơ trong mặt phẳng",
+      "title": "Tích vô hướng của hai vectơ và ứng dụng tính góc, khoảng cách",
+      "summary": "Định nghĩa tích vô hướng, biểu thức tọa độ và điều kiện vuông góc.",
+      "content_mdx": "### 1. Định nghĩa tích vô hướng\n$$\\vec{a} \\cdot \\vec{b} = |\\vec{a}| \\cdot |\\vec{b}| \\cdot \\cos(\\vec{a}, \\vec{b})$$\n\n### 2. Biểu thức tọa độ trong mặt phẳng Oxy\nVới $\\vec{a} = (x_1; y_1)$ và $\\vec{b} = (x_2; y_2)$:\n- $\\vec{a} \\cdot \\vec{b} = x_1 x_2 + y_1 y_2$\n- $\\vec{a} \\perp \\vec{b} \\Leftrightarrow x_1 x_2 + y_1 y_2 = 0$.",
+      "duration_min": 30,
+      "materials": [
+        { "title": "Chuyên đề Vectơ & Tọa độ Oxy lớp 10", "type": "pdf", "url": "#cdn-r2-toan10-vec", "is_free": true }
+      ]
+    },
+    {
+      "grade_id": 10,
+      "subject_code": "tin-hoc",
+      "textbook": "kntt",
+      "chapter": "Chủ đề 5: Giải quyết vấn đề với sự trợ giúp của máy tính (Python)",
+      "title": "Lập trình Python cơ bản: Biến, Vòng lặp và Danh sách (List)",
+      "summary": "Nền tảng tư duy thuật toán lớp 10 bằng ngôn ngữ Python theo chương trình GDPT 2018.",
+      "content_mdx": "### 1. Vòng lặp `for` và `range`\nDuyệt các số từ $1$ đến $n$ để tính tổng:\n- `total = sum(range(1, n + 1))`\n\n### 2. Kiểu danh sách (`list`)\n- Thêm phần tử vào cuối: `a.append(x)`\n- Độ dài danh sách: `len(a)`\n- Truy cập phần tử cuối: `a[-1]`.",
+      "duration_min": 25,
+      "materials": [
+        { "title": "50 bài tập Python lớp 10 kèm test case", "type": "pdf", "url": "#cdn-r2-tin10-py", "is_free": true }
+      ]
+    },
+    {
+      "grade_id": 11,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 6: Hàm số mũ và Hàm số Lôgarit",
+      "title": "Công thức Lôgarit và Phương trình Mũ - Lôgarit cơ bản",
+      "summary": "Hệ thống đầy đủ công thức biến đổi lôgarit và cách giải phương trình mũ.",
+      "content_mdx": "### 1. Định nghĩa\nVới $a > 0, a \\neq 1$ và $b > 0$:\n$$\\log_a b = \\alpha \\Leftrightarrow a^\\alpha = b$$\n\n### 2. Các quy tắc biến đổi nhanh\n- $\\log_a (xy) = \\log_a x + \\log_a y$\n- $\\log_a \\dfrac{x}{y} = \\log_a x - \\log_a y$\n- $\\log_{a^m} b^n = \\dfrac{n}{m} \\log_a b$\n- Đổi cơ số: $\\log_a b = \\dfrac{\\ln b}{\\ln a}$.",
+      "duration_min": 30,
+      "materials": [
+        { "title": "Tổng hợp công thức Mũ & Lôgarit lớp 11–12", "type": "pdf", "url": "#cdn-r2-toan11-log", "is_free": true }
+      ]
+    },
+    {
+      "grade_id": 12,
+      "subject_code": "hoa-hoc",
+      "textbook": "kntt",
+      "chapter": "Chương 1: Ester - Lipid",
+      "title": "Cấu tạo, danh pháp và phản ứng thủy phân Ester (Chuẩn GDPT 2018)",
+      "summary": "Phản ứng xà phòng hóa, danh pháp IUPAC mới theo chương trình Hóa học 12.",
+      "content_mdx": "### 1. Công thức tổng quát Ester no, đơn chức, mạch hở\n$$\\text{C}_n\\text{H}_{2n}\\text{O}_2 \\quad (n \\ge 2)$$\n\n### 2. Phản ứng thủy phân trong môi trường kiềm (Xà phòng hóa — một chiều)\n$$\\text{RCOOR}' + \\text{NaOH} \\xrightarrow{t^\\circ} \\text{RCOONa} + \\text{R}'\\text{OH}$$\n\n### 3. Danh pháp chuẩn 2018\n- $\\text{CH}_3\\text{COOC}_2\\text{H}_5$: *ethyl acetate*\n- $\\text{HCOOCH}_3$: *methyl formate*.",
+      "duration_min": 30,
+      "materials": [
+        { "title": "Sơ đồ tư duy Ester - Lipid chuẩn IUPAC 2025", "type": "mindmap", "url": "#cdn-r2-hoa12-es", "is_free": true }
+      ]
+    },
+    {
+      "grade_id": 12,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 4: Nguyên hàm và Tích phân",
+      "title": "Bảng nguyên hàm cơ bản và Ứng dụng Tích phân tính diện tích, thể tích",
+      "summary": "Trọng tâm thi tốt nghiệp THPT: Công thức Newton-Leibniz, diện tích hình phẳng và thể tích khối tròn xoay.",
+      "content_mdx": "### 1. Bảng nguyên hàm hay dùng nhất\n- $\\int x^\\alpha\\,dx = \\dfrac{x^{\\alpha+1}}{\\alpha+1} + C$ ($\\alpha \\neq -1$)\n- $\\int \\dfrac{1}{x}\\,dx = \\ln|x| + C$\n- $\\int e^x\\,dx = e^x + C$\n- $\\int \\sin x\\,dx = -\\cos x + C$, $\\quad \\int \\cos x\\,dx = \\sin x + C$.\n\n### 2. Ứng dụng hình học\n- Diện tích hình phẳng giới hạn bởi $y=f(x), y=g(x)$ trên $[a;b]$:\n$$S = \\int_a^b |f(x) - g(x)|\\,dx$$\n- Thể tích khối tròn xoay quanh trục $Ox$:\n$$V = \\pi \\int_a^b [f(x)]^2\\,dx$$",
+      "duration_min": 35,
+      "materials": [
+        { "title": "50 bài Tích phân chuẩn đề minh họa 2025+", "type": "pdf", "url": "#cdn-r2-toan12-tp", "is_free": true }
+      ]
+    },
+    {
+      "grade_id": 12,
+      "subject_code": "lich-su",
+      "textbook": "kntt",
+      "chapter": "Chủ đề 1: Thế giới trong và sau Chiến tranh lạnh",
+      "title": "Liên hợp quốc và Trật tự thế giới hai cực I-an-ta (1945–1991)",
+      "summary": "Bối cảnh thành lập, nguyên tắc hoạt động của Liên hợp quốc và xu thế đa cực.",
+      "content_mdx": "### 1. Sự thành lập Liên hợp quốc (1945)\n- Hội nghị I-an-ta (2/1945) thống nhất thành lập tổ chức Liên hợp quốc nhằm duy trì hòa bình, an ninh quốc tế.\n- Hiến chương Liên hợp quốc chính thức có hiệu lực ngày **24/10/1945**.\n- Việt Nam chính thức gia nhập Liên hợp quốc năm **1977** (thành viên thứ 149).",
+      "duration_min": 20,
+      "materials": [
+        { "title": "Timeline Lịch sử 12 dễ nhớ (PDF)", "type": "pdf", "url": "#cdn-r2-su12-1", "is_free": true }
+      ]
+    }
+  ]
+}
