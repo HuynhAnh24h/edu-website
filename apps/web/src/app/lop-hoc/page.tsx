@@ -15,7 +15,6 @@ import {
   Play,
   Radio,
   School,
-  Sparkles,
   Users,
 } from "lucide-react";
 import { CORE_API_URL, Lesson } from "@/lib/api";
@@ -513,15 +512,6 @@ export default function ClassroomsPage() {
             }`}
           >
             Lớp học của tôi
-          </button>
-          <button
-            type="button"
-            onClick={() =>
-              window.dispatchEvent(new CustomEvent("eduk12:mascot-tour", { detail: {} }))
-            }
-            className="inline-flex items-center gap-1.5 rounded-xl border border-indigo-200 bg-indigo-50 px-3.5 py-2 text-xs font-bold text-indigo-700 hover:bg-indigo-100 transition"
-          >
-            <Sparkles className="h-3.5 w-3.5" /> Cú Bông hướng dẫn
           </button>
         </div>
 

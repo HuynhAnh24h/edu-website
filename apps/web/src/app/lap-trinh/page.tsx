@@ -221,33 +221,15 @@ function CodingAcademyInner() {
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3">
-          <button
-            type="button"
-            onClick={() =>
-              window.dispatchEvent(
-                new CustomEvent("eduk12:mascot-tour", {
-                  detail: {
-                    tour: "coding",
-                    banner: "Hú hú! Để Cú Bông bay chỉ bạn cách code & mở khóa bài nhé!",
-                  },
-                })
-              )
-            }
-            className="inline-flex items-center gap-1.5 rounded-2xl bg-amber-400 px-4 py-2.5 text-xs font-extrabold text-slate-950 shadow hover:bg-amber-300 transition"
-          >
-            <Sparkles className="h-4 w-4" /> Cú Bông bay chỉ đường
-          </button>
-          <div className="flex items-center gap-3 rounded-2xl bg-white/10 px-4 py-3 ring-1 ring-white/15">
-            <Trophy className="h-7 w-7 text-amber-400" />
-            <div>
-              <p className="text-[11px] font-semibold text-slate-300">
-                Tiến độ {user ? user.full_name : "Cộng đồng"}
-              </p>
-              <p className="text-lg font-extrabold text-white">
-                {totalPassedAllTracks} / {totalLessonsAllTracks} bài đã vượt qua
-              </p>
-            </div>
+        <div className="flex items-center gap-3 rounded-2xl bg-white/10 px-4 py-3 ring-1 ring-white/15">
+          <Trophy className="h-7 w-7 text-amber-400" />
+          <div>
+            <p className="text-[11px] font-semibold text-slate-300">
+              Tiến độ {user ? user.full_name : "Cộng đồng"}
+            </p>
+            <p className="text-lg font-extrabold text-white">
+              {totalPassedAllTracks} / {totalLessonsAllTracks} bài đã vượt qua
+            </p>
           </div>
         </div>
       </div>
