@@ -26,6 +26,8 @@ export default defineConfig({
       AI: bindings.ai(),
       ASSETS: bindings.assets(),
       REALTIME_HUB: bindings.durableObject({ worker: "eduk12-scale", exportName: "RealtimeHub" }),
+      // Sau khi bật R2 (10 GB miễn phí/tháng) trên Cloudflare Dashboard, bỏ comment dòng dưới để kích hoạt:
+      // MATERIALS_R2: bindings.r2({ name: "eduk12-materials" }),
     },
   },
 });

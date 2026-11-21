@@ -25,6 +25,7 @@ export interface Env {
   AI: Ai;
   ASSETS: Fetcher;
   REALTIME_HUB?: DurableObjectNamespace;
+  MATERIALS_R2?: R2Bucket;
   JWT_SECRET?: string;
   GOOGLE_CLIENT_ID?: string;
   GOOGLE_CLIENT_SECRET?: string;
@@ -304,11 +305,12 @@ export default {
         return stub.fetch(new Request(forwardUrl.toString(), request));
       }
 
-      // === HỒ SƠ GIÁO VIÊN TÍCH XANH & UPLOAD TỆP HỌC LIỆU THẬT (PDF/WORD/SLIDE/ẢNH) ===
+      // === HỒ SƠ GIÁO VIÊN TÍCH XANH & UPLOAD TỆP HỌC LIỆU THẬT (R2 10GB FREE / KV) ===
       if (
         path.startsWith("/api/v1/files") ||
         path.startsWith("/api/v1/teachers") ||
-        path.startsWith("/api/v1/admin/teachers")
+        path.startsWith("/api/v1/admin/teachers") ||
+        path.startsWith("/api/v1/admin/storage")
       ) {
         const claims = await getClaims(request, env);
         const tfResp = await handleTeachersAndFilesRoutes(
@@ -320,7 +322,8 @@ export default {
           claims,
           jsonRes,
           CORS_HEADERS,
-          env.REALTIME_HUB
+          env.REALTIME_HUB,
+          env.MATERIALS_R2
         );
         if (tfResp) return tfResp;
       }

@@ -4,7 +4,11 @@ import { pushRealtimeEvent } from "./realtime";
 
 type JsonFn = (data: unknown, status?: number, extraHeaders?: Record<string, string>) => Response;
 
-const MAX_UPLOAD_BYTES = 5 * 1024 * 1024; // 5 MB
+const MAX_UPLOAD_BYTES_KV = 5 * 1024 * 1024; // 5 MB khi dùng KV
+const MAX_UPLOAD_BYTES_R2 = 20 * 1024 * 1024; // 20 MB/file đề thi PDF/Word/Slide khi dùng R2
+// Khóa trần an toàn ở 9.5 GB (dưới ngưỡng 10 GB miễn phí của Cloudflare R2) để đảm bảo luôn 0đ/tháng!
+const R2_FREE_SAFETY_CAP_BYTES = Math.floor(9.5 * 1024 * 1024 * 1024);
+const KV_FREE_SAFETY_CAP_BYTES = Math.floor(0.9 * 1024 * 1024 * 1024);
 
 const ALLOWED_EXT = new Set([
   "pdf",
@@ -67,10 +71,34 @@ export async function handleTeachersAndFilesRoutes(
   claims: JwtClaims | null,
   jsonRes: JsonFn,
   corsHeaders: Record<string, string>,
-  hub?: DurableObjectNamespace
+  hub?: DurableObjectNamespace,
+  r2?: R2Bucket
 ): Promise<Response | null> {
   // =========================================================================
-  // 1. UPLOAD & PHỤC VỤ TỆP HỌC LIỆU THẬT (PDF, WORD, SLIDE, ẢNH BÀI LÀM)
+  // 0. THỐNG KÊ DUNG LƯỢNG LƯU TRỮ TÀI LIỆU & ĐỀ THI (ADMIN)
+  // =========================================================================
+  if (path === "/api/v1/admin/storage/stats" && method === "GET") {
+    if (!claims || !isAdminRole(claims.role)) {
+      return jsonRes({ error: "Chỉ Quản trị viên mới được xem thống kê dung lượng" }, 403);
+    }
+    const agg = await db
+      .prepare("SELECT COUNT(*) as total_files, COALESCE(SUM(size_bytes), 0) as total_bytes FROM uploaded_files")
+      .first<{ total_files: number; total_bytes: number }>();
+    const usedBytes = Number(agg?.total_bytes || 0);
+    const capBytes = r2 ? R2_FREE_SAFETY_CAP_BYTES : KV_FREE_SAFETY_CAP_BYTES;
+    return jsonRes({
+      backend: r2 ? "r2_10gb_free" : "kv_1gb_free",
+      total_files: Number(agg?.total_files || 0),
+      used_bytes: usedBytes,
+      used_mb: Math.round((usedBytes / (1024 * 1024)) * 100) / 100,
+      safety_cap_gb: r2 ? 9.5 : 0.9,
+      free_tier_gb: r2 ? 10 : 1,
+      percent_used: Math.min(100, Math.round((usedBytes / capBytes) * 10000) / 100),
+    });
+  }
+
+  // =========================================================================
+  // 1. UPLOAD & PHỤC VỤ TỆP HỌC LIỆU THẬT (ƯU TIÊN R2 10GB FREE -> FALLBACK KV)
   // =========================================================================
   if (path === "/api/v1/files/upload" && method === "POST") {
     if (!claims) return jsonRes({ error: "Vui lòng đăng nhập để tải tệp lên." }, 401);
@@ -100,8 +128,26 @@ export async function handleTeachersAndFilesRoutes(
     if (file.size === 0) {
       return jsonRes({ error: "Tệp đang trống." }, 400);
     }
-    if (file.size > MAX_UPLOAD_BYTES) {
-      return jsonRes({ error: "Kích thước tệp vượt quá giới hạn 5 MB." }, 400);
+    const maxFileBytes = r2 ? MAX_UPLOAD_BYTES_R2 : MAX_UPLOAD_BYTES_KV;
+    if (file.size > maxFileBytes) {
+      return jsonRes(
+        { error: `Kích thước tệp vượt quá giới hạn ${r2 ? "20 MB" : "5 MB"} mỗi tệp.` },
+        400
+      );
+    }
+
+    // Khóa trần dung lượng an toàn (9.5 GB với R2 / 0.9 GB với KV) -> Đảm bảo không bao giờ phát sinh phí!
+    const usedRow = await db
+      .prepare("SELECT COALESCE(SUM(size_bytes), 0) as total_bytes FROM uploaded_files")
+      .first<{ total_bytes: number }>();
+    const capBytes = r2 ? R2_FREE_SAFETY_CAP_BYTES : KV_FREE_SAFETY_CAP_BYTES;
+    if (Number(usedRow?.total_bytes || 0) + file.size > capBytes) {
+      return jsonRes(
+        {
+          error: `Kho tài liệu đã chạm ngưỡng an toàn miễn phí (${r2 ? "9.5 GB / 10 GB R2" : "0.9 GB / 1 GB KV"}). Quản trị viên vui lòng dọn tệp cũ hoặc mở rộng dung lượng.`,
+        },
+        413
+      );
     }
 
     const safeName = sanitizeFilename(file.name || "tailieu");
@@ -120,9 +166,16 @@ export async function handleTeachersAndFilesRoutes(
     const fileId = `f-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
     const buf = await file.arrayBuffer();
 
-    await kv.put(`file:${fileId}`, buf, {
-      metadata: { filename: safeName, mime_type: mime, size_bytes: file.size },
-    });
+    if (r2) {
+      await r2.put(`materials/${fileId}`, buf, {
+        httpMetadata: { contentType: mime },
+        customMetadata: { filename: safeName, uploader: me.id, purpose },
+      });
+    } else {
+      await kv.put(`file:${fileId}`, buf, {
+        metadata: { filename: safeName, mime_type: mime, size_bytes: file.size },
+      });
+    }
 
     await db
       .prepare(
@@ -140,6 +193,7 @@ export async function handleTeachersAndFilesRoutes(
         mime_type: mime,
         size_bytes: file.size,
         is_image: isImage,
+        storage: r2 ? "r2" : "kv",
       },
       201
     );
@@ -148,6 +202,27 @@ export async function handleTeachersAndFilesRoutes(
   const getFileMatch = path.match(/^\/api\/v1\/files\/([^/]+)$/);
   if (getFileMatch && method === "GET") {
     const fileId = decodeURIComponent(getFileMatch[1]);
+
+    // Ưu tiên đọc từ Cloudflare R2 (10 GB miễn phí chuyên lưu Đề thi & Tài liệu)
+    if (r2) {
+      const obj = await r2.get(`materials/${fileId}`);
+      if (obj) {
+        const mime = obj.httpMetadata?.contentType || "application/octet-stream";
+        const fname = obj.customMetadata?.filename || fileId;
+        const inline = mime.startsWith("image/") || mime === "application/pdf" || mime.startsWith("text/");
+        return new Response(obj.body, {
+          status: 200,
+          headers: {
+            "Content-Type": mime,
+            "Content-Disposition": `${inline ? "inline" : "attachment"}; filename*=UTF-8''${encodeURIComponent(fname)}`,
+            "Cache-Control": "public, max-age=31536000, immutable",
+            ...corsHeaders,
+          },
+        });
+      }
+    }
+
+    // Fallback về KV cho các tệp đã tải trước đó
     const item = await kv.getWithMetadata<{ filename?: string; mime_type?: string }>(`file:${fileId}`, "arrayBuffer");
     if (!item.value) {
       return jsonRes({ error: "Không tìm thấy tệp hoặc tệp đã hết hạn." }, 404);
