@@ -1,10 +1,26 @@
 # 04. Hướng dẫn Triển khai Production (Đưa Website lên mạng cho Người dùng)
 
-Hệ thống đã được đóng gói đầy đủ **Docker Production Multi-stage**, **Nginx Reverse Proxy**, **Kubernetes Auto-scaling**, và **GitHub Actions CI/CD**.
+Hệ thống hỗ trợ **3 chế độ triển khai Production** tùy quy mô: **Cloudflare Edge Full-Stack (Không cần VPS)**, **VPS Docker Full-stack**, hoặc **Kubernetes Auto-scaling**.
 
 ---
 
-## Phương án 1 (Nhanh nhất & Toàn quyền): Triển khai trên 1 VPS Ubuntu (DigitalOcean / Hetzner / Vultr / AWS EC2 / Viettel Cloud)
+## Phương án 0 (Đề xuất — Không cần thuê VPS): Full-Stack trên Cloudflare Edge (Workers + D1 + KV + Workers AI)
+
+Toàn bộ Frontend Next.js (`apps/web/out`) + Edge API (`apps/cloudflare-edge`) chạy chung trên **1 Cloudflare Worker duy nhất (`eduk12-scale`)**:
+- **Cloudflare Static Assets:** Phục vụ giao diện toàn cầu trên 300+ Edge PoP (`<30ms`, không giới hạn request tĩnh).
+- **Cloudflare D1:** Lưu Users/RBAC, Lớp 1–12, Bài giảng kiểu Word, Ngân hàng câu hỏi 4 định dạng, Đề thi, Kết quả thi, và Kho tri thức RAG.
+- **Cloudflare KV:** Lưu gói đề mã hóa **AES-256-GCM**, autosave bài làm, `Idempotency-Key`, và **AI Semantic Cache** (`<15ms`).
+- **Cloudflare Workers AI:** Chạy AI Gia sư miễn phí (`@cf/meta/llama-3.1-8b-instruct`) kèm Streaming SSE!
+
+### Cách Deploy chỉ với 1 lệnh:
+```powershell
+.\deploy-cloudflare.ps1
+```
+Lệnh trên sẽ tự động build Next.js static export, mở trình duyệt đăng nhập Cloudflare (`cf auth login`) nếu chưa đăng nhập, **tự cấp phát D1 + KV + Workers AI (`--provision`)** và xuất bản live ra địa chỉ `https://eduk12-scale.<subdomain>.workers.dev`!
+
+---
+
+## Phương án 1 (Toàn quyền VPS): Triển khai trên 1 VPS Ubuntu (DigitalOcean / Hetzner / Vultr / AWS EC2 / Viettel Cloud)
 
 ### Bước 1: Cài Docker & kéo mã nguồn trên VPS
 ```bash

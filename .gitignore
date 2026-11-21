@@ -1,6 +1,7 @@
 # Dependencies & virtual environments
 node_modules/
 apps/web/node_modules/
+apps/cloudflare-edge/node_modules/
 services/ai-tutor/.venv/
 __pycache__/
 *.py[cod]
@@ -8,6 +9,8 @@ __pycache__/
 # Build outputs
 apps/web/.next/
 apps/web/out/
+apps/cloudflare-edge/dist/
+apps/cloudflare-edge/.cloudflare/
 services/core-api/bin/
 *.exe
 

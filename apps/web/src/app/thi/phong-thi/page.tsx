@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { use, useCallback, useEffect, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   AlertTriangle,
   CheckCircle2,
@@ -25,12 +26,9 @@ import { QuestionRenderer } from "@/components/QuestionRenderer";
 import { MathContent } from "@/components/MathContent";
 import { useAuth } from "@/context/AuthContext";
 
-export default function ExamRoomPage({
-  params,
-}: {
-  params: Promise<{ examId: string }>;
-}) {
-  const { examId } = use(params);
+function ExamRoomInner() {
+  const searchParams = useSearchParams();
+  const examId = searchParams.get("id") || "exam-toan-12-thpt-2025";
   const { user, accessToken } = useAuth();
 
   const [studentName, setStudentName] = useState("Nguyễn Minh Anh (Lớp 12A1)");
@@ -450,5 +448,13 @@ export default function ExamRoomPage({
         </button>
       </div>
     </div>
+  );
+}
+
+export default function ExamRoomPage() {
+  return (
+    <Suspense fallback={<div className="p-8 text-sm text-slate-500">Đang mở phòng thi...</div>}>
+      <ExamRoomInner />
+    </Suspense>
   );
 }

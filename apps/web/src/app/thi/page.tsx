@@ -83,7 +83,7 @@ export default function ExamsLobbyPage() {
               </div>
 
               <Link
-                href={`/thi/${ex.id}`}
+                href={`/thi/phong-thi?id=${ex.id}`}
                 className="shrink-0 rounded-xl bg-indigo-600 px-5 py-2.5 text-center text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 transition"
               >
                 Vào phòng thi
