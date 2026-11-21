@@ -8,6 +8,7 @@ import {
 } from "./crypto";
 import { parseRawExamText } from "./parser";
 import { ensureSeeded, slugify, SUBJECT_NAMES } from "./seed";
+import { handleClassroomRoutes } from "./classrooms";
 
 export interface Env {
   DB: D1Database;
@@ -213,6 +214,13 @@ export default {
 
     try {
       await ensureSeeded(env.DB);
+
+      // === CLASSROOMS / LMS ROUTES (Đăng ký lớp học, Giáo án, Quản lý học sinh & Kiểm tra) ===
+      if (path.startsWith("/api/v1/classrooms") || path.startsWith("/api/v1/cms/classrooms")) {
+        const claims = await getClaims(request, env);
+        const clsResp = await handleClassroomRoutes(request, env.DB, path, method, url, claims, jsonRes);
+        if (clsResp) return clsResp;
+      }
 
       // === HEALTH & TELEMETRY ===
       if (path === "/health") {

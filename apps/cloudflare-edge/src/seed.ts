@@ -39,7 +39,76 @@ export async function ensureSeeded(db: D1Database): Promise<void> {
     db.prepare(`CREATE TABLE IF NOT EXISTS exams (id TEXT PRIMARY KEY, grade_id INTEGER NOT NULL, subject_code TEXT NOT NULL, subject_name TEXT NOT NULL, title TEXT NOT NULL, slug TEXT UNIQUE NOT NULL, mode TEXT NOT NULL DEFAULT 'mock_live', duration_minutes INTEGER NOT NULL DEFAULT 45, total_points REAL NOT NULL DEFAULT 10.0, question_ids_json TEXT NOT NULL DEFAULT '[]', question_points_json TEXT NOT NULL DEFAULT '{}', bundle_version INTEGER NOT NULL DEFAULT 1, starts_at TEXT NOT NULL DEFAULT (datetime('now')))`),
     db.prepare(`CREATE TABLE IF NOT EXISTS exam_attempts (id TEXT PRIMARY KEY, exam_id TEXT NOT NULL, user_id TEXT, user_name TEXT NOT NULL DEFAULT 'Học sinh K-12', status TEXT NOT NULL DEFAULT 'in_progress', shuffle_seed INTEGER NOT NULL DEFAULT 1, started_at TEXT NOT NULL DEFAULT (datetime('now')), submitted_at TEXT, graded_at TEXT, duration_sec INTEGER DEFAULT 0, score REAL DEFAULT 0, max_score REAL DEFAULT 10.0, correct_count INTEGER DEFAULT 0, total_questions INTEGER DEFAULT 0, grading_latency_us INTEGER DEFAULT 0, answers_json TEXT NOT NULL DEFAULT '{}', details_json TEXT NOT NULL DEFAULT '[]', cheat_flags_json TEXT NOT NULL DEFAULT '[]')`),
     db.prepare(`CREATE TABLE IF NOT EXISTS knowledge_chunks (id TEXT PRIMARY KEY, grade_id INTEGER NOT NULL, subject_code TEXT NOT NULL, textbook TEXT NOT NULL DEFAULT 'kntt', citation TEXT NOT NULL, content TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT (datetime('now')))`),
+    db.prepare(`CREATE TABLE IF NOT EXISTS classrooms (id TEXT PRIMARY KEY, code TEXT UNIQUE NOT NULL, name TEXT NOT NULL, grade_id INTEGER NOT NULL, subject_code TEXT NOT NULL, subject_name TEXT NOT NULL, teacher_id TEXT NOT NULL, teacher_name TEXT NOT NULL, description TEXT DEFAULT '', allow_self_enroll INTEGER NOT NULL DEFAULT 1, created_at TEXT NOT NULL DEFAULT (datetime('now')))`),
+    db.prepare(`CREATE TABLE IF NOT EXISTS classroom_members (classroom_id TEXT NOT NULL, user_id TEXT NOT NULL, user_name TEXT NOT NULL, user_email TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'active', joined_at TEXT NOT NULL DEFAULT (datetime('now')), PRIMARY KEY (classroom_id, user_id))`),
+    db.prepare(`CREATE TABLE IF NOT EXISTS classroom_assignments (id TEXT PRIMARY KEY, classroom_id TEXT NOT NULL, item_type TEXT NOT NULL, item_id TEXT NOT NULL, item_title TEXT NOT NULL, due_at TEXT DEFAULT '', display_order INTEGER NOT NULL DEFAULT 0, assigned_at TEXT NOT NULL DEFAULT (datetime('now')))`),
   ]);
+
+  // Luôn đảm bảo có sẵn 2 lớp học mẫu nếu bảng classrooms chưa có dữ liệu
+  const clsRow = await db.prepare("SELECT COUNT(*) as cnt FROM classrooms").first<{ cnt: number }>();
+  if (!clsRow || clsRow.cnt === 0) {
+    const sampleLesson12 = await db
+      .prepare("SELECT id, title FROM lessons WHERE grade_id = 12 AND subject_code = 'toan' LIMIT 2")
+      .all<{ id: string; title: string }>();
+    const sampleLesson9 = await db
+      .prepare("SELECT id, title FROM lessons WHERE grade_id = 9 AND subject_code = 'toan' LIMIT 2")
+      .all<{ id: string; title: string }>();
+
+    const clsStmts: D1PreparedStatement[] = [
+      db
+        .prepare(
+          "INSERT OR IGNORE INTO classrooms (id, code, name, grade_id, subject_code, subject_name, teacher_id, teacher_name, description, allow_self_enroll) VALUES (?, ?, ?, 12, 'toan', 'Toán học', 'u-teacher-1', 'Thầy Nguyễn Văn Minh (GV Toán)', ?, 1)"
+        )
+        .bind(
+          "cls-toan-12a1",
+          "TOAN12-A1",
+          "Lớp Toán 12A1 — Luyện thi Tốt nghiệp THPT 2025+",
+          "Học theo đúng giáo án tuần, làm bài kiểm tra trắc nghiệm định kỳ và theo dõi điểm số trực tiếp."
+        ),
+      db
+        .prepare(
+          "INSERT OR IGNORE INTO classrooms (id, code, name, grade_id, subject_code, subject_name, teacher_id, teacher_name, description, allow_self_enroll) VALUES (?, ?, ?, 9, 'toan', 'Toán học', 'u-teacher-1', 'Thầy Nguyễn Văn Minh (GV Toán)', ?, 1)"
+        )
+        .bind(
+          "cls-toan-9-v10",
+          "TOAN9-V10",
+          "Lớp Toán 9 — Chuyên đề Ôn thi Tuyển sinh vào 10",
+          "Lộ trình ôn tập Căn thức, Định lý Viète, Tứ giác nội tiếp kèm đề thi thử hàng tuần."
+        ),
+      db
+        .prepare(
+          "INSERT OR IGNORE INTO classroom_members (classroom_id, user_id, user_name, user_email, status) VALUES ('cls-toan-12a1', 'u-student-1', 'Nguyễn Minh Anh', 'hocsinh@eduk12.vn', 'active')"
+        ),
+      db
+        .prepare(
+          "INSERT OR IGNORE INTO classroom_assignments (id, classroom_id, item_type, item_id, item_title, due_at, display_order) VALUES ('asg-exam-12', 'cls-toan-12a1', 'exam', 'exam-toan-12-thpt-2025', 'Kỳ thi thử THPT Quốc gia 2025 — Môn Toán (Chuẩn 3 Phần)', '2026-12-30', 10)"
+        ),
+      db
+        .prepare(
+          "INSERT OR IGNORE INTO classroom_assignments (id, classroom_id, item_type, item_id, item_title, due_at, display_order) VALUES ('asg-exam-9', 'cls-toan-9-v10', 'exam', 'exam-toan-9-tuyen-sinh-10', 'Thi thử Tuyển sinh vào lớp 10 — Chuyên đề Đại số trọng tâm', '2026-12-30', 10)"
+        ),
+    ];
+
+    sampleLesson12.results.forEach((l, i) => {
+      clsStmts.push(
+        db
+          .prepare(
+            "INSERT OR IGNORE INTO classroom_assignments (id, classroom_id, item_type, item_id, item_title, display_order) VALUES (?, 'cls-toan-12a1', 'lesson', ?, ?, ?)"
+          )
+          .bind(`asg-l12-${i + 1}`, l.id, l.title, i + 1)
+      );
+    });
+    sampleLesson9.results.forEach((l, i) => {
+      clsStmts.push(
+        db
+          .prepare(
+            "INSERT OR IGNORE INTO classroom_assignments (id, classroom_id, item_type, item_id, item_title, display_order) VALUES (?, 'cls-toan-9-v10', 'lesson', ?, ?, ?)"
+          )
+          .bind(`asg-l9-${i + 1}`, l.id, l.title, i + 1)
+      );
+    });
+    await db.batch(clsStmts);
+  }
 
   const row = await db.prepare("SELECT COUNT(*) as cnt FROM lessons").first<{ cnt: number }>();
   if (row && row.cnt > 0) {

@@ -10,6 +10,7 @@ import {
   LayoutDashboard,
   LogIn,
   LogOut,
+  School,
   ShieldCheck,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
@@ -17,6 +18,7 @@ import { useAuth } from "@/context/AuthContext";
 const NAV_ITEMS = [
   { href: "/", label: "Tổng quan", icon: GraduationCap },
   { href: "/tai-lieu", label: "Tài liệu 1–12", icon: BookOpen },
+  { href: "/lop-hoc", label: "Lớp học", icon: School },
   { href: "/bai-tap", label: "Bài tập", icon: CheckSquare },
   { href: "/thi", label: "Thi trắc nghiệm", icon: ShieldCheck },
   { href: "/ai-gia-su", label: "AI Gia sư", icon: Bot },

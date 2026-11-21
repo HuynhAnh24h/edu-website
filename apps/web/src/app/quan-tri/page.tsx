@@ -6,21 +6,26 @@ import {
   BookPlus,
   CheckCircle2,
   Database,
+  ExternalLink,
   FileQuestion,
   Lock,
+  Menu,
   Paperclip,
   Plus,
   Save,
+  School,
   ShieldAlert,
   ShieldCheck,
   Trash2,
   Upload,
   Users,
+  X,
 } from "lucide-react";
 import { AI_API_URL, CORE_API_URL } from "@/lib/api";
 import { AuthUser, useAuth } from "@/context/AuthContext";
 import { MathContent } from "@/components/MathContent";
 import { BulkImportPanel } from "@/components/cms/BulkImportPanel";
+import { ClassroomManager } from "@/components/cms/ClassroomManager";
 import { RichWordEditor } from "@/components/cms/RichWordEditor";
 import {
   createEmptyDraftQuestion,
@@ -92,8 +97,9 @@ function buildQuestionPayload(q: DraftQuestion, gradeId: number, subjectCode: st
 export default function CMSAdminPage() {
   const { user, accessToken, loading, isStaff, isAdmin } = useAuth();
   const [activeTab, setActiveTab] = useState<
-    "lessons" | "questions" | "exams" | "import" | "users"
-  >("lessons");
+    "classrooms" | "lessons" | "questions" | "exams" | "import" | "users"
+  >("classrooms");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [questions, setQuestions] = useState<CMSQuestion[]>([]);
   const [usersList, setUsersList] = useState<AuthUser[]>([]);
@@ -390,57 +396,152 @@ export default function CMSAdminPage() {
     }
   };
 
+  const sidebarGroups = [
+    {
+      groupLabel: "Lớp học & Học sinh (LMS)",
+      items: [
+        { id: "classrooms", label: "Quản lý Lớp học", desc: "Học sinh, Giáo án, Kiểm tra", icon: School },
+      ],
+    },
+    {
+      groupLabel: "Soạn thảo & Học liệu",
+      items: [
+        { id: "lessons", label: "Soạn Bài giảng (Word)", desc: "Trình soạn thảo kiểu Word", icon: BookPlus },
+        { id: "questions", label: `Soạn Câu hỏi (${questions.length})`, desc: "Điền nhãn đáp án trực quan", icon: FileQuestion },
+        { id: "exams", label: "Tạo Đề kiểm tra", desc: "Mã hóa AES-256-GCM", icon: ShieldCheck },
+        { id: "import", label: "Import JSON / Tách đề", desc: "Tách đề 3 phần tự động", icon: Upload },
+      ],
+    },
+    ...(isAdmin
+      ? [
+          {
+            groupLabel: "Quản trị Hệ thống",
+            items: [
+              { id: "users", label: "Phân quyền Tài khoản", desc: "Học sinh / Giáo viên / Admin", icon: Users },
+            ],
+          },
+        ]
+      : []),
+  ];
+
   return (
-    <div className="space-y-6">
-      {/* Header CMS */}
-      <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl bg-slate-900 p-6 text-white shadow-sm">
+    <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
+      {/* Nút mở Sidebar trên điện thoại */}
+      <div className="flex items-center justify-between rounded-2xl bg-slate-900 px-4 py-3 text-white lg:hidden">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-emerald-400">
-            Studio Soạn Bài giảng kiểu Word • CMS Quản trị Lớp 1–12
-          </p>
-          <h1 className="mt-1 text-2xl font-bold">Xin chào, {user.full_name}</h1>
+          <p className="text-[11px] font-bold uppercase text-emerald-400">Không gian Giáo viên</p>
+          <p className="text-sm font-bold">{user.full_name}</p>
         </div>
-        <div className="flex flex-wrap gap-2">
-          {[
-            { id: "lessons", label: "Soạn Bài giảng (Kiểu Word)", icon: BookPlus },
-            { id: "questions", label: `Soạn Câu hỏi (${questions.length})`, icon: FileQuestion },
-            { id: "exams", label: "Tạo Đề thi", icon: ShieldCheck },
-            { id: "import", label: "Import JSON / Tách đề", icon: Upload },
-            ...(isAdmin ? [{ id: "users", label: "Phân quyền User", icon: Users }] : []),
-          ].map((t) => {
-            const Icon = t.icon;
-            return (
-              <button
-                key={t.id}
-                onClick={() => setActiveTab(t.id as typeof activeTab)}
-                className={`inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-semibold transition ${
-                  activeTab === t.id
-                    ? "bg-emerald-500 text-white shadow-sm"
-                    : "bg-white/10 text-slate-200 hover:bg-white/20"
-                }`}
-              >
-                <Icon className="h-4 w-4" />
-                {t.label}
-              </button>
-            );
-          })}
-        </div>
+        <button
+          type="button"
+          onClick={() => setSidebarOpen((v) => !v)}
+          className="inline-flex items-center gap-1.5 rounded-xl bg-white/10 px-3 py-2 text-xs font-bold"
+        >
+          {sidebarOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+          Menu
+        </button>
       </div>
 
-      {toast && (
-        <div
-          className={`flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-semibold ${
-            toast.type === "ok"
-              ? "border-emerald-200 bg-emerald-50 text-emerald-800"
-              : "border-rose-200 bg-rose-50 text-rose-800"
-          }`}
-        >
-          <CheckCircle2 className="h-4 w-4 shrink-0" />
-          <span>{toast.msg}</span>
+      {/* === MENU SIDEBAR TRÁI TRỰC QUAN CHO GIÁO VIÊN === */}
+      <aside
+        className={`${
+          sidebarOpen ? "block" : "hidden"
+        } w-full shrink-0 rounded-2xl border border-slate-200 bg-white shadow-xs lg:sticky lg:top-[76px] lg:block lg:w-64 overflow-hidden`}
+      >
+        <div className="bg-slate-900 p-4 text-white">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-400">
+            Studio Giáo viên &amp; CMS
+          </p>
+          <p className="mt-1 truncate text-sm font-bold">{user.full_name}</p>
+          <p className="truncate text-[11px] text-slate-400">{user.email}</p>
         </div>
-      )}
 
-      {/* === TAB 1: STUDIO SOẠN BÀI GIẢNG KIỂU WORD + CÂU HỎI TRỰC QUAN === */}
+        <nav className="space-y-4 p-3">
+          {sidebarGroups.map((grp) => (
+            <div key={grp.groupLabel}>
+              <p className="mb-1.5 px-2.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                {grp.groupLabel}
+              </p>
+              <div className="space-y-1">
+                {grp.items.map((item) => {
+                  const Icon = item.icon;
+                  const active = activeTab === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => {
+                        setActiveTab(item.id as typeof activeTab);
+                        setSidebarOpen(false);
+                      }}
+                      className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition ${
+                        active
+                          ? "bg-indigo-600 text-white shadow-xs"
+                          : "text-slate-700 hover:bg-slate-100"
+                      }`}
+                    >
+                      <Icon className={`h-4 w-4 shrink-0 ${active ? "text-white" : "text-slate-500"}`} />
+                      <div className="min-w-0">
+                        <p className="truncate text-xs font-bold">{item.label}</p>
+                        <p
+                          className={`truncate text-[10px] ${
+                            active ? "text-indigo-100" : "text-slate-400"
+                          }`}
+                        >
+                          {item.desc}
+                        </p>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </nav>
+
+        <div className="border-t border-slate-100 bg-slate-50/70 p-3 space-y-1.5">
+          <Link
+            href="/lop-hoc"
+            className="flex items-center justify-between rounded-lg px-2.5 py-1.5 text-xs font-semibold text-slate-600 hover:bg-white hover:text-indigo-700 transition"
+          >
+            <span>Trang Lớp học (Học sinh)</span>
+            <ExternalLink className="h-3.5 w-3.5" />
+          </Link>
+          <Link
+            href="/tai-lieu"
+            className="flex items-center justify-between rounded-lg px-2.5 py-1.5 text-xs font-semibold text-slate-600 hover:bg-white hover:text-indigo-700 transition"
+          >
+            <span>Kho Tài liệu 1–12</span>
+            <ExternalLink className="h-3.5 w-3.5" />
+          </Link>
+        </div>
+      </aside>
+
+      {/* === KHU VỰC LÀM VIỆC CHÍNH BÊN PHẢI === */}
+      <div className="min-w-0 flex-1 space-y-6">
+        {toast && (
+          <div
+            className={`flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-semibold ${
+              toast.type === "ok"
+                ? "border-emerald-200 bg-emerald-50 text-emerald-800"
+                : "border-rose-200 bg-rose-50 text-rose-800"
+            }`}
+          >
+            <CheckCircle2 className="h-4 w-4 shrink-0" />
+            <span>{toast.msg}</span>
+          </div>
+        )}
+
+        {/* === TAB 0: QUẢN LÝ LỚP HỌC, HỌC SINH & GIAO BÀI KIỂM TRA === */}
+        {activeTab === "classrooms" && (
+          <ClassroomManager
+            accessToken={accessToken}
+            subjects={subjects}
+            onNotify={showToast}
+          />
+        )}
+
+        {/* === TAB 1: STUDIO SOẠN BÀI GIẢNG KIỂU WORD + CÂU HỎI TRỰC QUAN === */}
       {activeTab === "lessons" && (
         <form onSubmit={handlePublishLesson} className="space-y-6">
           {/* Bước 1: Thông tin phân loại Bài giảng (Labels rõ ràng) */}
@@ -947,6 +1048,7 @@ export default function CMSAdminPage() {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }
