@@ -13,7 +13,7 @@ function buildWsUrl(channel: string, token?: string | null): string {
       ? CORE_API_URL
       : typeof window !== "undefined"
         ? window.location.origin
-        : "https://eduk12-scale.eduk12-scale.workers.dev";
+        : "https://owlie.eduk12-scale.workers.dev";
   const wsBase = base.replace(/^https:/i, "wss:").replace(/^http:/i, "ws:");
   const qs = new URLSearchParams({ channel });
   if (token) qs.set("token", token);

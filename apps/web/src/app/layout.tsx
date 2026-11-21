@@ -17,14 +17,14 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "EduK12 Open — Nền tảng Học tập Phổ thông 1–12 & Lập trình Cộng đồng",
+  title: "Owlie Edu — Học Phổ thông 1–12, Khóa học & Lập trình Cộng đồng",
   description:
-    "Tài liệu học tập lớp 1–12 chuẩn GDPT 2018, lớp học trực tuyến, thi trắc nghiệm, AI Gia sư và 8 khóa học lập trình thực hành ngay trên trình duyệt.",
+    "Nền tảng học tập cộng đồng miễn phí cùng chú cú Owlie: tài liệu lớp 1–12, Mạng Xã Hội Giáo Viên, khóa học 5 sao, thi trắc nghiệm, AI Gia sư và 8 khóa lập trình.",
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "EduK12",
+    title: "Owlie Edu",
   },
   icons: {
     icon: [

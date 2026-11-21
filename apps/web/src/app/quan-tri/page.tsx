@@ -682,7 +682,7 @@ export default function CMSAdminPage() {
             <CuBongLogoMark className="h-9 w-9 shadow-md" />
             <div>
               <p className="text-sm font-extrabold tracking-tight text-white">
-                EduK12 <span className={isAdmin ? "text-rose-400" : "text-emerald-400"}>{isAdmin ? "Admin" : "Teacher"}</span>
+                Owlie <span className={isAdmin ? "text-rose-400" : "text-emerald-400"}>{isAdmin ? "Admin" : "Teacher"}</span>
               </p>
               <p className={`text-[10px] font-semibold uppercase tracking-wider ${isAdmin ? "text-rose-300" : "text-emerald-400"}`}>
                 {isAdmin ? "Quản trị Hệ thống" : "Studio Giảng dạy"}

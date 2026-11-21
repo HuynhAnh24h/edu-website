@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export const API_BASE = "https://eduk12-scale.eduk12-scale.workers.dev";
+export const API_BASE = "https://owlie.eduk12-scale.workers.dev";
 const TOKEN_KEY = "eduk12_mobile_token";
 const USER_KEY = "eduk12_mobile_user";
 

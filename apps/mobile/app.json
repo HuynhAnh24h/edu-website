@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "EduK12 Open",
-    "slug": "eduk12-open",
+    "name": "Owlie Edu",
+    "slug": "owlie-edu",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -29,9 +29,9 @@
       }
     },
     "extra": {
-      "apiBaseUrl": "https://eduk12-scale.eduk12-scale.workers.dev",
-      "privacyPolicyUrl": "https://eduk12-scale.eduk12-scale.workers.dev/chinh-sach-bao-mat/",
-      "termsUrl": "https://eduk12-scale.eduk12-scale.workers.dev/dieu-khoan/"
+      "apiBaseUrl": "https://owlie.eduk12-scale.workers.dev",
+      "privacyPolicyUrl": "https://owlie.eduk12-scale.workers.dev/chinh-sach-bao-mat/",
+      "termsUrl": "https://owlie.eduk12-scale.workers.dev/dieu-khoan/"
     },
     "plugins": [
       "expo-asset"

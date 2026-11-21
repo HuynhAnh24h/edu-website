@@ -9,13 +9,13 @@ export function Footer() {
     <footer className="mt-16 border-t border-slate-200 bg-slate-950 text-slate-300">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:py-14">
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-12">
-          {/* Cột 1: Thương hiệu Logo Cú Bông & Sứ mệnh Cộng đồng */}
+          {/* Cột 1: Thương hiệu Logo chú cú Owlie & Sứ mệnh Cộng đồng */}
           <div className="space-y-4 lg:col-span-4">
             <Link href="/" className="inline-flex items-center gap-3">
               <CuBongLogoMark className="h-11 w-11 shadow-md" />
               <div>
                 <span className="text-lg font-extrabold tracking-tight text-white">
-                  EduK12 <span className="text-indigo-400">Open</span>
+                  Owlie <span className="text-indigo-400">Edu</span>
                 </span>
                 <p className="text-xs font-medium text-slate-400">
                   Học Phổ thông 1–12 &amp; Lập trình Cộng đồng
@@ -159,7 +159,7 @@ export function Footer() {
         {/* Thanh bản quyền dưới cùng */}
         <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-slate-800/80 pt-6 text-xs text-slate-500 sm:flex-row">
           <p className="flex items-center gap-1.5">
-            © {new Date().getFullYear()} <strong className="text-slate-300">EduK12 Open</strong> — Xây dựng với
+            © {new Date().getFullYear()} <strong className="text-slate-300">Owlie Edu</strong> — Xây dựng với
             <Heart className="h-3.5 w-3.5 fill-rose-500 text-rose-500" /> cho cộng đồng học tập Việt Nam.
           </p>
           <div className="flex flex-wrap items-center gap-3 text-[11px] font-medium text-slate-400">

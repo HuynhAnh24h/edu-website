@@ -3,7 +3,7 @@ import { bindings, defineConfig, exports } from "cf/config";
 export default defineConfig({
   accountId: "90c67c01376ba41cb059c6fa7cb9d70e",
   worker: {
-    name: "eduk12-scale",
+    name: "owlie",
     entrypoint: "./src/index.ts",
     compatibilityDate: "2026-11-21",
     workersDev: true,
@@ -22,10 +22,10 @@ export default defineConfig({
     },
     env: {
       DB: bindings.d1({ name: "eduk12-db" }),
-      EDU_KV: bindings.kv(),
+      EDU_KV: bindings.kv({ id: "2b8ecb1e3b5e4467a54ca879fa921af0" }),
       AI: bindings.ai(),
       ASSETS: bindings.assets(),
-      REALTIME_HUB: bindings.durableObject({ worker: "eduk12-scale", exportName: "RealtimeHub" }),
+      REALTIME_HUB: bindings.durableObject({ worker: "owlie", exportName: "RealtimeHub" }),
       // Sau khi bật R2 (10 GB miễn phí/tháng) trên Cloudflare Dashboard, bỏ comment dòng dưới để kích hoạt:
       // MATERIALS_R2: bindings.r2({ name: "eduk12-materials" }),
     },

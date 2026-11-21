@@ -25,7 +25,7 @@ export default function DownloadAppPage() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [installed, setInstalled] = useState(false);
   const [installMsg, setInstallMsg] = useState("");
-  const [origin, setOrigin] = useState("https://eduk12-scale.eduk12-scale.workers.dev");
+  const [origin, setOrigin] = useState("https://owlie.eduk12-scale.workers.dev");
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -59,7 +59,7 @@ export default function DownloadAppPage() {
       const choice = await deferredPrompt.userChoice;
       if (choice.outcome === "accepted") {
         setInstalled(true);
-        setInstallMsg("Đang thêm biểu tượng Cú Bông EduK12 lên màn hình chính...");
+        setInstallMsg("Đang thêm biểu tượng Owlie Edu lên màn hình chính...");
       }
       setDeferredPrompt(null);
     } else {
@@ -87,7 +87,7 @@ export default function DownloadAppPage() {
               <CuBongLogoMark className="h-14 w-14 shrink-0 shadow-lg" />
               <div>
                 <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">
-                  Tải App EduK12 Open cho Điện thoại
+                  Tải App Owlie Edu cho Điện thoại
                 </h1>
                 <p className="text-xs sm:text-sm text-indigo-200">
                   Học Lớp 1–12, vào Lớp Live, luyện Code &amp; Thi trắc nghiệm mọi lúc mọi nơi
@@ -96,7 +96,7 @@ export default function DownloadAppPage() {
             </div>
 
             <p className="text-xs leading-relaxed text-slate-300 sm:text-sm">
-              Cài trực tiếp biểu tượng <strong>Cú Bông EduK12</strong> lên màn hình chính iPhone &amp; Android — chạy toàn màn hình mượt mà như ứng dụng gốc, tự động đồng bộ điểm thi &amp; bảo mật 2FA, không tốn dung lượng bộ nhớ máy.
+              Cài trực tiếp biểu tượng chú cú <strong>Owlie</strong> lên màn hình chính iPhone &amp; Android — chạy toàn màn hình mượt mà như ứng dụng gốc, tự động đồng bộ điểm thi &amp; bảo mật 2FA, không tốn dung lượng bộ nhớ máy.
             </p>
 
             <div className="flex flex-wrap gap-3 pt-1">
@@ -185,7 +185,7 @@ export default function DownloadAppPage() {
                 3
               </span>
               <span>
-                Biểu tượng <strong>Cú Bông EduK12</strong> sẽ nằm ngay trên màn hình chính điện thoại — mở lên đăng nhập, học bài và làm bài thi mượt mà!
+                Biểu tượng <strong>Owlie Edu</strong> sẽ nằm ngay trên màn hình chính điện thoại — mở lên đăng nhập, học bài và làm bài thi mượt mà!
               </span>
             </li>
           </ol>
@@ -234,7 +234,7 @@ export default function DownloadAppPage() {
                 3
               </span>
               <span>
-                Bấm <strong>Thêm (Add)</strong> ở góc trên phải — ứng dụng <strong>EduK12</strong> sẽ hiển thị sẵn với icon Cú Bông để mở học ngay!
+                Bấm <strong>Thêm (Add)</strong> ở góc trên phải — ứng dụng <strong>EduK12</strong> sẽ hiển thị sẵn với icon chú cú Owlie để mở học ngay!
               </span>
             </li>
           </ol>
