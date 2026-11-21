@@ -372,6 +372,23 @@ export default {
         return jsonRes({ user });
       }
 
+      // Tự xóa tài khoản (Bắt buộc theo chính sách Apple App Store 5.1.1(v) & Google Play Data Deletion)
+      if (path === "/api/v1/auth/me" && method === "DELETE") {
+        const claims = await getClaims(request, env);
+        if (!claims) return jsonRes({ error: "Vui lòng đăng nhập" }, 401);
+        if (claims.role === "super_admin") {
+          return jsonRes({ error: "Tài khoản Super Admin không thể tự xóa trực tiếp để tránh mất quyền quản trị hệ thống." }, 400);
+        }
+        await env.DB.batch([
+          env.DB.prepare("DELETE FROM user_security WHERE user_id = ?").bind(claims.uid),
+          env.DB.prepare("DELETE FROM classroom_members WHERE user_id = ?").bind(claims.uid),
+          env.DB.prepare("DELETE FROM coding_progress WHERE user_id = ?").bind(claims.uid),
+          env.DB.prepare("DELETE FROM live_attendance WHERE user_id = ?").bind(claims.uid),
+          env.DB.prepare("DELETE FROM users WHERE id = ?").bind(claims.uid),
+        ]);
+        return jsonRes({ status: "account_deleted" });
+      }
+
       // === 2. GRADES, SUBJECTS, LESSONS ===
       if (path === "/api/v1/grades" && method === "GET") {
         const { results } = await env.DB.prepare("SELECT * FROM grades ORDER BY id ASC").all();

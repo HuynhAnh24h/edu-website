@@ -13,17 +13,25 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "vn.eduk12.open"
+      "bundleIdentifier": "vn.eduk12.open",
+      "buildNumber": "1",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "package": "vn.eduk12.open",
+      "versionCode": 1,
+      "permissions": [],
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#4f46e5"
       }
     },
     "extra": {
-      "apiBaseUrl": "https://eduk12-scale.eduk12-scale.workers.dev"
+      "apiBaseUrl": "https://eduk12-scale.eduk12-scale.workers.dev",
+      "privacyPolicyUrl": "https://eduk12-scale.eduk12-scale.workers.dev/chinh-sach-bao-mat/",
+      "termsUrl": "https://eduk12-scale.eduk12-scale.workers.dev/dieu-khoan/"
     }
   }
 }

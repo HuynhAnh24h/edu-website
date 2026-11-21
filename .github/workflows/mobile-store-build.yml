@@ -1,0 +1,52 @@
+name: Build Mobile App (Android APK/AAB & iOS IPA)
+
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: "Nền tảng cần đóng gói"
+        required: true
+        default: "all"
+        type: choice
+        options:
+          - all
+          - android
+          - ios
+      profile:
+        description: "Chế độ build (preview = xuất file .APK test, production = lên CH Play & App Store)"
+        required: true
+        default: "production"
+        type: choice
+        options:
+          - preview
+          - production
+
+jobs:
+  eas-build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/mobile
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Setup Expo & EAS CLI
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Install mobile dependencies
+        run: npm install
+
+      - name: Typecheck TypeScript
+        run: npx tsc --noEmit
+
+      - name: Run EAS Cloud Build
+        run: eas build --platform ${{ inputs.platform }} --profile ${{ inputs.profile }} --non-interactive --no-wait

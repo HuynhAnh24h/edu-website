@@ -153,13 +153,17 @@ export function Footer() {
             <Heart className="h-3.5 w-3.5 fill-rose-500 text-rose-500" /> cho cộng đồng học tập Việt Nam.
           </p>
           <div className="flex flex-wrap items-center gap-3 text-[11px] font-medium text-slate-400">
-            <span>Chương trình GDPT 2018</span>
+            <Link href="/chinh-sach-bao-mat" className="hover:text-white transition">
+              Chính sách bảo mật
+            </Link>
             <span>•</span>
-            <span>Lớp học Trực tuyến</span>
+            <Link href="/dieu-khoan" className="hover:text-white transition">
+              Điều khoản sử dụng
+            </Link>
             <span>•</span>
-            <span>Học Lập trình</span>
-            <span>•</span>
-            <span>Bảo mật 2FA</span>
+            <Link href="/tai-app" className="hover:text-white transition">
+              Tải App Mobile
+            </Link>
           </div>
         </div>
       </div>

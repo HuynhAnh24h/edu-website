@@ -182,6 +182,29 @@ export default function App() {
     setReadingLesson(null);
   };
 
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      "Xóa tài khoản vĩnh viễn?",
+      "Toàn bộ thông tin cá nhân và tiến độ học tập của bạn sẽ bị xóa khỏi hệ thống và không thể khôi phục.",
+      [
+        { text: "Hủy", style: "cancel" },
+        {
+          text: "Xác nhận xóa",
+          style: "destructive",
+          onPress: async () => {
+            const res = await apiFetch("/api/v1/auth/me", { method: "DELETE" }, token);
+            if (!res.ok) {
+              Alert.alert("Không thể xóa tài khoản", res.error || "Vui lòng thử lại sau.");
+              return;
+            }
+            Alert.alert("Đã xóa tài khoản", "Tài khoản và dữ liệu của bạn đã được xóa hoàn toàn.");
+            await handleLogout();
+          },
+        },
+      ]
+    );
+  };
+
   const openLesson = async (id: string) => {
     const res = await apiFetch<{ lesson: MobileLesson }>(`/api/v1/lessons/${encodeURIComponent(id)}`);
     if (res.ok && res.data.lesson) {
@@ -569,6 +592,20 @@ export default function App() {
             >
               <Text style={styles.primaryBtnText}>Đăng xuất</Text>
             </Pressable>
+
+            <View style={{ marginTop: 18, borderTopWidth: 1, borderTopColor: "#e2e8f0", paddingTop: 14, gap: 10 }}>
+              <Pressable onPress={() => void Linking.openURL(`${API_BASE}/chinh-sach-bao-mat/`)}>
+                <Text style={styles.backLink}>Chính sách bảo mật &amp; Quyền riêng tư →</Text>
+              </Pressable>
+              <Pressable onPress={() => void Linking.openURL(`${API_BASE}/dieu-khoan/`)}>
+                <Text style={styles.backLink}>Điều khoản sử dụng →</Text>
+              </Pressable>
+              <Pressable onPress={handleDeleteAccount}>
+                <Text style={{ fontSize: 13, fontWeight: "700", color: "#be123c", marginTop: 4 }}>
+                  Xóa tài khoản &amp; dữ liệu vĩnh viễn
+                </Text>
+              </Pressable>
+            </View>
           </View>
         )}
       </ScrollView>
