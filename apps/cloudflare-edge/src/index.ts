@@ -11,6 +11,7 @@ import { ensureSeeded, slugify, SUBJECT_NAMES } from "./seed";
 import { handleClassroomRoutes } from "./classrooms";
 import { handleAuthSecurityRoutes, issueSessionTokens } from "./auth-security";
 import { handleCodingRoutes } from "./coding";
+import { handleSocialRoutes } from "./social";
 
 export interface Env {
   DB: D1Database;
@@ -251,6 +252,13 @@ export default {
         const claims = await getClaims(request, env);
         const codingResp = await handleCodingRoutes(request, env.DB, path, method, claims, jsonRes);
         if (codingResp) return codingResp;
+      }
+
+      // === MẠNG XÃ HỘI GIÁO VIÊN & KIỂM DUYỆT CỘNG ĐỒNG ===
+      if (path.startsWith("/api/v1/social")) {
+        const claims = await getClaims(request, env);
+        const socialResp = await handleSocialRoutes(request, env.DB, path, method, url, claims, jsonRes);
+        if (socialResp) return socialResp;
       }
 
       // === HEALTH & TELEMETRY ===

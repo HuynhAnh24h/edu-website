@@ -55,6 +55,11 @@ export async function ensureSeeded(db: D1Database): Promise<void> {
     db.prepare(`CREATE TABLE IF NOT EXISTS live_attendance (session_id TEXT NOT NULL, classroom_id TEXT NOT NULL, user_id TEXT NOT NULL, user_name TEXT NOT NULL, user_email TEXT NOT NULL, joined_at TEXT NOT NULL DEFAULT (datetime('now')), last_seen_at TEXT NOT NULL DEFAULT (datetime('now')), PRIMARY KEY (session_id, user_id))`),
     db.prepare(`CREATE TABLE IF NOT EXISTS user_security (user_id TEXT PRIMARY KEY, auth_provider TEXT NOT NULL DEFAULT 'email', provider_id TEXT DEFAULT '', totp_secret TEXT DEFAULT '', totp_enabled INTEGER NOT NULL DEFAULT 0, recovery_codes_json TEXT DEFAULT '[]', updated_at TEXT NOT NULL DEFAULT (datetime('now')))`),
     db.prepare(`CREATE TABLE IF NOT EXISTS coding_progress (user_id TEXT NOT NULL, track_id TEXT NOT NULL, lesson_id TEXT NOT NULL, submitted_code TEXT DEFAULT '', passed_at TEXT NOT NULL DEFAULT (datetime('now')), PRIMARY KEY (user_id, lesson_id))`),
+    db.prepare(`CREATE TABLE IF NOT EXISTS teacher_posts (id TEXT PRIMARY KEY, author_id TEXT NOT NULL, author_name TEXT NOT NULL, author_role TEXT NOT NULL DEFAULT 'teacher', author_school TEXT DEFAULT '', category TEXT NOT NULL DEFAULT 'lesson_share', grade_id INTEGER NOT NULL DEFAULT 0, subject_code TEXT NOT NULL DEFAULT 'chung', subject_name TEXT NOT NULL DEFAULT 'Liên môn', title TEXT NOT NULL, content TEXT NOT NULL, attachment_label TEXT DEFAULT '', attachment_url TEXT DEFAULT '', tags_json TEXT NOT NULL DEFAULT '[]', is_pinned INTEGER NOT NULL DEFAULT 0, status TEXT NOT NULL DEFAULT 'published', created_at TEXT NOT NULL DEFAULT (datetime('now')))`),
+    db.prepare(`CREATE TABLE IF NOT EXISTS teacher_post_likes (post_id TEXT NOT NULL, user_id TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT (datetime('now')), PRIMARY KEY (post_id, user_id))`),
+    db.prepare(`CREATE TABLE IF NOT EXISTS teacher_post_bookmarks (post_id TEXT NOT NULL, user_id TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT (datetime('now')), PRIMARY KEY (post_id, user_id))`),
+    db.prepare(`CREATE TABLE IF NOT EXISTS teacher_post_comments (id TEXT PRIMARY KEY, post_id TEXT NOT NULL, user_id TEXT NOT NULL, user_name TEXT NOT NULL, user_role TEXT NOT NULL DEFAULT 'teacher', content TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT (datetime('now')))`),
+    db.prepare(`CREATE TABLE IF NOT EXISTS teacher_follows (follower_id TEXT NOT NULL, teacher_id TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT (datetime('now')), PRIMARY KEY (follower_id, teacher_id))`),
   ]);
 
   // Luôn đảm bảo có sẵn 2 lớp học mẫu nếu bảng classrooms chưa có dữ liệu
@@ -167,6 +172,160 @@ export async function ensureSeeded(db: D1Database): Promise<void> {
       db.prepare(
         "INSERT OR IGNORE INTO classroom_assignments (id, classroom_id, item_type, item_id, item_title, display_order) VALUES ('asg-code-pg', 'cls-code-be', 'coding', 'postgresql', 'Khóa Thực hành PostgreSQL & JOIN (3 bài)', 3)"
       ),
+    ]);
+  }
+
+  // Seed dữ liệu Mạng Xã Hội Giáo Viên (bài chia sẻ giáo án, đề thi, thảo luận chuyên môn)
+  const socialRow = await db.prepare("SELECT COUNT(*) as cnt FROM teacher_posts").first<{ cnt: number }>();
+  if (!socialRow || socialRow.cnt === 0) {
+    const teacherSampleHash = await hashPassword("Teacher@123");
+    await db.batch([
+      db
+        .prepare(
+          "INSERT OR IGNORE INTO users (id, email, password_hash, full_name, role, tier, school_name) VALUES (?, ?, ?, ?, 'teacher', 'pro', ?)"
+        )
+        .bind("u-teacher-2", "colan@eduk12.vn", teacherSampleHash, "Cô Trần Thị Lan (GV Ngữ văn)", "THPT Chuyên Lê Hồng Phong"),
+      db
+        .prepare(
+          "INSERT OR IGNORE INTO users (id, email, password_hash, full_name, role, tier, school_name) VALUES (?, ?, ?, ?, 'teacher', 'pro', ?)"
+        )
+        .bind("u-teacher-3", "thaynam@eduk12.vn", teacherSampleHash, "Thầy Lê Hoàng Nam (GV Tin học)", "THPT Gia Định"),
+      db
+        .prepare(
+          `INSERT OR IGNORE INTO teacher_posts (id, author_id, author_name, author_role, author_school, category, grade_id, subject_code, subject_name, title, content, attachment_label, attachment_url, tags_json, is_pinned, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'published')`
+        )
+        .bind(
+          "post-toan12-de3phan",
+          "u-teacher-1",
+          "Thầy Nguyễn Văn Minh (GV Toán)",
+          "teacher",
+          "THPT Chuyên KHTN",
+          "exam_share",
+          12,
+          "toan",
+          "Toán học",
+          "Chia sẻ trọn bộ Đề thi thử THPT 2025+ chuẩn 3 phần (Đúng/Sai & Trả lời ngắn)",
+          "Chào quý thầy cô! Mình vừa hoàn thiện bộ đề ôn tập Chương 1 Ứng dụng đạo hàm bám sát ma trận đề minh họa mới của Bộ GD&ĐT (gồm 12 câu chọn 1, 4 câu Đúng/Sai và 6 câu trả lời ngắn).\n\nThầy cô có thể bấm mở đề bên dưới để xem cấu trúc, giao ngay cho lớp mình hoặc lưu lại tủ giáo án dùng cho tuần tới nhé!",
+          "Mở đề thi thử Toán 12 (Chuẩn 3 phần)",
+          "/thi",
+          JSON.stringify(["Toán 12", "THPT 2025", "Đề chuẩn 3 phần"]),
+          1
+        ),
+      db
+        .prepare(
+          `INSERT OR IGNORE INTO teacher_posts (id, author_id, author_name, author_role, author_school, category, grade_id, subject_code, subject_name, title, content, attachment_label, attachment_url, tags_json, is_pinned, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'published')`
+        )
+        .bind(
+          "post-van12-cham-nghiluan",
+          "u-teacher-2",
+          "Cô Trần Thị Lan (GV Ngữ văn)",
+          "teacher",
+          "THPT Chuyên Lê Hồng Phong",
+          "teaching_tip",
+          12,
+          "ngu-van",
+          "Ngữ văn",
+          "Kinh nghiệm hướng dẫn học sinh viết Nghị luận xã hội không bị văn mẫu",
+          "Khi chuyển sang ngữ liệu ngoài sách giáo khoa, nhiều em bị lúng túng ở khâu tìm dẫn chứng đời sống. Mình áp dụng quy tắc 3 bước ngay trên lớp:\n1. Tách từ khóa cốt lõi của vấn đề.\n2. Đặt 2 câu hỏi ngược ('Nếu thiếu điều này thì sao?').\n3. Chọn 1 dẫn chứng thực tế trong 2 năm gần nhất.\n\nQuý thầy cô dạy Văn có mẹo nào hay cho học sinh lớp 11–12 chia sẻ thêm bên dưới nhé!",
+          "Xem Kho bài giảng Ngữ văn 1–12",
+          "/tai-lieu",
+          JSON.stringify(["Ngữ văn", "Phương pháp dạy", "Nghị luận"]),
+          0
+        ),
+      db
+        .prepare(
+          `INSERT OR IGNORE INTO teacher_posts (id, author_id, author_name, author_role, author_school, category, grade_id, subject_code, subject_name, title, content, attachment_label, attachment_url, tags_json, is_pinned, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'published')`
+        )
+        .bind(
+          "post-code-python-go",
+          "u-teacher-3",
+          "Thầy Lê Hoàng Nam (GV Tin học)",
+          "teacher",
+          "THPT Gia Định",
+          "lesson_share",
+          0,
+          "python",
+          "Lập trình Python",
+          "Lộ trình dạy Tin học & Lập trình thực hành ngay trên trình duyệt không cần cài máy",
+          "Tin vui cho các thầy cô dạy Tin học ở trường máy cấu hình thấp: mình đang cho cả lớp thực hành Python, JavaScript và SQL ngay trên mục Lập trình của EduK12.\n\nĐiểm mình ưng nhất là cơ chế chấm test tự động và gợi ý tư duy 3 tầng — học sinh không thể copy-paste đáp án mà phải tự sửa code chạy ĐÚNG mới qua bài tiếp theo!",
+          "Trải nghiệm Phòng thực hành Lập trình",
+          "/lap-trinh",
+          JSON.stringify(["Tin học", "Python", "Thực hành Code"]),
+          0
+        ),
+      db
+        .prepare(
+          `INSERT OR IGNORE INTO teacher_posts (id, author_id, author_name, author_role, author_school, category, grade_id, subject_code, subject_name, title, content, attachment_label, attachment_url, tags_json, is_pinned, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'published')`
+        )
+        .bind(
+          "post-live-toan9-vao10",
+          "u-teacher-1",
+          "Thầy Nguyễn Văn Minh (GV Toán)",
+          "teacher",
+          "THPT Chuyên KHTN",
+          "class_promo",
+          9,
+          "toan",
+          "Toán học",
+          "Mở lớp Live miễn phí tối Thứ 5: Chuyên đề Viète & Tứ giác nội tiếp ôn thi vào 10",
+          "Tuần này mình mở buổi Livestream giải đề tổng ôn miễn phí cho học sinh lớp 9. Thầy cô có thể giới thiệu mã lớp TOAN9-V10 cho các em tham gia học cùng hoặc vào dự giờ trao đổi cách trình bày bài hình học cho học sinh trung bình – khá nhé!",
+          "Vào lớp Toán 9 (Mã: TOAN9-V10)",
+          "/lop-hoc",
+          JSON.stringify(["Lớp Live", "Toán 9", "Ôn thi vào 10"]),
+          0
+        ),
+      db
+        .prepare(
+          `INSERT OR IGNORE INTO teacher_posts (id, author_id, author_name, author_role, author_school, category, grade_id, subject_code, subject_name, title, content, attachment_label, attachment_url, tags_json, is_pinned, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'published')`
+        )
+        .bind(
+          "post-thaoluan-hocsinh-matgoc",
+          "u-teacher-2",
+          "Cô Trần Thị Lan (GV Ngữ văn)",
+          "teacher",
+          "THPT Chuyên Lê Hồng Phong",
+          "discussion",
+          10,
+          "chung",
+          "Liên môn",
+          "Thảo luận: Làm sao giữ tương tác tốt khi dạy lớp đông 45 học sinh qua Live?",
+          "Mỗi lần dạy tăng cường buổi tối có hơn 40 em vào cùng lúc, mình hay chia nhỏ 15 phút giảng + 1 câu hỏi nhanh trên khung chat để điểm danh sự tập trung. Không biết các thầy cô môn Tự nhiên và Ngoại ngữ có cách nào giúp các em đỡ ngại bật mic/nhắn tin hơn không ạ?",
+          "",
+          "",
+          JSON.stringify(["Thảo luận", "Kỹ năng sư phạm", "Dạy trực tuyến"]),
+          0
+        ),
+      db
+        .prepare(
+          "INSERT OR IGNORE INTO teacher_post_comments (id, post_id, user_id, user_name, user_role, content) VALUES (?, ?, ?, ?, ?, ?)"
+        )
+        .bind(
+          "cmt-seed-1",
+          "post-toan12-de3phan",
+          "u-teacher-3",
+          "Thầy Lê Hoàng Nam (GV Tin học)",
+          "teacher",
+          "Cảm ơn thầy Minh! Cấu trúc phần Đúng/Sai rất sát đề mẫu, mình đã lưu vào tủ giáo án để giới thiệu cho tổ Toán trường mình."
+        ),
+      db
+        .prepare(
+          "INSERT OR IGNORE INTO teacher_post_comments (id, post_id, user_id, user_name, user_role, content) VALUES (?, ?, ?, ?, ?, ?)"
+        )
+        .bind(
+          "cmt-seed-2",
+          "post-thaoluan-hocsinh-matgoc",
+          "u-teacher-1",
+          "Thầy Nguyễn Văn Minh (GV Toán)",
+          "teacher",
+          "Mình thường ghim câu hỏi ngắn ở đầu khung chat và khen trực tiếp 3 bạn trả lời nhanh nhất, lớp sôi nổi hẳn lên cô Lan ạ!"
+        ),
+      db.prepare("INSERT OR IGNORE INTO teacher_post_likes (post_id, user_id) VALUES ('post-toan12-de3phan', 'u-teacher-2')"),
+      db.prepare("INSERT OR IGNORE INTO teacher_post_likes (post_id, user_id) VALUES ('post-toan12-de3phan', 'u-teacher-3')"),
+      db.prepare("INSERT OR IGNORE INTO teacher_post_likes (post_id, user_id) VALUES ('post-van12-cham-nghiluan', 'u-teacher-1')"),
+      db.prepare("INSERT OR IGNORE INTO teacher_post_likes (post_id, user_id) VALUES ('post-code-python-go', 'u-teacher-1')"),
+      db.prepare("INSERT OR IGNORE INTO teacher_follows (follower_id, teacher_id) VALUES ('u-teacher-2', 'u-teacher-1')"),
+      db.prepare("INSERT OR IGNORE INTO teacher_follows (follower_id, teacher_id) VALUES ('u-teacher-3', 'u-teacher-1')"),
+      db.prepare("INSERT OR IGNORE INTO teacher_follows (follower_id, teacher_id) VALUES ('u-student-1', 'u-teacher-1')"),
     ]);
   }
 

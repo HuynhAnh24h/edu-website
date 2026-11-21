@@ -37,6 +37,7 @@ import { BulkImportPanel } from "@/components/cms/BulkImportPanel";
 import { ClassroomManager } from "@/components/cms/ClassroomManager";
 import { RichWordEditor } from "@/components/cms/RichWordEditor";
 import { UserManagementPanel } from "@/components/cms/UserManagementPanel";
+import { CommunityModerationPanel } from "@/components/cms/CommunityModerationPanel";
 import { CuBongLogoMark } from "@/components/BrandLogo";
 import {
   createEmptyDraftQuestion,
@@ -87,6 +88,7 @@ type DashboardTab =
   | "questions"
   | "exams"
   | "import"
+  | "community"
   | "users";
 
 const TAB_META: Record<DashboardTab, { title: string; subtitle: string }> = {
@@ -115,12 +117,16 @@ const TAB_META: Record<DashboardTab, { title: string; subtitle: string }> = {
     subtitle: "Chọn câu hỏi từ ngân hàng và xuất bản đề thi trực tuyến ngay cho học sinh.",
   },
   import: {
-    title: "Import JSON & Tách đề Thông minh",
+    title: "Nhập nhanh & Tách đề Thông minh",
     subtitle: "Nhập hàng loạt bài giảng/câu hỏi hoặc dán văn bản đề thi để hệ thống tự tách thành 3 phần.",
   },
+  community: {
+    title: "Kiểm duyệt Mạng Xã Hội Giáo Viên",
+    subtitle: "Ghim giáo án/đề thi xuất sắc lên đầu bảng tin, tạm ẩn hoặc xóa bài viết không phù hợp.",
+  },
   users: {
-    title: "Phân quyền Tài khoản (RBAC)",
-    subtitle: "Quản lý quyền Học sinh, Giáo viên, Biên tập viên và Super Admin.",
+    title: "Quản lý & Phân quyền Tài khoản",
+    subtitle: "Quản lý quyền Học sinh, Giáo viên, Biên tập viên và Quản trị viên hệ thống.",
   },
 };
 
@@ -491,7 +497,7 @@ export default function CMSAdminPage() {
     setExTitle("");
     setSelectedQIds([]);
     void loadDashboardOverview();
-    showToast("ok", "Đã xuất bản đề thi & mã hóa gói AES-256-GCM sẵn sàng trên /thi!");
+    showToast("ok", "Đã xuất bản đề thi trực tuyến sẵn sàng trên phòng thi!");
   };
 
   const totalStudentsInClasses = myClassrooms.reduce(
@@ -563,11 +569,17 @@ export default function CMSAdminPage() {
     ...(isAdmin
       ? [
           {
-            groupLabel: "Quản trị Hệ thống",
+            groupLabel: "Quản trị Hệ thống (Admin)",
             items: [
               {
+                id: "community" as DashboardTab,
+                label: "Kiểm duyệt MXH Giáo viên",
+                desc: "Ghim bài hay & duyệt nội dung",
+                icon: Sparkles,
+              },
+              {
                 id: "users" as DashboardTab,
-                label: "Phân quyền Tài khoản",
+                label: "Quản lý & Phân quyền",
                 desc: "Học sinh / Giáo viên / Admin",
                 icon: Users,
               },
@@ -601,10 +613,10 @@ export default function CMSAdminPage() {
             <CuBongLogoMark className="h-9 w-9 shadow-md" />
             <div>
               <p className="text-sm font-extrabold tracking-tight text-white">
-                EduK12 <span className="text-indigo-400">Studio</span>
+                EduK12 <span className={isAdmin ? "text-rose-400" : "text-emerald-400"}>{isAdmin ? "Admin" : "Teacher"}</span>
               </p>
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-emerald-400">
-                Dashboard Quản trị
+              <p className={`text-[10px] font-semibold uppercase tracking-wider ${isAdmin ? "text-rose-300" : "text-emerald-400"}`}>
+                {isAdmin ? "Quản trị Hệ thống" : "Studio Giảng dạy"}
               </p>
             </div>
           </div>
@@ -616,6 +628,19 @@ export default function CMSAdminPage() {
           >
             <X className="h-4 w-4" />
           </button>
+        </div>
+
+        {/* Nút chuyển nhanh sang Mạng Xã Hội Giáo Viên */}
+        <div className="px-3 pt-3">
+          <Link
+            href="/cong-dong"
+            className="flex w-full items-center justify-between gap-2 rounded-xl bg-emerald-600/20 px-3 py-2.5 text-xs font-extrabold text-emerald-300 ring-1 ring-emerald-500/40 hover:bg-emerald-600/30 hover:text-white transition"
+          >
+            <span className="inline-flex items-center gap-2">
+              <Users className="h-4 w-4" /> Mạng Xã Hội Giáo Viên
+            </span>
+            <ExternalLink className="h-3.5 w-3.5" />
+          </Link>
         </div>
 
         {/* Navigation Groups */}
@@ -1496,7 +1521,12 @@ export default function CMSAdminPage() {
             />
           )}
 
-          {/* === TAB 6: QUẢN LÝ NGƯỜI DÙNG, 2FA & OAUTH GOOGLE/FACEBOOK (SUPER ADMIN) === */}
+          {/* === TAB 6: KIỂM DUYỆT MẠNG XÃ HỘI GIÁO VIÊN (ADMIN) === */}
+          {activeTab === "community" && isAdmin && (
+            <CommunityModerationPanel accessToken={accessToken} onToast={showToast} />
+          )}
+
+          {/* === TAB 7: QUẢN LÝ NGƯỜI DÙNG & PHÂN QUYỀN (ADMIN) === */}
           {activeTab === "users" && isAdmin && (
             <UserManagementPanel
               accessToken={accessToken}

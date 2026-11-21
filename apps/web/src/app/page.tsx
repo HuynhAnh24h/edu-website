@@ -21,6 +21,7 @@ import {
 import { CORE_API_URL } from "@/lib/api";
 import { getSubjectMeta, SUBJECT_ORDER } from "@/lib/subjects";
 import { CODING_TRACKS } from "@/lib/codingCurriculum";
+import { useAuth } from "@/context/AuthContext";
 
 interface SummaryRow {
   grade_id: number;
@@ -71,16 +72,17 @@ const PLATFORM_FEATURES = [
     desc: "Bám sát đúng kiến thức từng lớp học, gợi mở phương pháp tư duy từng bước thay vì chỉ đưa đáp án chép sẵn.",
   },
   {
-    href: "/dang-nhap",
-    icon: Smartphone,
-    badge: "An toàn 2FA",
-    color: "bg-amber-50 text-amber-600",
-    title: "Quản lý Tài khoản & Bảo mật 2FA",
-    desc: "Đăng nhập linh hoạt qua Email, Google, Facebook kèm bảo mật 2 lớp Google Authenticator và không gian Giáo viên tách biệt.",
+    href: "/cong-dong",
+    icon: Users,
+    badge: "Mới • MXH Giáo viên",
+    color: "bg-amber-50 text-amber-700",
+    title: "Mạng Xã Hội Giáo Viên",
+    desc: "Nơi thầy cô chia sẻ giáo án hay, đề thi chuẩn mới, kinh nghiệm đứng lớp, theo dõi đồng nghiệp và lưu nhanh về tủ bài giảng.",
   },
 ];
 
 export default function LandingPage() {
+  const { user, isTeacher, isAdmin } = useAuth();
   const [summaryRows, setSummaryRows] = useState<SummaryRow[]>([]);
   const [totalLessons, setTotalLessons] = useState<number>(157);
   const [selectedGrade, setSelectedGrade] = useState<number>(12);
@@ -108,7 +110,117 @@ export default function LandingPage() {
   }, [summaryRows, selectedGrade]);
 
   return (
-    <div className="space-y-14 pb-12">
+    <div className="space-y-12 pb-12">
+      {/* === THANH ĐIỀU HƯỚNG THÔNG MINH THEO VAI TRÒ KHI ĐÃ ĐĂNG NHẬP === */}
+      {user && (
+        <section
+          className={`rounded-3xl border p-5 shadow-xs sm:p-6 ${
+            isAdmin
+              ? "border-rose-200 bg-gradient-to-r from-rose-50 via-white to-slate-50"
+              : isTeacher
+                ? "border-emerald-200 bg-gradient-to-r from-emerald-50 via-white to-indigo-50/40"
+                : "border-indigo-200 bg-gradient-to-r from-indigo-50 via-white to-sky-50/50"
+          }`}
+        >
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="space-y-1">
+              <span
+                className={`inline-block rounded-full px-2.5 py-0.5 text-[11px] font-extrabold ${
+                  isAdmin
+                    ? "bg-rose-100 text-rose-700"
+                    : isTeacher
+                      ? "bg-emerald-100 text-emerald-700"
+                      : "bg-indigo-100 text-indigo-700"
+                }`}
+              >
+                {isAdmin
+                  ? "Không gian Quản trị viên"
+                  : isTeacher
+                    ? "Không gian Giáo viên"
+                    : `Không gian Học sinh${user.current_grade ? ` • Lớp ${user.current_grade}` : ""}`}
+              </span>
+              <h2 className="text-lg font-extrabold text-slate-900 sm:text-xl">
+                Xin chào, {user.full_name}!
+              </h2>
+              <p className="text-xs text-slate-600">
+                {isAdmin
+                  ? "Chọn nhanh chức năng quản trị người dùng, kiểm duyệt cộng đồng giáo viên hoặc cập nhật kho học liệu."
+                  : isTeacher
+                    ? "Vào ngay Mạng Xã Hội Giáo Viên để chia sẻ giáo án cùng đồng nghiệp hoặc mở Studio để dạy Live & soạn đề."
+                    : "Bắt đầu ngay vào lớp học, bài giảng, thi thử hoặc xem chia sẻ mới từ thầy cô."}
+              </p>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              {isAdmin ? (
+                <>
+                  <Link
+                    href="/quan-tri"
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-rose-600 px-4 py-2.5 text-xs font-extrabold text-white shadow hover:bg-rose-500 transition"
+                  >
+                    <ShieldCheck className="h-4 w-4" /> Trung tâm Quản trị
+                  </Link>
+                  <Link
+                    href="/cong-dong"
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold text-slate-800 hover:bg-slate-50 transition"
+                  >
+                    <Users className="h-4 w-4 text-indigo-600" /> Mạng XH Giáo viên
+                  </Link>
+                </>
+              ) : isTeacher ? (
+                <>
+                  <Link
+                    href="/cong-dong"
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2.5 text-xs font-extrabold text-white shadow hover:bg-emerald-500 transition"
+                  >
+                    <Users className="h-4 w-4" /> Mạng Xã Hội Giáo Viên
+                  </Link>
+                  <Link
+                    href="/quan-tri"
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-slate-900 px-4 py-2.5 text-xs font-bold text-white hover:bg-slate-800 transition"
+                  >
+                    <GraduationCap className="h-4 w-4" /> Mở Studio Giảng dạy
+                  </Link>
+                  <Link
+                    href="/lop-hoc"
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold text-slate-800 hover:bg-slate-50 transition"
+                  >
+                    <Radio className="h-4 w-4 text-rose-500" /> Lớp đang dạy
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link
+                    href="/lop-hoc"
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2.5 text-xs font-extrabold text-white shadow hover:bg-indigo-500 transition"
+                  >
+                    <Radio className="h-4 w-4" /> Lớp của em
+                  </Link>
+                  <Link
+                    href="/tai-lieu"
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold text-slate-800 hover:bg-slate-50 transition"
+                  >
+                    <BookOpen className="h-4 w-4 text-blue-600" /> Bài giảng Lớp {user.current_grade || 12}
+                  </Link>
+                  <Link
+                    href="/thi"
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold text-slate-800 hover:bg-slate-50 transition"
+                  >
+                    <ShieldCheck className="h-4 w-4 text-emerald-600" /> Thi trắc nghiệm
+                  </Link>
+                  <Link
+                    href="/cong-dong"
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold text-slate-800 hover:bg-slate-50 transition"
+                  >
+                    <Users className="h-4 w-4 text-amber-600" /> Góc Thầy Cô
+                  </Link>
+                </>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* ================= 1. HERO LANDING SECTION ================= */}
       <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 px-6 py-12 text-white shadow-xl sm:px-12 sm:py-16">
         <div className="pointer-events-none absolute -top-24 -right-24 h-80 w-80 rounded-full bg-indigo-500/20 blur-3xl" />

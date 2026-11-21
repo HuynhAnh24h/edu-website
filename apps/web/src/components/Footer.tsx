@@ -118,6 +118,11 @@ export function Footer() {
             </h3>
             <ul className="space-y-2 text-xs text-slate-400">
               <li>
+                <Link href="/cong-dong" className="font-semibold text-emerald-300 hover:text-white transition">
+                  Mạng Xã Hội Giáo Viên (Chia sẻ giáo án)
+                </Link>
+              </li>
+              <li>
                 <Link href="/dang-nhap" className="hover:text-white transition">
                   Đăng nhập (Google / Facebook / Email)
                 </Link>
@@ -129,7 +134,7 @@ export function Footer() {
               </li>
               <li>
                 <Link href="/quan-tri" className="inline-flex items-center gap-1 hover:text-white transition">
-                  <Radio className="h-3 w-3 text-rose-400" /> Dashboard Giáo viên &amp; Phát Live
+                  <Radio className="h-3 w-3 text-rose-400" /> Studio Giáo viên &amp; Quản trị
                 </Link>
               </li>
               <li>

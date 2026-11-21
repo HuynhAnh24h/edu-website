@@ -22,24 +22,30 @@ import { useAuth } from "@/context/AuthContext";
 
 const DEMO_ACCOUNTS = [
   {
-    label: "Admin (Toàn quyền CMS + Quản lý User + 2FA)",
+    label: "Admin — Quản trị Hệ thống, Phân quyền & Kiểm duyệt Cộng đồng",
     email: "admin@eduk12.vn",
     pass: "Admin@123",
     badge: "bg-rose-50 text-rose-700 border-rose-200",
   },
   {
-    label: "Giáo viên (Phòng Live, Lớp học, Soạn bài)",
+    label: "Giáo viên — Mạng Xã Hội Giáo Viên, Lớp Live & Soạn đề",
     email: "giaovien@eduk12.vn",
     pass: "Teacher@123",
     badge: "bg-emerald-50 text-emerald-700 border-emerald-200",
   },
   {
-    label: "Học sinh / Cộng đồng (Học K–12 & Lập trình)",
+    label: "Học sinh — Học 1–12, Luyện Code, Thi thử & Hỏi Thầy Cô",
     email: "hocsinh@eduk12.vn",
     pass: "Student@123",
     badge: "bg-indigo-50 text-indigo-700 border-indigo-200",
   },
 ];
+
+function getLandingRouteByRole(role?: string): string {
+  if (role === "super_admin" || role === "content_admin") return "/quan-tri";
+  if (role === "teacher") return "/cong-dong";
+  return "/";
+}
 
 interface OAuthProvidersState {
   google_configured: boolean;
@@ -120,7 +126,7 @@ function AuthPageInner() {
     if (oauthCode) {
       void completeOAuthExchange(oauthCode).then((res) => {
         if (res.ok) {
-          router.push(res.user && ["teacher", "content_admin", "super_admin"].includes(res.user.role) ? "/quan-tri" : "/");
+          router.push(getLandingRouteByRole(res.user?.role));
         } else {
           setError(res.error || "Đăng nhập OAuth thất bại");
         }
@@ -158,7 +164,7 @@ function AuthPageInner() {
         } else if (!res.ok) {
           setError(res.error || "Đăng nhập thất bại");
         } else {
-          router.push(email.includes("admin") || email.includes("giaovien") ? "/quan-tri" : "/");
+          router.push(getLandingRouteByRole(res.user?.role));
         }
       } else {
         const res = await register({
@@ -172,7 +178,7 @@ function AuthPageInner() {
         if (!res.ok) {
           setError(res.error || "Đăng ký thất bại");
         } else {
-          router.push(role === "teacher" ? "/quan-tri" : "/lop-hoc");
+          router.push(getLandingRouteByRole(res.user?.role || role));
         }
       }
     } finally {
@@ -190,7 +196,7 @@ function AuthPageInner() {
         setError(res.error || "Mã 2FA không chính xác");
       } else {
         setTwoFaTempToken("");
-        router.push(res.user && ["teacher", "content_admin", "super_admin"].includes(res.user.role) ? "/quan-tri" : "/");
+        router.push(getLandingRouteByRole(res.user?.role));
       }
     } finally {
       setSubmitting(false);

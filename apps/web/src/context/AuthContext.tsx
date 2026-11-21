@@ -18,12 +18,15 @@ export interface LoginResult {
   error?: string;
   requires_2fa?: boolean;
   temp_token?: string;
+  user?: AuthUser;
 }
 
 interface AuthContextValue {
   user: AuthUser | null;
   accessToken: string | null;
   loading: boolean;
+  isStudent: boolean;
+  isTeacher: boolean;
   isStaff: boolean;
   isAdmin: boolean;
   login: (email: string, password: string) => Promise<LoginResult>;
@@ -36,7 +39,7 @@ interface AuthContextValue {
     role: string;
     current_grade?: number;
     school_name?: string;
-  }) => Promise<{ ok: boolean; error?: string }>;
+  }) => Promise<{ ok: boolean; error?: string; user?: AuthUser }>;
   logout: () => Promise<void>;
 }
 
@@ -97,7 +100,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           return { ok: false, requires_2fa: true, temp_token: data.temp_token };
         }
         persistSession(data);
-        return { ok: true };
+        return { ok: true, user: data.user as AuthUser };
       } catch {
         return { ok: false, error: "Không thể kết nối máy chủ xác thực" };
       }
@@ -167,7 +170,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           return { ok: false, error: data.error || "Đăng ký thất bại" };
         }
         persistSession(data);
-        return { ok: true };
+        return { ok: true, user: data.user as AuthUser };
       } catch {
         return { ok: false, error: "Không thể kết nối máy chủ xác thực" };
       }
@@ -190,11 +193,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(null);
   }, []);
 
-  const isStaff =
-    user?.role === "teacher" ||
-    user?.role === "content_admin" ||
-    user?.role === "super_admin";
-  const isAdmin = user?.role === "super_admin";
+  const isStudent = user?.role === "student" || user?.role === "parent";
+  const isTeacher = user?.role === "teacher";
+  const isAdmin = user?.role === "super_admin" || user?.role === "content_admin";
+  const isStaff = isTeacher || isAdmin;
 
   return (
     <AuthContext.Provider
@@ -202,6 +204,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         user,
         accessToken,
         loading,
+        isStudent,
+        isTeacher,
         isStaff,
         isAdmin,
         login,

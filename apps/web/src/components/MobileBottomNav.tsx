@@ -2,18 +2,44 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpen, Code2, Home, Radio, ShieldCheck } from "lucide-react";
-
-const TABS = [
-  { href: "/", label: "Trang chủ", icon: Home },
-  { href: "/tai-lieu", label: "Lớp 1–12", icon: BookOpen },
-  { href: "/lap-trinh", label: "Lập trình", icon: Code2 },
-  { href: "/lop-hoc", label: "Lớp Live", icon: Radio },
-  { href: "/thi", label: "Thi thử", icon: ShieldCheck },
-];
+import {
+  BookOpen,
+  Code2,
+  Home,
+  LayoutDashboard,
+  Radio,
+  ShieldCheck,
+  Users,
+} from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 export function MobileBottomNav() {
   const pathname = usePathname();
+  const { isTeacher, isAdmin } = useAuth();
+
+  const tabs = isTeacher
+    ? [
+        { href: "/cong-dong", label: "MXH GV", icon: Users },
+        { href: "/lop-hoc", label: "Lớp dạy", icon: Radio },
+        { href: "/tai-lieu", label: "Lớp 1–12", icon: BookOpen },
+        { href: "/lap-trinh", label: "Lập trình", icon: Code2 },
+        { href: "/quan-tri", label: "Studio", icon: LayoutDashboard },
+      ]
+    : isAdmin
+      ? [
+          { href: "/cong-dong", label: "Cộng đồng", icon: Users },
+          { href: "/quan-tri", label: "Quản trị", icon: ShieldCheck },
+          { href: "/lop-hoc", label: "Lớp Live", icon: Radio },
+          { href: "/tai-lieu", label: "Lớp 1–12", icon: BookOpen },
+          { href: "/thi", label: "Đề thi", icon: LayoutDashboard },
+        ]
+      : [
+          { href: "/", label: "Trang chủ", icon: Home },
+          { href: "/tai-lieu", label: "Lớp 1–12", icon: BookOpen },
+          { href: "/lap-trinh", label: "Lập trình", icon: Code2 },
+          { href: "/lop-hoc", label: "Lớp Live", icon: Radio },
+          { href: "/thi", label: "Thi thử", icon: ShieldCheck },
+        ];
 
   return (
     <nav
@@ -21,7 +47,7 @@ export function MobileBottomNav() {
       className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200/90 bg-white/95 px-2 pt-1.5 pb-2 shadow-[0_-4px_20px_rgba(15,23,42,0.06)] backdrop-blur-lg md:hidden"
     >
       <div className="mx-auto grid max-w-md grid-cols-5 gap-1">
-        {TABS.map((t) => {
+        {tabs.map((t) => {
           const Icon = t.icon;
           const active = t.href === "/" ? pathname === "/" : pathname.startsWith(t.href);
           return (
