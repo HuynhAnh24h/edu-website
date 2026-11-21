@@ -29,7 +29,7 @@ export function Footer() {
 
             <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold text-emerald-300">
               <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-              Cloudflare Edge Global • Hoạt động 24/7
+              Học trực tuyến miễn phí • Hoạt động 24/7
             </div>
           </div>
 
@@ -88,10 +88,10 @@ export function Footer() {
                 TypeScript
               </Link>
               <Link href="/lap-trinh?track=python" className="hover:text-white transition">
-                Python WebAssembly
+                Lập trình Python
               </Link>
               <Link href="/lap-trinh?track=golang" className="hover:text-white transition">
-                Golang Compiler
+                Lập trình Golang
               </Link>
               <Link href="/lap-trinh?track=mongodb" className="hover:text-white transition">
                 MongoDB NoSQL
@@ -116,7 +116,7 @@ export function Footer() {
               </li>
               <li>
                 <Link href="/dang-nhap" className="hover:text-white transition">
-                  Cài đặt Bảo mật 2 lớp (2FA TOTP)
+                  Cài đặt Bảo mật 2 lớp (2FA)
                 </Link>
               </li>
               <li>
@@ -145,13 +145,13 @@ export function Footer() {
             <Heart className="h-3.5 w-3.5 fill-rose-500 text-rose-500" /> cho cộng đồng học tập Việt Nam.
           </p>
           <div className="flex flex-wrap items-center gap-3 text-[11px] font-medium text-slate-400">
-            <span>GDPT 2018</span>
+            <span>Chương trình GDPT 2018</span>
             <span>•</span>
-            <span>AES-256-GCM</span>
+            <span>Lớp học Trực tuyến</span>
             <span>•</span>
-            <span>2FA TOTP</span>
+            <span>Học Lập trình</span>
             <span>•</span>
-            <span>Browser IDE</span>
+            <span>Bảo mật 2FA</span>
           </div>
         </div>
       </div>

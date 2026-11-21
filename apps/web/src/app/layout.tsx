@@ -11,9 +11,9 @@ const beVietnam = Be_Vietnam_Pro({
 });
 
 export const metadata: Metadata = {
-  title: "EduK12 Scale — Nền tảng Giáo dục Lớp 1–12 & AI Gia sư",
+  title: "EduK12 Open — Nền tảng Học tập Phổ thông 1–12 & Lập trình Cộng đồng",
   description:
-    "Tài liệu học tập lớp 1–12, đăng ký lớp học theo giáo án, làm bài tập trực tuyến, thi trắc nghiệm chịu tải cao và AI Gia sư chuẩn chương trình GDPT 2018.",
+    "Tài liệu học tập lớp 1–12 chuẩn GDPT 2018, lớp học trực tuyến, thi trắc nghiệm, AI Gia sư và 8 khóa học lập trình thực hành ngay trên trình duyệt.",
 };
 
 export default function RootLayout({

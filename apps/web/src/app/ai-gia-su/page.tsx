@@ -29,25 +29,17 @@ function AITutorContent() {
   const [subject, setSubject] = useState<string>(searchParams.get("subject") || "toan");
   const [tutorMode, setTutorMode] = useState<string>("socratic");
   const [input, setInput] = useState<string>(searchParams.get("q") || "");
-  const [providerStatus, setProviderStatus] = useState<string>("Đang kiểm tra...");
   const [streaming, setStreaming] = useState<boolean>(false);
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: "welcome",
       role: "assistant",
-      text: "Xin chào! Thầy là **AI Gia sư K–12**.\n\nHãy chọn đúng **Khối lớp (1–12)** và **Chế độ học** ở phía trên. Hệ thống sẽ khóa cứng kiến thức theo đúng SGK lớp em đang học (không giải vượt cấp) và bật **Semantic Cache** giúp câu hỏi quen thuộc phản hồi gần như tức thì (`<20ms`)!",
+      text: "Xin chào! Thầy là **AI Gia sư K–12**.\n\nHãy chọn đúng **Khối lớp (1–12)** và **Chế độ học** ở phía trên. Thầy sẽ hướng dẫn sát chương trình lớp em đang học (không giải vượt cấp) và gợi mở từng bước giúp em tự hiểu bài nhé!",
       model: "system",
     },
   ]);
 
   const bottomRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    fetch(`${AI_API_URL}/health`)
-      .then((r) => r.json())
-      .then((d) => setProviderStatus(d.active_provider || "mock-socratic-k12"))
-      .catch(() => setProviderStatus("offline"));
-  }, []);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -172,10 +164,10 @@ function AITutorContent() {
             </div>
             <div>
               <h1 className="text-base font-bold text-slate-900">
-                AI Gia sư Lớp 1–12 (RAG + Semantic Cache)
+                AI Gia sư Lớp 1–12
               </h1>
               <p className="text-xs text-slate-500">
-                Backend: <strong className="text-purple-700">{providerStatus}</strong> • Tự động nhận Local Ollama nếu đang chạy
+                Trợ lý học tập 24/7 — bám sát kiến thức từng khối lớp và gợi mở tư duy từng bước
               </p>
             </div>
           </div>
@@ -261,11 +253,11 @@ function AITutorContent() {
                       <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-slate-200/80 pt-2 text-[11px]">
                         {m.cacheHit ? (
                           <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 font-bold text-emerald-800">
-                            <Zap className="h-3 w-3" /> Semantic Cache HIT ({m.latencyMs ?? 5}ms • 0đ token)
+                            <Zap className="h-3 w-3" /> Phản hồi tức thì
                           </span>
                         ) : (
                           <span className="rounded-full bg-purple-100 px-2 py-0.5 font-semibold text-purple-800">
-                            {m.model} {m.latencyMs ? `• ${m.latencyMs}ms` : ""}
+                            AI Gia sư
                           </span>
                         )}
                         {m.citations?.map((c) => (
@@ -305,7 +297,7 @@ function AITutorContent() {
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder={`Nhập câu hỏi môn ${subject} Lớp ${gradeId}... (Thử hỏi lại 2 lần để test Semantic Cache!)`}
+            placeholder={`Nhập câu hỏi môn ${subject} Lớp ${gradeId}... để AI Gia sư hướng dẫn từng bước`}
             className="flex-1 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm focus:border-purple-500 focus:bg-white focus:outline-none"
           />
           <button

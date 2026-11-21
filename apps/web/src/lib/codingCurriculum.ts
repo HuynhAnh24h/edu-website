@@ -457,12 +457,12 @@ export const CODING_TRACKS: CodingTrack[] = [
     id: "python",
     name: "Python Thực chiến & AI",
     shortName: "Python",
-    tagline: "Chạy trình thông dịch Python 3 (WebAssembly) thật ngay trên trình duyệt!",
+    tagline: "Thực hành Python 3 trực tiếp ngay trên trình duyệt — dễ hiểu, thực tế!",
     category: "Backend",
     accentBg: "bg-emerald-50",
     accentText: "text-emerald-700",
     accentBorder: "border-emerald-200",
-    runtimeLabel: "CPython WebAssembly",
+    runtimeLabel: "Chạy Python trực tiếp",
     lessons: [
       {
         id: "py-1",
@@ -546,12 +546,12 @@ export const CODING_TRACKS: CodingTrack[] = [
     id: "golang",
     name: "Golang Hiệu năng cao",
     shortName: "Golang",
-    tagline: "Biên dịch & chạy Go thật trên Cloud Compiler — ngôn ngữ backend triệu CCU.",
+    tagline: "Biên dịch & chạy Golang trực tiếp trên trình duyệt — ngôn ngữ backend tốc độ cao.",
     category: "Backend",
     accentBg: "bg-cyan-50",
     accentText: "text-cyan-700",
     accentBorder: "border-cyan-200",
-    runtimeLabel: "Real Go Compiler",
+    runtimeLabel: "Chạy Golang trực tiếp",
     lessons: [
       {
         id: "go-1",

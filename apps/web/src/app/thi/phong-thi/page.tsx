@@ -229,10 +229,10 @@ function ExamRoomInner() {
           <Lock className="h-3.5 w-3.5" /> Đề thi mã hóa AES-256-GCM
         </div>
         <h1 className="mt-3 text-xl font-bold text-slate-900">
-          Chuẩn bị vào phòng thi ({examId})
+          Chuẩn bị vào phòng thi
         </h1>
         <p className="mt-2 text-sm text-slate-600">
-          Khi bấm bắt đầu, trình duyệt sẽ tải gói đề đã mã hóa từ CDN, nhận khóa giải mã riêng và tự động lưu nháp offline bằng IndexedDB để không bao giờ mất bài khi rớt mạng.
+          Khi bấm bắt đầu, đồng hồ sẽ bắt đầu đếm ngược và hệ thống tự động lưu bài làm trên máy để không bị mất đáp án khi rớt mạng.
         </p>
 
         <div className="mt-5 space-y-2">
@@ -276,10 +276,10 @@ function ExamRoomInner() {
       <div className="mx-auto max-w-lg rounded-2xl border border-indigo-200 bg-white p-10 text-center shadow-xs">
         <Zap className="mx-auto h-10 w-10 animate-pulse text-indigo-600" />
         <h2 className="mt-3 text-lg font-bold text-slate-900">
-          202 Accepted — Đã tiếp nhận bài thi vào hàng đợi!
+          Đang tiếp nhận &amp; chấm điểm bài thi...
         </h2>
         <p className="mt-1 text-sm text-slate-500">
-          Cụm Go Grading Workers đang chấm điểm và cập nhật bảng xếp hạng...
+          Hệ thống đang chấm điểm chi tiết và cập nhật bảng xếp hạng...
         </p>
       </div>
     );
@@ -298,8 +298,7 @@ function ExamRoomInner() {
                 {result.score.toFixed(2)} / {result.max_score.toFixed(2)} điểm
               </h1>
               <p className="mt-1 text-sm text-indigo-100">
-                Đúng trọn vẹn {result.correct_count}/{result.total_questions} câu • Thời gian làm: {result.duration_sec}s • Worker chấm trong{" "}
-                <strong>{result.grading_latency_us ?? 15} µs</strong>
+                Đúng trọn vẹn {result.correct_count}/{result.total_questions} câu • Thời gian làm: {result.duration_sec} giây
               </p>
             </div>
             <Link

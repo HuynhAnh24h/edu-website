@@ -321,7 +321,7 @@ function AuthPageInner() {
                   Xác thực 2 lớp (2FA — Google Authenticator / Authy)
                 </h2>
                 <p className="text-xs text-slate-500">
-                  Bảo vệ tài khoản bằng mã OTP 6 chữ số thay đổi mỗi 30 giây theo chuẩn RFC-6238.
+                  Bảo vệ tài khoản bằng mã OTP 6 chữ số thay đổi mỗi 30 giây trên điện thoại của bạn.
                 </p>
               </div>
             </div>
@@ -701,7 +701,7 @@ function AuthPageInner() {
           <h2 className="text-sm font-bold">Bảo mật 2FA &amp; Tài khoản Demo</h2>
         </div>
         <p className="text-xs leading-relaxed text-slate-600">
-          Hỗ trợ <strong>2FA (Google Authenticator TOTP)</strong>, đăng nhập <strong>Google &amp; Facebook OAuth 2.0</strong> và lưu tiến độ học lập trình trên Cloudflare D1.
+          Hỗ trợ <strong>bảo mật 2 lớp (Google Authenticator)</strong>, đăng nhập nhanh qua <strong>Google &amp; Facebook</strong> và lưu trọn bộ tiến độ học tập trực tuyến.
         </p>
 
         <div className="space-y-2.5">

@@ -449,7 +449,7 @@ export function LiveClassroomStudio({
                   Bật Camera / Mic / Chia sẻ màn hình Slide trực tiếp trên trình duyệt (Miễn phí 0đ)
                 </span>
                 <div className="flex items-center gap-1.5">
-                  <span className="text-slate-400">Máy chủ:</span>
+                  <span className="text-slate-400">Kênh phát:</span>
                   <button
                     type="button"
                     onClick={() => setWebrtcServer("ffmuc")}
@@ -459,7 +459,7 @@ export function LiveClassroomStudio({
                         : "bg-slate-800 text-slate-400 hover:text-white"
                     }`}
                   >
-                    Open Jitsi (Không cần đăng nhập)
+                    Kênh chính
                   </button>
                   <button
                     type="button"
@@ -470,7 +470,7 @@ export function LiveClassroomStudio({
                         : "bg-slate-800 text-slate-400 hover:text-white"
                     }`}
                   >
-                    Jitsi Dự phòng
+                    Kênh dự phòng
                   </button>
                 </div>
               </div>

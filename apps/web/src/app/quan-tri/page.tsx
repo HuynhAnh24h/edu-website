@@ -100,11 +100,11 @@ const TAB_META: Record<DashboardTab, { title: string; subtitle: string }> = {
   },
   live: {
     title: "Phòng học Trực tuyến & Livestream",
-    subtitle: "Mở lớp Video 2 chiều WebRTC (0đ) hoặc phát Livestream YouTube/OBS kèm Live Chat & Điểm danh tự động.",
+    subtitle: "Mở lớp Video tương tác 2 chiều hoặc phát Livestream kèm Live Chat & Điểm danh tự động.",
   },
   lessons: {
     title: "Soạn Bài giảng (Kiểu Word)",
-    subtitle: "Trình soạn thảo trực quan hỗ trợ công thức KaTeX, tài liệu đính kèm và câu hỏi củng cố.",
+    subtitle: "Trình soạn thảo trực quan hỗ trợ công thức Toán/Lý/Hóa, tài liệu đính kèm và câu hỏi củng cố.",
   },
   questions: {
     title: "Ngân hàng Câu hỏi Trực quan",
@@ -112,7 +112,7 @@ const TAB_META: Record<DashboardTab, { title: string; subtitle: string }> = {
   },
   exams: {
     title: "Tạo & Xuất bản Đề kiểm tra",
-    subtitle: "Chọn câu hỏi từ ngân hàng và tự động mã hóa gói đề thi AES-256-GCM.",
+    subtitle: "Chọn câu hỏi từ ngân hàng và xuất bản đề thi trực tuyến ngay cho học sinh.",
   },
   import: {
     title: "Import JSON & Tách đề Thông minh",
@@ -549,7 +549,7 @@ export default function CMSAdminPage() {
         {
           id: "exams",
           label: "Tạo Đề kiểm tra",
-          desc: "Mã hóa AES-256-GCM",
+          desc: "Xuất bản đề thi trực tuyến",
           icon: ShieldCheck,
         },
         {
@@ -727,7 +727,7 @@ export default function CMSAdminPage() {
           <div className="flex flex-wrap items-center gap-2">
             <span className="hidden items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-[11px] font-bold text-emerald-700 sm:inline-flex">
               <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-              Cloudflare Edge • ONLINE
+              Hệ thống đang hoạt động
             </span>
             <button
               type="button"
@@ -1196,7 +1196,7 @@ export default function CMSAdminPage() {
                             )
                           )
                         }
-                        placeholder="Link file trên Cloudflare R2 / YouTube / Google Drive"
+                        placeholder="Link file PDF / YouTube / Google Drive"
                         className="rounded-xl border border-slate-300 px-3 py-2 text-xs sm:col-span-4"
                       />
                       <button
@@ -1242,7 +1242,7 @@ export default function CMSAdminPage() {
                       className="h-4 w-4 accent-emerald-600"
                     />
                     <ShieldCheck className="h-4 w-4 text-emerald-600" />
-                    Tự động tạo luôn Bài kiểm tra nhanh trên /thi (Mã hóa AES-256-GCM) từ các câu hỏi trên
+                    Tự động tạo luôn Bài kiểm tra nhanh trên /thi từ các câu hỏi trên
                   </label>
 
                   <label className="flex items-center gap-2 text-xs font-semibold text-purple-800">
@@ -1253,7 +1253,7 @@ export default function CMSAdminPage() {
                       className="h-4 w-4 accent-purple-600"
                     />
                     <Database className="h-4 w-4 text-purple-600" />
-                    Tự động nạp nội dung bài giảng vào tri thức AI Gia sư (RAG)
+                    Tự động cập nhật nội dung bài giảng vào AI Gia sư
                   </label>
                 </div>
 
@@ -1362,7 +1362,7 @@ export default function CMSAdminPage() {
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div>
                   <h2 className="text-base font-bold text-slate-900">
-                    Xuất bản Đề thi mới (Tự động mã hóa AES-256-GCM)
+                    Xuất bản Đề thi mới
                   </h2>
                   <p className="text-xs text-slate-500">
                     Chọn các câu hỏi từ Ngân hàng bên dưới — đề thi sẽ xuất hiện ngay tại trang /thi và có thể giao cho lớp học.
@@ -1478,7 +1478,7 @@ export default function CMSAdminPage() {
                 type="submit"
                 className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-6 py-2.5 text-sm font-bold text-white shadow hover:bg-emerald-500"
               >
-                <ShieldCheck className="h-4 w-4" /> Xuất bản Đề thi &amp; Mã hóa AES-256-GCM
+                <ShieldCheck className="h-4 w-4" /> Xuất bản Đề thi trực tuyến
               </button>
             </form>
           )}

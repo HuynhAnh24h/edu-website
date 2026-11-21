@@ -192,7 +192,7 @@ export const SUBJECT_META: Record<string, SubjectMeta> = {
     name: "Lập trình Python",
     shortName: "Python",
     icon: Terminal,
-    tagline: "Python 3 WebAssembly, Dữ liệu & AI",
+    tagline: "Lập trình Python 3, Xử lý dữ liệu & AI",
     cardBg: "bg-emerald-50/70 border-emerald-200 hover:border-emerald-400",
     iconBoxBg: "bg-emerald-100 text-emerald-700",
     badgeBg: "bg-emerald-100 text-emerald-700",

@@ -32,13 +32,13 @@ export default function ExamsLobbyPage() {
           <div>
             <div className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-700">
               <ShieldCheck className="h-4 w-4" />
-              KIẾN TRÚC PHÒNG THI CHỊU TẢI 1.000.000 CCU
+              PHÒNG THI TRỰC TUYẾN CHUẨN GDPT 2018
             </div>
             <h1 className="mt-1 text-2xl font-bold text-slate-900">
               Thi Trắc nghiệm Trực tuyến
             </h1>
             <p className="mt-1 text-sm text-slate-600">
-              Đề thi được tiền mã hóa <strong>AES-256-GCM</strong> (phát qua CDN không chạm Database), giải mã cục bộ bằng Web Crypto API, lưu nháp offline <strong>IndexedDB</strong> và chấm điểm qua <strong>Async Worker Pool</strong>.
+              Luyện đề chuẩn cấu trúc mới 2025+, tự động lưu bài làm ngay trên máy khi rớt mạng và chấm điểm kèm lời giải chi tiết ngay sau khi nộp.
             </p>
           </div>
         </div>
@@ -67,7 +67,7 @@ export default function ExamsLobbyPage() {
                     {ex.mode === "mock_live" ? "Thi thử đồng loạt" : "Luyện đề tự do"}
                   </span>
                   <span className="inline-flex items-center gap-1 text-slate-400">
-                    <Lock className="h-3 w-3" /> AES-256-GCM v{ex.bundle_version}
+                    <Lock className="h-3 w-3" /> Đề thi bảo mật
                   </span>
                 </div>
                 <h2 className="text-base font-bold text-slate-900">{ex.title}</h2>

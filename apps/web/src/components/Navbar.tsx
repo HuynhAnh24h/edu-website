@@ -29,9 +29,9 @@ const MAIN_LINKS = [
 ];
 
 const MORE_LINKS = [
-  { href: "/thi", label: "Thi trắc nghiệm", desc: "Phòng thi AES-256-GCM", icon: ShieldCheck },
-  { href: "/bai-tap", label: "Bài tập 1–12", desc: "4 định dạng đề 2025+", icon: CheckSquare },
-  { href: "/ai-gia-su", label: "AI Gia sư 24/7", desc: "Hỏi bài chuẩn Socratic", icon: Bot },
+  { href: "/thi", label: "Thi trắc nghiệm", desc: "Luyện đề & chấm điểm tức thì", icon: ShieldCheck },
+  { href: "/bai-tap", label: "Bài tập 1–12", desc: "4 định dạng câu hỏi 2025+", icon: CheckSquare },
+  { href: "/ai-gia-su", label: "AI Gia sư 24/7", desc: "Hướng dẫn học từng bước", icon: Bot },
 ];
 
 export function Navbar() {

@@ -756,23 +756,23 @@ export function ClassroomManager({
                         {
                           id: "webrtc" as const,
                           icon: Video,
-                          title: "Video 2 chiều (WebRTC)",
+                          title: "Phòng Video 2 chiều",
                           badge: "Khuyên dùng • 0đ",
                           desc: "Bật Camera, Mic, Chia sẻ Slide, Giơ tay ngay trên web không cần cài app.",
                         },
                         {
                           id: "youtube" as const,
                           icon: Tv,
-                          title: "Livestream YouTube / OBS",
-                          badge: "Lớp siêu đông",
-                          desc: "Phát từ OBS lên YouTube (Không công khai) rồi dán link để học sinh xem mượt.",
+                          title: "Livestream YouTube",
+                          badge: "Lớp đông người",
+                          desc: "Dán link YouTube Live (Không công khai) để hàng trăm học viên xem mượt.",
                         },
                         {
                           id: "stream_url" as const,
                           icon: Globe,
-                          title: "Link Stream / HLS / Cloudflare",
+                          title: "Link phát trực tiếp khác",
                           badge: "Đa nền tảng",
-                          desc: "Dán link .m3u8, .mp4, Cloudflare Stream iframe hoặc link nhúng bất kỳ.",
+                          desc: "Dán link video trực tiếp hoặc link nhúng từ nền tảng phát khác.",
                         },
                       ].map((m) => {
                         const Icon = m.icon;

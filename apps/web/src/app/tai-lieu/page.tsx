@@ -176,7 +176,7 @@ function MaterialsTreeContent() {
             Cây Chương trình &amp; Tài liệu Lớp 1–12
           </h1>
           <p className="text-sm text-slate-500">
-            Chọn Khối lớp → Môn học → Chương → Bài giảng (Tải siêu tốc theo yêu cầu trên Cloudflare Edge).
+            Chọn Khối lớp → Môn học → Chương → Bài giảng chuẩn chương trình GDPT 2018.
           </p>
         </div>
 
