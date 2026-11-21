@@ -501,6 +501,71 @@ export default {
         return jsonRes({ user });
       }
 
+      if (path === "/api/v1/auth/me" && method === "PATCH") {
+        const claims = await getClaims(request, env);
+        if (!claims) return jsonRes({ error: "Vui lòng đăng nhập" }, 401);
+        const body = (await request.json().catch(() => ({}))) as {
+          full_name?: string;
+          school_name?: string;
+          current_grade?: number | null;
+          current_password?: string;
+          new_password?: string;
+        };
+
+        const existing = await env.DB.prepare("SELECT * FROM users WHERE id = ?")
+          .bind(claims.uid)
+          .first<Record<string, unknown>>();
+        if (!existing) return jsonRes({ error: "Không tìm thấy tài khoản" }, 404);
+        if (Number(existing.is_active ?? 1) === 0) {
+          return jsonRes({ error: "Tài khoản đang bị tạm khóa" }, 403);
+        }
+
+        const nextName =
+          typeof body.full_name === "string" && body.full_name.trim().length >= 2
+            ? body.full_name.trim().slice(0, 100)
+            : String(existing.full_name);
+        const nextSchool =
+          typeof body.school_name === "string"
+            ? body.school_name.trim().slice(0, 140)
+            : String(existing.school_name || "");
+        const nextGrade =
+          body.current_grade === null
+            ? null
+            : typeof body.current_grade === "number" && body.current_grade >= 1 && body.current_grade <= 12
+              ? Math.round(body.current_grade)
+              : existing.current_grade;
+
+        let nextPassHash = String(existing.password_hash);
+        if (body.new_password && body.new_password.trim().length > 0) {
+          if (body.new_password.trim().length < 6) {
+            return jsonRes({ error: "Mật khẩu mới cần tối thiểu 6 ký tự." }, 400);
+          }
+          const okOld = await verifyPassword(String(body.current_password || ""), String(existing.password_hash));
+          if (!okOld) {
+            return jsonRes({ error: "Mật khẩu hiện tại chưa chính xác." }, 400);
+          }
+          nextPassHash = await hashPassword(body.new_password.trim());
+        }
+
+        await env.DB.prepare(
+          "UPDATE users SET full_name = ?, school_name = ?, current_grade = ?, password_hash = ? WHERE id = ?"
+        )
+          .bind(nextName, nextSchool, nextGrade ?? null, nextPassHash, claims.uid)
+          .run();
+
+        const updated = await env.DB.prepare(
+          "SELECT id, email, full_name, role, tier, current_grade, school_name FROM users WHERE id = ?"
+        )
+          .bind(claims.uid)
+          .first();
+
+        return jsonRes({
+          ok: true,
+          user: updated,
+          message: "Đã lưu thay đổi thông tin hồ sơ cá nhân!",
+        });
+      }
+
       // Tự xóa tài khoản (Bắt buộc theo chính sách Apple App Store 5.1.1(v) & Google Play Data Deletion)
       if (path === "/api/v1/auth/me" && method === "DELETE") {
         const claims = await getClaims(request, env);

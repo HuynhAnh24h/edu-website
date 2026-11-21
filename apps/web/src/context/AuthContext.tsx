@@ -40,6 +40,7 @@ interface AuthContextValue {
     current_grade?: number;
     school_name?: string;
   }) => Promise<{ ok: boolean; error?: string; user?: AuthUser }>;
+  refreshUser: () => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -178,6 +179,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     [persistSession]
   );
 
+  const refreshUser = useCallback(async () => {
+    const token = accessToken || (typeof window !== "undefined" ? localStorage.getItem(TOKEN_KEY) : null);
+    if (!token) return;
+    try {
+      const res = await fetch(`${CORE_API_URL}/api/v1/auth/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data?.user) setUser(data.user as AuthUser);
+      }
+    } catch {
+      // ignore transient
+    }
+  }, [accessToken]);
+
   const logout = useCallback(async () => {
     const refresh = localStorage.getItem(REFRESH_KEY);
     if (refresh) {
@@ -212,6 +229,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         verify2faLogin,
         completeOAuthExchange,
         register,
+        refreshUser,
         logout,
       }}
     >
