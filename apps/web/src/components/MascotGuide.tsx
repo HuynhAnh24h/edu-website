@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ArrowDown,
   ArrowLeft,
@@ -15,6 +15,8 @@ import {
   Code2,
   GraduationCap,
   HelpCircle,
+  Pause,
+  Play,
   Radio,
   Sparkles,
   X,
@@ -128,55 +130,118 @@ const TOURS: Record<TourKind, FlyingTourStep[]> = {
 function getContextualTip(pathname: string): { title: string; text: string; tour: TourKind } {
   if (pathname.startsWith("/quan-tri")) {
     return {
-      title: "Cú Bông sẵn sàng dẫn đường Thầy/Cô!",
-      text: "Bấm nút bên dưới để mình bay chỉ tận tay cách mở Lớp Lập trình, bật Phòng học Live 0đ và soạn bài giảng kiểu Word nhé!",
+      title: "Cú Bông luôn bay theo dẫn đường Thầy/Cô!",
+      text: "Thầy/Cô cứ bấm chọn bất kỳ mục nào — Cú Bông sẽ tự bay vù tới ngay chỗ đó để chỉ dẫn!",
       tour: "teacher",
     };
   }
   if (pathname.startsWith("/lap-trinh")) {
     return {
-      title: "Mẹo học Lập trình siêu hiệu quả!",
-      text: "Tự đọc đề → gõ code vào khung tối → bấm Ctrl+Enter chấm test! Đạt 100% test mà không cần gợi ý sẽ nhận huy hiệu Tự lực xuất sắc!",
+      title: "Học Lập trình cùng Cú Bông!",
+      text: "Chọn ngôn ngữ → gõ code → bấm Ctrl+Enter! Cú Bông sẽ bay theo cổ vũ từng bước của bạn!",
       tour: "coding",
     };
   }
   if (pathname.startsWith("/lop-hoc")) {
     return {
-      title: "Mẹo tham gia Lớp Lập trình & Lớp 1–12",
-      text: "Nhập mã lớp (VD: CODE-JS01 hoặc TOAN12-A1) vào ô góc trên phải, hoặc lọc 'Lớp Lập trình Cộng đồng' để đăng ký ngay!",
-      tour: "student-classroom",
-    };
-  }
-  if (pathname.startsWith("/tai-lieu")) {
-    return {
-      title: "Học theo từng Môn & Chương",
-      text: "Chọn Khối lớp 1–12 → chọn thẻ Môn học (Toán, Lý, Hóa, Sử, Địa...) → bấm mở từng Chương ở cột trái để đọc bài giảng nhé!",
+      title: "Tham gia Lớp Lập trình & Lớp 1–12",
+      text: "Nhập mã lớp (VD: CODE-JS01 hoặc TOAN12-A1) hoặc chọn lớp bên dưới để vào học ngay!",
       tour: "student-classroom",
     };
   }
   return {
     title: "Hú hú! Mình là Cú Bông Edu!",
-    text: "Mình có thể bay đi chỉ từng nút cho người mới học Lập trình, vào Lớp Live hoặc tạo lớp cho Giáo viên! Bấm xem hướng dẫn bay bên dưới nhé!",
+    text: "Bạn cứ bấm chọn bất kỳ nút hay mục nào trên web — mình sẽ tự động vỗ cánh bay ngay tới chỗ đó để hướng dẫn bạn liền!",
     tour: "coding",
   };
+}
+
+/**
+ * Sinh lời dẫn hào hứng theo đúng nút/mục người dùng vừa bấm chọn
+ */
+function buildInstantReaction(el: HTMLElement): string {
+  const tourAttr = el.getAttribute("data-tour") || "";
+  const href = el.getAttribute("href") || "";
+  const rawText = (el.textContent || "").replace(/\s+/g, " ").trim();
+  const shortLabel = rawText.slice(0, 38);
+  const lower = rawText.toLowerCase();
+
+  if (tourAttr === "sidebar-classrooms" || lower.includes("quản lý lớp")) {
+    return "Mở Lớp Lập trình hoặc Lớp 1–12, lấy Mã lớp & quản lý học viên ngay tại đây!";
+  }
+  if (tourAttr === "header-live-btn" || lower.includes("phát live") || lower.includes("phòng học live")) {
+    return "Bật Video 2 chiều 0đ hoặc dán link YouTube/OBS để dạy trực tuyến kèm điểm danh!";
+  }
+  if (tourAttr === "sidebar-lessons" || lower.includes("soạn bài giảng")) {
+    return "Soạn bài giảng đẹp như Microsoft Word + chèn công thức Toán/Lý/Hóa KaTeX!";
+  }
+  if (tourAttr === "sidebar-exams" || lower.includes("đề kiểm tra")) {
+    return "Xuất bản đề thi mã hóa AES-256-GCM và giao thẳng cho lớp học chấm tự động!";
+  }
+  if (tourAttr === "coding-run-btn" || lower.includes("chạy & kiểm tra")) {
+    return "Đang chạy chấm test! Đạt 100% PASS là Cú Bông mở khóa bài tiếp theo liền!";
+  }
+  if (lower.includes("tạo lớp học") || lower.includes("mở lớp")) {
+    return "Chọn 'Lớp Lập trình Cộng đồng' hoặc 'Lớp 1–12' rồi đặt tên lớp thật hay nhé!";
+  }
+  if (lower.includes("lớp lập trình")) {
+    return "Tuyệt vời! Bạn có thể dạy HTML, CSS, JS, TS, Python, Golang, MongoDB & PostgreSQL!";
+  }
+  if (lower.includes("gợi mở tầng")) {
+    return "Đọc kỹ gợi mở rồi tự tay gõ code nhé — tự tư duy mới nhớ lâu cực đỉnh!";
+  }
+  if (lower.includes("chuyển bài tiếp theo")) {
+    return "Quá xuất sắc! Bay sang chinh phục thử thách tiếp theo nào!";
+  }
+  if (lower.includes("đăng ký học") || lower.includes("tham gia")) {
+    return "Hoan hô! Vào lớp học đúng giáo án & nhớ điểm danh khi thầy cô bật LIVE nhé!";
+  }
+  if (lower.includes("vào phòng live")) {
+    return "Đang mở Phòng học Trực tuyến — hệ thống tự điểm danh bạn rồi đó!";
+  }
+  if (href.includes("/lap-trinh") || /\b(html|css|javascript|typescript|python|golang|mongodb|postgresql)\b/i.test(lower)) {
+    return `Chinh phục ${shortLabel || "Lập trình"} ngay trên trình duyệt — chạy ĐÚNG mới qua bài!`;
+  }
+  if (href.includes("/lop-hoc") || lower.includes("lớp live")) {
+    return "Khám phá Lớp Lập trình Cộng đồng & Lớp Phổ thông 1–12 có Livestream 0đ!";
+  }
+  if (href.includes("/tai-lieu") || /^lớp\s+\d+$/i.test(lower)) {
+    return `Mở ngay ${shortLabel} để xem đầy đủ các môn theo Chương & Bài giảng chuẩn GDPT 2018!`;
+  }
+  if (href.includes("/ai-gia-su") || lower.includes("ai gia sư")) {
+    return "Hỏi AI Gia sư Socratic bất cứ bài khó nào — thầy AI sẽ gợi mở từng bước dễ hiểu!";
+  }
+  if (href.includes("/dang-nhap") || lower.includes("đăng nhập") || lower.includes("2fa")) {
+    return "Hỗ trợ đăng nhập Email, Google, Facebook & bật bảo mật 2FA Google Authenticator!";
+  }
+  if (el.tagName === "TEXTAREA" || el.tagName === "INPUT") {
+    return "Cú Bông đang đứng cạnh cổ vũ bạn nhập liệu đây! Cứ tự tin nhé!";
+  }
+  if (shortLabel) {
+    return `Bạn vừa chọn "${shortLabel}" — Cú Bông đã bay tới ngay để đồng hành cùng bạn!`;
+  }
+  return "Hú hú! Cú Bông đang bay theo hỗ trợ từng thao tác của bạn đây!";
 }
 
 function EduOwlSvg({
   happy = false,
   flying = false,
   pointing = false,
+  faceLeft = false,
 }: {
   happy?: boolean;
   flying?: boolean;
   pointing?: boolean;
+  faceLeft?: boolean;
 }) {
   return (
     <svg
       viewBox="0 0 92 84"
-      className={`h-16 w-16 drop-shadow-lg ${flying ? "animate-owl-float" : ""}`}
+      className={`h-16 w-16 drop-shadow-lg ${flying ? "animate-owl-float" : ""} ${
+        faceLeft ? "-scale-x-100" : ""
+      }`}
       aria-hidden="true"
     >
-      {/* Ngôi sao hào hứng khi bay hướng dẫn */}
       {flying && (
         <>
           <circle cx="12" cy="14" r="2.6" fill="#fbbf24" className="animate-ping" />
@@ -195,7 +260,7 @@ function EduOwlSvg({
         <ellipse cx="19" cy="51" rx="7" ry="12" fill="#4338ca" transform="rotate(16 19 51)" />
       </g>
 
-      {/* Cánh phải vỗ hoặc giơ gậy chỉ đường */}
+      {/* Cánh phải vỗ & cầm que chỉ đường */}
       <g className={flying ? "animate-owl-wing-r" : ""}>
         <ellipse cx="69" cy="50" rx="7" ry="12" fill="#4338ca" transform="rotate(-22 69 50)" />
         {pointing && (
@@ -255,14 +320,54 @@ export function MascotGuide() {
   const [tourKind, setTourKind] = useState<TourKind>("student-classroom");
   const [stepIdx, setStepIdx] = useState(0);
   const [celebrationMsg, setCelebrationMsg] = useState("");
-  const [pulseBadge, setPulseBadge] = useState(false);
 
-  // Tọa độ bay & khung spotlight bám theo phần tử đang chỉ dẫn
+  // CHẾ ĐỘ TỰ ĐỘNG BAY THEO BẤT KỲ MỤC NÀO NGƯỜI DÙNG CHỌN (MẶC ĐỊNH BẬT SẴN!)
+  const [autoFollow, setAutoFollow] = useState(true);
+  const [companionPos, setCompanionPos] = useState<{ left: number; top: number; faceLeft: boolean } | null>(null);
+  const [instantSpeech, setInstantSpeech] = useState("");
+  const [bursting, setBursting] = useState(false);
+  const speechTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const burstTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Tọa độ bay & khung spotlight khi chạy tour từng bước
   const [targetBox, setTargetBox] = useState<TargetBox | null>(null);
   const [flyPos, setFlyPos] = useState<{ left: number; top: number; arrowDir: "left" | "right" | "up" | "down" } | null>(null);
 
-  // Ẩn linh vật khi đang làm bài thi thật để tránh phân tâm
+  // Ẩn linh vật khi đang làm bài thi thật
   const hidden = pathname.startsWith("/thi/phong-thi");
+
+  // Khôi phục tùy chọn autoFollow và đặt vị trí xuất phát ở góc dưới phải để cú bay mượt ngay từ cú click ĐẦU TIÊN
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const saved = localStorage.getItem("eduk12_mascot_autofollow");
+    if (saved === "0") {
+      setAutoFollow(false);
+    } else {
+      setCompanionPos({
+        left: Math.max(16, window.innerWidth - 96),
+        top: Math.max(80, window.innerHeight - 96),
+        faceLeft: true,
+      });
+    }
+  }, []);
+
+  const toggleAutoFollow = () => {
+    setAutoFollow((prev) => {
+      const next = !prev;
+      localStorage.setItem("eduk12_mascot_autofollow", next ? "1" : "0");
+      if (!next) {
+        setCompanionPos(null);
+        setInstantSpeech("");
+      } else {
+        setCompanionPos({
+          left: Math.max(16, window.innerWidth - 96),
+          top: Math.max(80, window.innerHeight - 96),
+          faceLeft: true,
+        });
+      }
+      return next;
+    });
+  };
 
   const startTour = useCallback((kind: TourKind, customBanner = "") => {
     setTourKind(kind);
@@ -270,10 +375,62 @@ export function MascotGuide() {
     setMode("tour");
     setStepIdx(0);
     setOpen(true);
-    setPulseBadge(false);
+    setInstantSpeech("");
   }, []);
 
-  // Lắng nghe sự kiện gọi linh vật bay chỉ dẫn từ mọi trang
+  // === TỰ ĐỘNG BAY VÙ TỚI NGAY BẤT KỲ NÚT / MỤC NÀO NGƯỜI DÙNG CHỌN (KHÔNG CẦN ẤN CHO PHÉP!) ===
+  useEffect(() => {
+    if (hidden || !autoFollow) return;
+
+    const handleGlobalClick = (e: MouseEvent) => {
+      // Nếu đang mở tour hướng dẫn chính thì nhường quyền cho tour
+      if (open && mode === "tour") return;
+
+      const rawTarget = e.target as HTMLElement | null;
+      if (!rawTarget || rawTarget.closest("[data-mascot-ui]")) return;
+
+      const interactive = rawTarget.closest(
+        'button, a, select, input, textarea, [role="tab"], [data-tour]'
+      ) as HTMLElement | null;
+      if (!interactive) return;
+
+      const rect = interactive.getBoundingClientRect();
+      if (rect.width === 0 && rect.height === 0) return;
+
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const owlW = 72;
+      const owlH = 72;
+
+      // Bay tới đậu ngay cạnh phần tử vừa chọn (tránh che mất phần tử đang bấm)
+      let left = rect.right + 10;
+      let faceLeft = true; // Cú quay mặt nhìn vào nút bên trái nó
+      if (left + owlW + 16 > vw) {
+        left = Math.max(12, rect.left - owlW - 10);
+        faceLeft = false; // Đậu bên trái thì quay mặt nhìn sang phải
+      }
+      let top = rect.top + rect.height / 2 - owlH / 2 - 8;
+      top = Math.max(72, Math.min(top, vh - owlH - 16));
+      left = Math.max(12, Math.min(left, vw - owlW - 12));
+
+      setCompanionPos({ left, top, faceLeft });
+      setInstantSpeech(buildInstantReaction(interactive));
+      setBursting(true);
+
+      if (burstTimerRef.current) clearTimeout(burstTimerRef.current);
+      burstTimerRef.current = setTimeout(() => setBursting(false), 1400);
+
+      if (speechTimerRef.current) clearTimeout(speechTimerRef.current);
+      speechTimerRef.current = setTimeout(() => setInstantSpeech(""), 4800);
+    };
+
+    document.addEventListener("click", handleGlobalClick, true);
+    return () => {
+      document.removeEventListener("click", handleGlobalClick, true);
+    };
+  }, [hidden, autoFollow, open, mode]);
+
+  // Lắng nghe sự kiện gọi tour từ mọi trang
   useEffect(() => {
     const onTourEvent = (e: Event) => {
       const custom = e as CustomEvent<{
@@ -299,7 +456,7 @@ export function MascotGuide() {
     return () => window.removeEventListener("eduk12:mascot-tour", onTourEvent);
   }, [pathname, startTour]);
 
-  // Tự động kích hoạt bay hướng dẫn cho Giáo viên vừa đăng ký / Học sinh mới / Người mới vào /lap-trinh
+  // Tự động kích hoạt tour bay khi Giáo viên / Học viên vừa đăng ký mới
   useEffect(() => {
     if (typeof window === "undefined" || hidden) return;
 
@@ -308,8 +465,8 @@ export function MascotGuide() {
       if (pending === "teacher" && pathname.startsWith("/quan-tri")) {
         localStorage.removeItem("eduk12_pending_tour");
         const timer = setTimeout(() => {
-          startTour("teacher", "Chào mừng Thầy/Cô vừa đăng ký tài khoản! Để Cú Bông bay dẫn đường nhé!");
-        }, 450);
+          startTour("teacher", "Chào mừng Thầy/Cô mới! Cú Bông bay dẫn đường liền đây!");
+        }, 400);
         return () => clearTimeout(timer);
       }
       if (pending === "student-classroom" && !pathname.startsWith("/dang-nhap")) {
@@ -319,29 +476,13 @@ export function MascotGuide() {
             pathname.startsWith("/lap-trinh") ? "coding" : "student-classroom",
             "Chào mừng thành viên mới gia nhập cộng đồng EduK12!"
           );
-        }, 450);
+        }, 400);
         return () => clearTimeout(timer);
       }
     }
-
-    if (pathname.startsWith("/lop-hoc") && !localStorage.getItem("eduk12_seen_classroom_mascot")) {
-      localStorage.setItem("eduk12_seen_classroom_mascot", "1");
-      const timer = setTimeout(() => startTour("student-classroom"), 500);
-      return () => clearTimeout(timer);
-    }
-
-    if (pathname.startsWith("/lap-trinh") && !localStorage.getItem("eduk12_seen_coding_mascot")) {
-      localStorage.setItem("eduk12_seen_coding_mascot", "1");
-      const timer = setTimeout(() => startTour("coding"), 500);
-      return () => clearTimeout(timer);
-    }
-
-    if (!localStorage.getItem("eduk12_mascot_greeted")) {
-      setPulseBadge(true);
-    }
   }, [pathname, hidden, startTour]);
 
-  // Tính toán vị trí bay & khung spotlight bám theo phần tử mục tiêu của bước tour hiện tại
+  // Tính vị trí Spotlight & bay theo bước tour
   useEffect(() => {
     if (!open || mode !== "tour" || hidden) {
       setTargetBox(null);
@@ -387,7 +528,6 @@ export function MascotGuide() {
       const cardW = vw < 640 ? Math.min(320, vw - 24) : 356;
       const cardH = 260;
 
-      // Ưu tiên bay sang phải phần tử -> sang trái -> xuống dưới -> lên trên
       let left = rect.right + 18;
       let top = rect.top - 12;
       let arrowDir: "left" | "right" | "up" | "down" = "left";
@@ -442,9 +582,12 @@ export function MascotGuide() {
           ? ArrowUp
           : ArrowDown;
 
+  // Khi đang ở chế độ tự bay theo người dùng (chưa mở hộp thoại menu)
+  const isRoaming = !open && autoFollow && companionPos !== null;
+
   return (
     <>
-      {/* Khung Spotlight phát sáng bao quanh nút / khu vực Cú Bông đang chỉ tới */}
+      {/* Khung Spotlight phát sáng khi đang chạy tour từng bước */}
       {isFlyingTour && targetBox && (
         <div
           className="pointer-events-none fixed z-40 rounded-2xl border-2 border-amber-400 bg-indigo-500/10 transition-all duration-500 ease-out animate-spotlight-ring"
@@ -457,13 +600,13 @@ export function MascotGuide() {
         />
       )}
 
-      {/* CHẾ ĐỘ BAY THEO & CHỈ ĐƯỜNG KHI ĐANG HƯỚNG DẪN NGƯỜI MỚI */}
+      {/* CHẾ ĐỘ 1: TOUR BAY CHỈ TỪNG NÚT */}
       {isFlyingTour && flyPos ? (
         <div
+          data-mascot-ui
           className="fixed z-50 w-[320px] sm:w-[356px] transition-all duration-700 ease-out"
           style={{ left: flyPos.left, top: flyPos.top }}
         >
-          {/* Chú Cú Bông bay lơ lửng ngay trên đầu hộp thoại, vỗ cánh & cầm que chỉ! */}
           <div className="mb-1 flex items-center justify-between px-2">
             <div className="flex items-center gap-2">
               <EduOwlSvg happy={true} flying={true} pointing={true} />
@@ -555,18 +698,62 @@ export function MascotGuide() {
             </div>
           </div>
         </div>
+      ) : isRoaming && companionPos ? (
+        /* CHẾ ĐỘ 2: CÚ BÔNG TỰ ĐỘNG BAY VÙ TỚI ĐÚNG MỤC NGƯỜI DÙNG VỪA BẤM CHỌN! */
+        <div
+          data-mascot-ui
+          className="pointer-events-none fixed z-50 transition-all duration-700 ease-out"
+          style={{ left: companionPos.left, top: companionPos.top }}
+        >
+          <div className="relative flex items-start gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                setMode("tip");
+                setOpen(true);
+              }}
+              title="Bấm vào Cú Bông để xem menu nhanh hoặc tạm dừng bay theo"
+              className="pointer-events-auto relative rounded-full p-0.5 transition hover:scale-110 focus:outline-none"
+            >
+              <EduOwlSvg
+                happy={true}
+                flying={true}
+                pointing={bursting}
+                faceLeft={companionPos.faceLeft}
+              />
+            </button>
+
+            {instantSpeech && (
+              <div
+                className={`pointer-events-none absolute ${
+                  companionPos.left > (typeof window !== "undefined" ? window.innerWidth * 0.58 : 700)
+                    ? "right-16"
+                    : "left-16"
+                } top-0 w-60 rounded-2xl border-2 border-indigo-300 bg-white/95 px-3.5 py-2.5 text-xs font-semibold text-slate-800 shadow-xl backdrop-blur`}
+              >
+                <div className="flex items-center gap-1 text-[10px] font-extrabold uppercase text-indigo-600">
+                  <Sparkles className="h-3 w-3 text-amber-500" /> Cú Bông Edu
+                </div>
+                <p className="mt-0.5 leading-snug">{instantSpeech}</p>
+              </div>
+            )}
+          </div>
+        </div>
       ) : (
-        /* VỊ TRÍ GÓC DƯỚI PHẢI KHI ĐANG MỞ MẸO NHANH HOẶC ĐANG NGHỈ */
-        <div className="fixed right-4 bottom-4 z-50 flex flex-col items-end gap-2.5 sm:right-6 sm:bottom-6">
+        /* CHẾ ĐỘ 3: MENU NHANH / GÓC NGHỈ DƯỚI PHẢI */
+        <div
+          data-mascot-ui
+          className="fixed right-4 bottom-4 z-50 flex flex-col items-end gap-2.5 sm:right-6 sm:bottom-6"
+        >
           {open && (
             <div className="w-[330px] sm:w-[360px] overflow-hidden rounded-2xl border border-indigo-200 bg-white shadow-2xl">
               <div className="flex items-center justify-between bg-gradient-to-r from-indigo-600 to-violet-600 px-4 py-3 text-white">
                 <div className="flex items-center gap-2">
                   <Sparkles className="h-4 w-4 text-amber-300" />
                   <div>
-                    <p className="text-xs font-bold leading-none">Cú Bông Edu • Hướng dẫn viên</p>
+                    <p className="text-xs font-bold leading-none">Cú Bông Edu • Trợ lý Bay theo</p>
                     <p className="mt-0.5 text-[10px] text-indigo-100">
-                      {mode === "tour" ? currentStep.badge : "Mẹo nhanh tại trang này"}
+                      {autoFollow ? "Đang BẬT tự động bay theo mục bạn chọn" : "Đang tạm nghỉ tại góc màn hình"}
                     </p>
                   </div>
                 </div>
@@ -581,133 +768,80 @@ export function MascotGuide() {
               </div>
 
               <div className="p-4 space-y-3">
-                {mode === "tour" ? (
-                  <>
-                    {stepIdx === 0 && celebrationMsg && (
-                      <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-800">
-                        {celebrationMsg}
-                      </div>
-                    )}
-                    <h3 className="text-sm font-bold text-slate-900">{currentStep.title}</h3>
-                    <p className="text-xs leading-relaxed text-slate-600">{currentStep.description}</p>
-                    {currentStep.actionHref && (
-                      <Link
-                        href={currentStep.actionHref}
-                        onClick={() => setOpen(false)}
-                        className="inline-flex items-center gap-1 text-xs font-bold text-indigo-600 hover:underline"
-                      >
-                        {currentStep.actionLabel} <ArrowRight className="h-3.5 w-3.5" />
-                      </Link>
-                    )}
-                    <div className="flex items-center justify-between border-t border-slate-100 pt-3">
-                      <div className="flex gap-1">
-                        {steps.map((_, idx) => (
-                          <span
-                            key={idx}
-                            className={`h-1.5 rounded-full transition-all ${
-                              idx === stepIdx ? "w-5 bg-indigo-600" : "w-1.5 bg-slate-200"
-                            }`}
-                          />
-                        ))}
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        {stepIdx > 0 && (
-                          <button
-                            type="button"
-                            onClick={() => setStepIdx((s) => s - 1)}
-                            className="inline-flex items-center gap-0.5 rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-50"
-                          >
-                            <ChevronLeft className="h-3.5 w-3.5" /> Trước
-                          </button>
-                        )}
-                        {stepIdx < steps.length - 1 ? (
-                          <button
-                            type="button"
-                            onClick={() => setStepIdx((s) => s + 1)}
-                            className="inline-flex items-center gap-0.5 rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-indigo-500"
-                          >
-                            Tiếp <ChevronRight className="h-3.5 w-3.5" />
-                          </button>
-                        ) : (
-                          <button
-                            type="button"
-                            onClick={() => setOpen(false)}
-                            className="rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-emerald-500"
-                          >
-                            Bắt đầu ngay!
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <h3 className="text-sm font-bold text-slate-900">{tip.title}</h3>
-                    <p className="text-xs leading-relaxed text-slate-600">{tip.text}</p>
+                <h3 className="text-sm font-bold text-slate-900">{tip.title}</h3>
+                <p className="text-xs leading-relaxed text-slate-600">{tip.text}</p>
 
-                    <div className="grid grid-cols-2 gap-1.5 pt-1">
-                      <Link
-                        href="/lap-trinh"
-                        onClick={() => setOpen(false)}
-                        className="flex items-center gap-1.5 rounded-xl bg-indigo-50 px-2.5 py-2 text-[11px] font-bold text-indigo-700 hover:bg-indigo-100"
-                      >
-                        <Code2 className="h-3.5 w-3.5" /> Học Lập trình
-                      </Link>
-                      <Link
-                        href="/lop-hoc"
-                        onClick={() => setOpen(false)}
-                        className="flex items-center gap-1.5 rounded-xl bg-rose-50 px-2.5 py-2 text-[11px] font-bold text-rose-700 hover:bg-rose-100"
-                      >
-                        <Radio className="h-3.5 w-3.5" /> Lớp Live
-                      </Link>
-                      <Link
-                        href="/tai-lieu"
-                        onClick={() => setOpen(false)}
-                        className="flex items-center gap-1.5 rounded-xl bg-blue-50 px-2.5 py-2 text-[11px] font-bold text-blue-700 hover:bg-blue-100"
-                      >
-                        <BookOpen className="h-3.5 w-3.5" /> Tài liệu 1–12
-                      </Link>
-                      <Link
-                        href="/ai-gia-su"
-                        onClick={() => setOpen(false)}
-                        className="flex items-center gap-1.5 rounded-xl bg-purple-50 px-2.5 py-2 text-[11px] font-bold text-purple-700 hover:bg-purple-100"
-                      >
-                        <Bot className="h-3.5 w-3.5" /> AI Gia sư
-                      </Link>
-                    </div>
+                {/* Công tắc bật/tắt tự bay theo ngay */}
+                <button
+                  type="button"
+                  onClick={toggleAutoFollow}
+                  className={`flex w-full items-center justify-between rounded-xl border px-3 py-2 text-xs font-bold transition ${
+                    autoFollow
+                      ? "border-emerald-200 bg-emerald-50 text-emerald-800"
+                      : "border-slate-200 bg-slate-50 text-slate-600"
+                  }`}
+                >
+                  <span className="flex items-center gap-1.5">
+                    {autoFollow ? <Play className="h-3.5 w-3.5" /> : <Pause className="h-3.5 w-3.5" />}
+                    Tự bay theo mọi nút bạn chọn
+                  </span>
+                  <span className="rounded-md bg-white px-2 py-0.5 text-[10px] uppercase shadow-xs">
+                    {autoFollow ? "Đang bật" : "Đã tắt"}
+                  </span>
+                </button>
 
-                    <button
-                      type="button"
-                      onClick={() => startTour(tip.tour)}
-                      className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-indigo-600 py-2.5 text-xs font-extrabold text-white shadow hover:bg-indigo-500 transition"
-                    >
-                      <HelpCircle className="h-3.5 w-3.5" />
-                      Cho Cú Bông bay chỉ dẫn từng nút!
-                    </button>
-                  </>
-                )}
+                <div className="grid grid-cols-2 gap-1.5 pt-1">
+                  <Link
+                    href="/lap-trinh"
+                    onClick={() => setOpen(false)}
+                    className="flex items-center gap-1.5 rounded-xl bg-indigo-50 px-2.5 py-2 text-[11px] font-bold text-indigo-700 hover:bg-indigo-100"
+                  >
+                    <Code2 className="h-3.5 w-3.5" /> Học Lập trình
+                  </Link>
+                  <Link
+                    href="/lop-hoc"
+                    onClick={() => setOpen(false)}
+                    className="flex items-center gap-1.5 rounded-xl bg-rose-50 px-2.5 py-2 text-[11px] font-bold text-rose-700 hover:bg-rose-100"
+                  >
+                    <Radio className="h-3.5 w-3.5" /> Lớp Live
+                  </Link>
+                  <Link
+                    href="/tai-lieu"
+                    onClick={() => setOpen(false)}
+                    className="flex items-center gap-1.5 rounded-xl bg-blue-50 px-2.5 py-2 text-[11px] font-bold text-blue-700 hover:bg-blue-100"
+                  >
+                    <BookOpen className="h-3.5 w-3.5" /> Tài liệu 1–12
+                  </Link>
+                  <Link
+                    href="/ai-gia-su"
+                    onClick={() => setOpen(false)}
+                    className="flex items-center gap-1.5 rounded-xl bg-purple-50 px-2.5 py-2 text-[11px] font-bold text-purple-700 hover:bg-purple-100"
+                  >
+                    <Bot className="h-3.5 w-3.5" /> AI Gia sư
+                  </Link>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => startTour(tip.tour)}
+                  className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-indigo-600 py-2.5 text-xs font-extrabold text-white shadow hover:bg-indigo-500 transition"
+                >
+                  <HelpCircle className="h-3.5 w-3.5" />
+                  Xem Tour 4 bước Spotlight
+                </button>
               </div>
             </div>
           )}
 
-          {/* Nút Cú Bông nổi ở góc dưới phải (lơ lửng bay nhẹ) */}
           <button
             type="button"
             onClick={() => {
-              localStorage.setItem("eduk12_mascot_greeted", "1");
-              setPulseBadge(false);
               if (!open) setMode("tip");
               setOpen((v) => !v);
             }}
             className="group relative flex items-center gap-2 rounded-full border-2 border-indigo-200 bg-white p-1.5 pr-4 shadow-lg transition hover:-translate-y-1 hover:border-indigo-400 hover:shadow-xl"
-            title="Gọi Cú Bông Edu bay chỉ dẫn!"
+            title="Cú Bông Edu — Tự động bay theo mọi mục bạn chọn!"
           >
-            {pulseBadge && (
-              <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75" />
-                <span className="relative inline-flex h-3.5 w-3.5 rounded-full bg-amber-500" />
-              </span>
-            )}
             <div className="transition-transform group-hover:scale-105">
               <EduOwlSvg happy={open} flying={true} pointing={false} />
             </div>
@@ -716,7 +850,7 @@ export function MascotGuide() {
                 <GraduationCap className="h-3.5 w-3.5 text-indigo-600" /> Cú Bông Edu
               </p>
               <p className="text-[10px] font-semibold text-indigo-600 leading-tight">
-                {open ? "Thu gọn" : "Bay chỉ đường!"}
+                {open ? "Thu gọn" : autoFollow ? "Chọn gì mình bay liền!" : "Đang tạm nghỉ"}
               </p>
             </div>
           </button>
