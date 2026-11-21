@@ -14,7 +14,7 @@ import { handleCodingRoutes } from "./coding";
 import { handleSocialRoutes } from "./social";
 import { handleSafetyAndChatRoutes } from "./safety";
 import { handleCourseRoutes } from "./courses";
-import { RealtimeHub } from "./realtime";
+import { pushRealtimeEvent, RealtimeHub } from "./realtime";
 
 export { RealtimeHub };
 
@@ -611,14 +611,216 @@ export default {
         return jsonRes(gradeQuestion(q, body.answer));
       }
 
-      // === 4. HIGH-CONCURRENCY EXAMS (AES-256-GCM + KV + D1) ===
+function gradeToLevel(gradeId: number): "primary" | "middle" | "high" {
+  if (gradeId <= 5) return "primary";
+  if (gradeId <= 9) return "middle";
+  return "high";
+}
+
+      // === 4. HIGH-CONCURRENCY EXAMS + MỞ KHÓA & TỔNG HỢP ĐỀ THI THEO CẤP ===
+      if (path === "/api/v1/exam-levels" && method === "GET") {
+        const [lvlRes, qRes, exRes] = await Promise.all([
+          env.DB.prepare("SELECT * FROM exam_level_controls ORDER BY min_grade ASC").all<Record<string, unknown>>(),
+          env.DB.prepare("SELECT grade_id, COUNT(*) as cnt FROM questions GROUP BY grade_id").all<{ grade_id: number; cnt: number }>(),
+          env.DB.prepare("SELECT grade_id, COUNT(*) as cnt FROM exams GROUP BY grade_id").all<{ grade_id: number; cnt: number }>(),
+        ]);
+
+        const levels = lvlRes.results.map((l) => {
+          const minG = Number(l.min_grade);
+          const maxG = Number(l.max_grade);
+          const questionCount = qRes.results
+            .filter((r) => r.grade_id >= minG && r.grade_id <= maxG)
+            .reduce((acc, r) => acc + r.cnt, 0);
+          const examCount = exRes.results
+            .filter((r) => r.grade_id >= minG && r.grade_id <= maxG)
+            .reduce((acc, r) => acc + r.cnt, 0);
+          return {
+            level: String(l.level),
+            label: String(l.label),
+            min_grade: minG,
+            max_grade: maxG,
+            is_unlocked: Number(l.is_unlocked ?? 1) === 1,
+            exam_id: String(l.exam_id || ""),
+            announcement: String(l.announcement || ""),
+            updated_by: String(l.updated_by || ""),
+            updated_at: String(l.updated_at || ""),
+            question_count: questionCount,
+            exam_count: examCount,
+          };
+        });
+        return jsonRes({ levels });
+      }
+
+      const lvlPatchMatch = path.match(/^\/api\/v1\/admin\/exam-levels\/(primary|middle|high)$/);
+      if (lvlPatchMatch && method === "PATCH") {
+        const claims = await getClaims(request, env);
+        if (!claims || (claims.role !== "super_admin" && claims.role !== "content_admin")) {
+          return jsonRes({ error: "Chỉ Quản trị viên mới được mở/khóa kỳ thi theo cấp" }, 403);
+        }
+        const level = lvlPatchMatch[1];
+        const b = (await request.json().catch(() => ({}))) as {
+          is_unlocked?: boolean;
+          announcement?: string;
+        };
+        const current = await env.DB.prepare("SELECT * FROM exam_level_controls WHERE level = ?")
+          .bind(level)
+          .first<Record<string, unknown>>();
+        if (!current) return jsonRes({ error: "Không tìm thấy cấp học" }, 404);
+
+        const nextUnlocked =
+          typeof b.is_unlocked === "boolean" ? (b.is_unlocked ? 1 : 0) : Number(current.is_unlocked ?? 1);
+        const nextAnnouncement =
+          typeof b.announcement === "string" ? b.announcement.trim().slice(0, 300) : String(current.announcement || "");
+
+        await env.DB.prepare(
+          "UPDATE exam_level_controls SET is_unlocked = ?, announcement = ?, updated_by = ?, updated_at = datetime('now') WHERE level = ?"
+        )
+          .bind(nextUnlocked, nextAnnouncement, claims.name || claims.email, level)
+          .run();
+
+        await pushRealtimeEvent(env.REALTIME_HUB, "social:feed", {
+          type: "exam_levels_updated",
+          level,
+          is_unlocked: nextUnlocked === 1,
+        });
+
+        return jsonRes({
+          ok: true,
+          level,
+          is_unlocked: nextUnlocked === 1,
+          announcement: nextAnnouncement,
+          message:
+            nextUnlocked === 1
+              ? `Đã MỞ KHÓA thi ${String(current.label)} theo thời gian thực!`
+              : `Đã KHÓA tạm thời thi ${String(current.label)}!`,
+        });
+      }
+
+      const lvlGenMatch = path.match(/^\/api\/v1\/admin\/exam-levels\/(primary|middle|high)\/generate$/);
+      if (lvlGenMatch && method === "POST") {
+        const claims = await getClaims(request, env);
+        if (!claims || (claims.role !== "super_admin" && claims.role !== "content_admin")) {
+          return jsonRes({ error: "Chỉ Quản trị viên mới được tổng hợp đề thi theo cấp" }, 403);
+        }
+        const level = lvlGenMatch[1];
+        const lvl = await env.DB.prepare("SELECT * FROM exam_level_controls WHERE level = ?")
+          .bind(level)
+          .first<Record<string, unknown>>();
+        if (!lvl) return jsonRes({ error: "Không tìm thấy cấp học" }, 404);
+
+        const minG = Number(lvl.min_grade);
+        const maxG = Number(lvl.max_grade);
+        const b = (await request.json().catch(() => ({}))) as {
+          title?: string;
+          duration_minutes?: number;
+          question_limit?: number;
+          auto_unlock?: boolean;
+        };
+
+        const limit = Math.min(40, Math.max(3, Number(b.question_limit || 12)));
+        const duration = Math.min(180, Math.max(10, Number(b.duration_minutes || 45)));
+
+        // Gom câu hỏi thuộc đúng cấp học (min_grade..max_grade)
+        let qRows = await env.DB.prepare(
+          "SELECT id, grade_id, subject_code FROM questions WHERE grade_id >= ? AND grade_id <= ? ORDER BY RANDOM() LIMIT ?"
+        )
+          .bind(minG, maxG, limit)
+          .all<{ id: string; grade_id: number; subject_code: string }>();
+
+        // Nếu cấp học đó có quá ít câu hỏi trong ngân hàng -> bổ sung thêm câu hỏi tổng quát để đề vẫn đầy đủ
+        if (qRows.results.length === 0) {
+          qRows = await env.DB.prepare("SELECT id, grade_id, subject_code FROM questions ORDER BY RANDOM() LIMIT ?")
+            .bind(limit)
+            .all<{ id: string; grade_id: number; subject_code: string }>();
+        }
+        if (qRows.results.length === 0) {
+          return jsonRes({ error: "Ngân hàng câu hỏi đang trống, vui lòng thêm câu hỏi trước khi tổng hợp đề." }, 400);
+        }
+
+        const qIds = qRows.results.map((r) => r.id);
+        const perPt = Math.round((10 / qIds.length) * 100) / 100;
+        const ptsMap: Record<string, number> = {};
+        qIds.forEach((qid, idx) => {
+          ptsMap[qid] = idx === qIds.length - 1 ? Math.round((10 - perPt * (qIds.length - 1)) * 100) / 100 : perPt;
+        });
+
+        const examId = `exam-cap-${level}-${Date.now().toString(36)}`;
+        const title =
+          (b.title || "").trim() ||
+          `Đề Thi Tổng Hợp ${String(lvl.label)} (${qIds.length} câu — Chuẩn GDPT 2018)`;
+        const slug = `${slugify(title)}-${Date.now().toString(36)}`;
+
+        await env.DB.prepare(
+          `INSERT INTO exams (id, grade_id, subject_code, subject_name, title, slug, mode, duration_minutes, total_points, question_ids_json, question_points_json, bundle_version, starts_at)
+           VALUES (?, ?, 'tong-hop', ?, ?, ?, 'comprehensive_level', ?, 10.0, ?, ?, 1, datetime('now'))`
+        )
+          .bind(
+            examId,
+            maxG,
+            `Tổng hợp ${String(lvl.label)}`,
+            title.slice(0, 180),
+            slug,
+            duration,
+            JSON.stringify(qIds),
+            JSON.stringify(ptsMap)
+          )
+          .run();
+
+        await buildAndCacheExamBundle(env, examId);
+
+        const shouldUnlock = b.auto_unlock !== false;
+        await env.DB.prepare(
+          "UPDATE exam_level_controls SET exam_id = ?, is_unlocked = CASE WHEN ? = 1 THEN 1 ELSE is_unlocked END, updated_by = ?, updated_at = datetime('now') WHERE level = ?"
+        )
+          .bind(examId, shouldUnlock ? 1 : 0, claims.name || claims.email, level)
+          .run();
+
+        await pushRealtimeEvent(env.REALTIME_HUB, "social:feed", {
+          type: "exam_levels_updated",
+          level,
+          exam_id: examId,
+          is_unlocked: shouldUnlock,
+        });
+
+        return jsonRes(
+          {
+            ok: true,
+            exam_id: examId,
+            title,
+            question_count: qIds.length,
+            message: `Đã tổng hợp & xuất bản "${title}" (${qIds.length} câu hỏi) cho ${String(lvl.label)}!`,
+          },
+          201
+        );
+      }
+
       if (path === "/api/v1/exams" && method === "GET") {
-        const { results } = await env.DB.prepare("SELECT * FROM exams ORDER BY starts_at DESC").all<Record<string, unknown>>();
+        const [{ results }, lvlRows] = await Promise.all([
+          env.DB.prepare("SELECT * FROM exams ORDER BY starts_at DESC").all<Record<string, unknown>>(),
+          env.DB.prepare("SELECT * FROM exam_level_controls").all<Record<string, unknown>>(),
+        ]);
+        const lvlMap = new Map(
+          lvlRows.results.map((l) => [
+            String(l.level),
+            {
+              label: String(l.label),
+              is_unlocked: Number(l.is_unlocked ?? 1) === 1,
+              announcement: String(l.announcement || ""),
+            },
+          ])
+        );
+
         const exams = results.map((e) => {
           const qIds = JSON.parse(String(e.question_ids_json || "[]")) as string[];
+          const lvl = gradeToLevel(Number(e.grade_id || 12));
+          const info = lvlMap.get(lvl);
           return {
             id: e.id,
             grade_id: e.grade_id,
+            level: lvl,
+            level_label: info?.label || (lvl === "primary" ? "Tiểu học (1–5)" : lvl === "middle" ? "THCS (6–9)" : "THPT (10–12)"),
+            is_level_unlocked: info ? info.is_unlocked : true,
+            level_announcement: info?.announcement || "",
             subject_code: e.subject_code,
             subject_name: e.subject_name,
             title: e.title,
@@ -662,6 +864,23 @@ export default {
           .first<Record<string, unknown>>();
         if (!ex) return jsonRes({ error: "Không tìm thấy kỳ thi" }, 404);
 
+        const claims = await getClaims(request, env);
+        const examLevel = gradeToLevel(Number(ex.grade_id || 12));
+        const lvlCtrl = await env.DB.prepare("SELECT label, is_unlocked, announcement FROM exam_level_controls WHERE level = ?")
+          .bind(examLevel)
+          .first<{ label: string; is_unlocked: number; announcement: string }>();
+        const isPrivileged = claims && ["teacher", "content_admin", "super_admin"].includes(claims.role);
+        if (lvlCtrl && Number(lvlCtrl.is_unlocked) === 0 && !isPrivileged) {
+          return jsonRes(
+            {
+              error: `Kỳ thi ${lvlCtrl.label} hiện đang tạm khóa. ${
+                lvlCtrl.announcement || "Vui lòng chờ Quản trị viên mở khóa kỳ thi!"
+              }`,
+            },
+            403
+          );
+        }
+
         let keyB64 = await env.EDU_KV.get(`exam:key:${ex.id}`);
         if (!keyB64) {
           const built = await buildAndCacheExamBundle(env, String(ex.id));
@@ -669,7 +888,6 @@ export default {
         }
 
         const body = (await request.json().catch(() => ({}))) as { user_name?: string };
-        const claims = await getClaims(request, env);
         const userName = body.user_name?.trim() || claims?.name || "Học sinh K-12";
         const attemptId = `att-${crypto.randomUUID()}`;
         const qIds = JSON.parse(String(ex.question_ids_json || "[]")) as string[];

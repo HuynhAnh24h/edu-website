@@ -39,6 +39,7 @@ import { RichWordEditor } from "@/components/cms/RichWordEditor";
 import { UserManagementPanel } from "@/components/cms/UserManagementPanel";
 import { CommunityModerationPanel } from "@/components/cms/CommunityModerationPanel";
 import { SafetyCenterPanel } from "@/components/cms/SafetyCenterPanel";
+import { ExamLevelControlPanel } from "@/components/cms/ExamLevelControlPanel";
 import { CuBongLogoMark } from "@/components/BrandLogo";
 import {
   createEmptyDraftQuestion,
@@ -89,6 +90,7 @@ type DashboardTab =
   | "questions"
   | "exams"
   | "import"
+  | "exam_levels"
   | "safety"
   | "community"
   | "users";
@@ -121,6 +123,10 @@ const TAB_META: Record<DashboardTab, { title: string; subtitle: string }> = {
   import: {
     title: "Nhập nhanh & Tách đề Thông minh",
     subtitle: "Nhập hàng loạt bài giảng/câu hỏi hoặc dán văn bản đề thi để hệ thống tự tách thành 3 phần.",
+  },
+  exam_levels: {
+    title: "Mở khóa Thi & Tổng hợp Đề theo Cấp",
+    subtitle: "Đóng/mở kỳ thi theo thời gian thực cho Tiểu học (1–5), THCS (6–9), THPT (10–12) và tổng hợp đề thi tổng hợp cấp.",
   },
   safety: {
     title: "Trung tâm An toàn & BOT Quét Vi phạm",
@@ -587,6 +593,12 @@ export default function CMSAdminPage() {
           {
             groupLabel: "Quản trị Hệ thống (Admin)",
             items: [
+              {
+                id: "exam_levels" as DashboardTab,
+                label: "Mở khóa & Tổng hợp Đề cấp",
+                desc: "Tiểu học • THCS • THPT",
+                icon: GraduationCap,
+              },
               {
                 id: "safety" as DashboardTab,
                 label: `BOT An toàn & Xử phạt${openSafetyCount > 0 ? ` (${openSafetyCount})` : ""}`,
@@ -1540,6 +1552,15 @@ export default function CMSAdminPage() {
                 void loadQuestions();
                 void loadDashboardOverview();
               }}
+            />
+          )}
+
+          {/* === TAB 6-0: MỞ KHÓA THI & TỔNG HỢP ĐỀ THEO CẤP (ADMIN) === */}
+          {activeTab === "exam_levels" && isAdmin && (
+            <ExamLevelControlPanel
+              accessToken={accessToken}
+              onToast={showToast}
+              onGenerated={() => void loadDashboardOverview()}
             />
           )}
 

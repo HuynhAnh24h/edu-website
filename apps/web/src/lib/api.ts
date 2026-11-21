@@ -82,6 +82,10 @@ export interface ExerciseSet {
 export interface ExamSummary {
   id: string;
   grade_id: number;
+  level?: "primary" | "middle" | "high";
+  level_label?: string;
+  is_level_unlocked?: boolean;
+  level_announcement?: string;
   subject_code: string;
   subject_name: string;
   title: string;

@@ -68,6 +68,7 @@ export async function ensureSeeded(db: D1Database): Promise<void> {
     db.prepare(`CREATE TABLE IF NOT EXISTS courses (id TEXT PRIMARY KEY, teacher_id TEXT NOT NULL, teacher_name TEXT NOT NULL, teacher_school TEXT DEFAULT '', title TEXT NOT NULL, subject_name TEXT NOT NULL, grade_label TEXT NOT NULL DEFAULT 'Lớp 12', level TEXT NOT NULL DEFAULT 'Cơ bản → Nâng cao', cover_theme TEXT NOT NULL DEFAULT 'indigo', summary TEXT NOT NULL, modules_json TEXT NOT NULL DEFAULT '[]', status TEXT NOT NULL DEFAULT 'published', created_at TEXT NOT NULL DEFAULT (datetime('now')))`),
     db.prepare(`CREATE TABLE IF NOT EXISTS course_enrollments (course_id TEXT NOT NULL, user_id TEXT NOT NULL, completed_lessons_json TEXT NOT NULL DEFAULT '[]', enrolled_at TEXT NOT NULL DEFAULT (datetime('now')), PRIMARY KEY (course_id, user_id))`),
     db.prepare(`CREATE TABLE IF NOT EXISTS course_reviews (id TEXT PRIMARY KEY, course_id TEXT NOT NULL, user_id TEXT NOT NULL, user_name TEXT NOT NULL, user_role TEXT NOT NULL DEFAULT 'student', rating INTEGER NOT NULL, comment TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT (datetime('now')), updated_at TEXT NOT NULL DEFAULT (datetime('now')), UNIQUE(course_id, user_id))`),
+    db.prepare(`CREATE TABLE IF NOT EXISTS exam_level_controls (level TEXT PRIMARY KEY, label TEXT NOT NULL, min_grade INTEGER NOT NULL, max_grade INTEGER NOT NULL, is_unlocked INTEGER NOT NULL DEFAULT 1, exam_id TEXT DEFAULT '', announcement TEXT DEFAULT '', updated_by TEXT DEFAULT '', updated_at TEXT NOT NULL DEFAULT (datetime('now')))`),
   ]);
 
   // Luôn đảm bảo có sẵn 2 lớp học mẫu nếu bảng classrooms chưa có dữ liệu
@@ -616,6 +617,22 @@ export async function ensureSeeded(db: D1Database): Promise<void> {
           5,
           "Khóa học thực chiến rất hay, học xong em đã tự làm được web học từ vựng Tiếng Anh luôn!"
         ),
+    ]);
+  }
+
+  // Seed cấu hình Mở/Khóa Thi Tổng hợp theo 3 cấp học (Tiểu học, THCS, THPT)
+  const lvlRow = await db.prepare("SELECT COUNT(*) as cnt FROM exam_level_controls").first<{ cnt: number }>();
+  if (!lvlRow || lvlRow.cnt === 0) {
+    await db.batch([
+      db.prepare(
+        "INSERT OR IGNORE INTO exam_level_controls (level, label, min_grade, max_grade, is_unlocked, announcement) VALUES ('primary', 'Cấp Tiểu học (Lớp 1–5)', 1, 5, 1, 'Kỳ thi tổng hợp cấp Tiểu học đang mở cho học sinh luyện tập!')"
+      ),
+      db.prepare(
+        "INSERT OR IGNORE INTO exam_level_controls (level, label, min_grade, max_grade, is_unlocked, announcement) VALUES ('middle', 'Cấp THCS (Lớp 6–9)', 6, 9, 1, 'Kỳ thi tổng hợp THCS & Ôn thi vào 10 đang mở!')"
+      ),
+      db.prepare(
+        "INSERT OR IGNORE INTO exam_level_controls (level, label, min_grade, max_grade, is_unlocked, announcement) VALUES ('high', 'Cấp THPT (Lớp 10–12)', 10, 12, 1, 'Kỳ thi tổng hợp THPT 2025+ đang mở cho học sinh tham gia!')"
+      ),
     ]);
   }
 
