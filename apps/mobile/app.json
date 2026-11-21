@@ -1,0 +1,29 @@
+{
+  "expo": {
+    "name": "EduK12 Open",
+    "slug": "eduk12-open",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0f172a"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "vn.eduk12.open"
+    },
+    "android": {
+      "package": "vn.eduk12.open",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#4f46e5"
+      }
+    },
+    "extra": {
+      "apiBaseUrl": "https://eduk12-scale.eduk12-scale.workers.dev"
+    }
+  }
+}

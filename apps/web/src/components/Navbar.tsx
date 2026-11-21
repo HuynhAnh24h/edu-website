@@ -9,6 +9,7 @@ import {
   CheckSquare,
   ChevronDown,
   Code2,
+  Download,
   LayoutDashboard,
   LogIn,
   LogOut,
@@ -128,8 +129,20 @@ export function Navbar() {
           </div>
         </nav>
 
-        {/* Góc phải: Quản trị + Tài khoản / 2FA */}
+        {/* Góc phải: Tải App + Quản trị + Tài khoản / 2FA */}
         <div className="flex items-center gap-2">
+          <Link
+            href="/tai-app"
+            className={`hidden items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-bold transition lg:inline-flex ${
+              pathname.startsWith("/tai-app")
+                ? "border-indigo-600 bg-indigo-50 text-indigo-700"
+                : "border-indigo-200 bg-indigo-50/60 text-indigo-700 hover:bg-indigo-100"
+            }`}
+          >
+            <Download className="h-3.5 w-3.5" />
+            <span>Tải App</span>
+          </Link>
+
           {isStaff && (
             <Link
               href="/quan-tri"
@@ -221,7 +234,7 @@ export function Navbar() {
       {mobileOpen && (
         <div className="border-t border-slate-200 bg-white px-4 py-3 shadow-lg md:hidden">
           <div className="grid gap-1">
-            {[...MAIN_LINKS, ...MORE_LINKS].map((item) => (
+            {[...MAIN_LINKS, ...MORE_LINKS, { href: "/tai-app", label: "Tải App Mobile (Android & iOS)" }].map((item) => (
               <Link
                 key={item.href}
                 href={item.href}

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { BookOpen, Code2, ExternalLink, Heart, Radio, ShieldCheck } from "lucide-react";
+import { BookOpen, Code2, Download, ExternalLink, Heart, Radio, ShieldCheck } from "lucide-react";
 import { CuBongLogoMark } from "@/components/BrandLogo";
 
 export function Footer() {
@@ -27,9 +27,17 @@ export function Footer() {
               Nền tảng giáo dục mở hoàn toàn miễn phí cho học sinh, sinh viên và giáo viên Việt Nam — kết hợp chương trình chuẩn GDPT 2018, Phòng học Livestream 0đ, AI Gia sư Socratic và Học viện Lập trình thực chiến ngay trên trình duyệt.
             </p>
 
-            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold text-emerald-300">
-              <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-              Học trực tuyến miễn phí • Hoạt động 24/7
+            <div className="flex flex-wrap items-center gap-2">
+              <Link
+                href="/tai-app"
+                className="inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-3.5 py-2 text-xs font-bold text-white shadow hover:bg-indigo-500 transition"
+              >
+                <Download className="h-3.5 w-3.5" /> Tải App Android &amp; iOS tại đây
+              </Link>
+              <span className="inline-flex items-center gap-2 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold text-emerald-300">
+                <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+                Miễn phí 24/7
+              </span>
             </div>
           </div>
 

@@ -381,6 +381,12 @@ export default function LandingPage() {
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-3">
           <Link
+            href="/tai-app"
+            className="rounded-2xl bg-emerald-400 px-6 py-3 text-sm font-extrabold text-slate-950 shadow hover:bg-emerald-300 transition"
+          >
+            Tải App Android &amp; iOS tại đây
+          </Link>
+          <Link
             href="/dang-nhap"
             className="rounded-2xl bg-white px-6 py-3 text-sm font-extrabold text-indigo-700 shadow hover:bg-indigo-50 transition"
           >
