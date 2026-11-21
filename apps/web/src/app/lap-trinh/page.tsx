@@ -1,11 +1,14 @@
 "use client";
 
+import Link from "next/link";
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import {
   AlertCircle,
   ArrowRight,
   BookOpen,
+  Bot,
+  Brain,
   CheckCircle2,
   Code2,
   Database,
@@ -15,6 +18,7 @@ import {
   Lock,
   Play,
   RotateCcw,
+  Sparkles,
   Terminal,
   Trophy,
   XCircle,
@@ -57,7 +61,8 @@ function CodingAcademyInner() {
   const [code, setCode] = useState("");
   const [running, setRunning] = useState(false);
   const [runResult, setRunResult] = useState<RunResult | null>(null);
-  const [showHint, setShowHint] = useState(false);
+  const [attempts, setAttempts] = useState(0);
+  const [revealedTier, setRevealedTier] = useState<0 | 1 | 2 | 3>(0);
   const [lockNotice, setLockNotice] = useState("");
 
   const track = useMemo(() => getTrackById(activeTrackId), [activeTrackId]);
@@ -93,7 +98,8 @@ function CodingAcademyInner() {
     const saved = passedMap[lesson.id]?.code;
     setCode(saved && saved.trim() ? saved : lesson.starterCode);
     setRunResult(null);
-    setShowHint(false);
+    setAttempts(0);
+    setRevealedTier(0);
     setLockNotice("");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lesson.id]);
@@ -144,6 +150,7 @@ function CodingAcademyInner() {
   const handleRunCode = useCallback(async () => {
     setRunning(true);
     setLockNotice("");
+    setAttempts((n) => n + 1);
     try {
       const result = await executeCodingLesson(lesson, code);
       setRunResult(result);
@@ -425,21 +432,111 @@ function CodingAcademyInner() {
             </div>
           )}
 
-          {/* Nút Xem gợi ý */}
-          <div>
-            <button
-              type="button"
-              onClick={() => setShowHint((v) => !v)}
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-700 hover:underline"
-            >
-              <Lightbulb className="h-3.5 w-3.5" />
-              {showHint ? "Ẩn gợi ý lời giải" : "Cần gợi ý? Xem hướng dẫn nhanh"}
-            </button>
-            {showHint && (
-              <pre className="mt-2 overflow-x-auto rounded-xl border border-amber-200 bg-amber-50 p-3 font-mono text-[11px] text-slate-800">
-                {lesson.hint}
-              </pre>
-            )}
+          {/* HỆ THỐNG GỢI MỞ TƯ DUY 3 TẦNG (CHỐNG COPY ĐÁP ÁN) */}
+          <div
+            onCopy={(e) => e.preventDefault()}
+            className="select-none rounded-2xl border border-amber-200 bg-amber-50/50 p-4 space-y-3"
+          >
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h4 className="flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wide text-amber-900">
+                <Brain className="h-4 w-4 text-amber-600" />
+                Gợi mở Tư duy 3 Tầng (Không đưa đáp án chép sẵn)
+              </h4>
+              <span className="rounded-full bg-white px-2.5 py-0.5 text-[10px] font-bold text-slate-600 ring-1 ring-amber-200">
+                Đã tự thử: {attempts} lần
+              </span>
+            </div>
+
+            <p className="text-[11px] leading-relaxed text-slate-600">
+              Để thực sự hiểu bài, hệ thống <strong>không hiện lời giải copy-paste</strong>. Hãy tự suy nghĩ và bấm <strong>Chạy &amp; Kiểm tra</strong> trước — mỗi lần tự thử sẽ mở thêm 1 tầng gợi mở tư duy:
+            </p>
+
+            <div className="space-y-2">
+              {[
+                {
+                  tier: 1 as const,
+                  minAttempts: 1,
+                  label: "Tầng 1: Câu hỏi Phân tích Bài toán",
+                  badge: "Mở sau 1 lần chạy thử",
+                },
+                {
+                  tier: 2 as const,
+                  minAttempts: 2,
+                  label: "Tầng 2: Dàn ý Thuật toán từng bước",
+                  badge: "Mở sau 2 lần chạy thử",
+                },
+                {
+                  tier: 3 as const,
+                  minAttempts: 3,
+                  label: "Tầng 3: Khung cú pháp khuyết (___) để tự gõ",
+                  badge: "Mở sau 3 lần chạy thử",
+                },
+              ].map((step) => {
+                const isRevealed = revealedTier >= step.tier;
+                const canReveal =
+                  attempts >= step.minAttempts && revealedTier === step.tier - 1;
+                const remaining = Math.max(0, step.minAttempts - attempts);
+
+                return (
+                  <div
+                    key={step.tier}
+                    className={`rounded-xl border p-3 transition ${
+                      isRevealed
+                        ? "border-amber-300 bg-white"
+                        : "border-amber-200/70 bg-white/60"
+                    }`}
+                  >
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <span className="flex items-center gap-1.5 text-xs font-bold text-slate-800">
+                        {isRevealed ? (
+                          <Lightbulb className="h-3.5 w-3.5 text-amber-500" />
+                        ) : (
+                          <Lock className="h-3.5 w-3.5 text-slate-400" />
+                        )}
+                        {step.label}
+                      </span>
+
+                      {!isRevealed &&
+                        (canReveal ? (
+                          <button
+                            type="button"
+                            onClick={() => setRevealedTier(step.tier)}
+                            className="rounded-lg bg-amber-500 px-2.5 py-1 text-[11px] font-bold text-white hover:bg-amber-400 transition"
+                          >
+                            Mở gợi mở Tầng {step.tier}
+                          </button>
+                        ) : (
+                          <span className="text-[10px] font-semibold text-slate-400">
+                            {remaining > 0
+                              ? `Cần tự chạy thử thêm ${remaining} lần`
+                              : `Mở Tầng ${step.tier - 1} trước`}
+                          </span>
+                        ))}
+                    </div>
+
+                    {isRevealed && (
+                      <div className="mt-2 whitespace-pre-wrap border-t border-amber-100 pt-2 text-xs leading-relaxed text-slate-700 font-medium">
+                        {lesson.thinkingHints[step.tier - 1]}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="flex flex-wrap items-center justify-between gap-2 border-t border-amber-200/70 pt-2.5">
+              <span className="text-[10px] font-semibold text-amber-800">
+                Bí ý tưởng? Hỏi AI Gia sư để được gợi mở theo từng bước!
+              </span>
+              <Link
+                href={`/ai-gia-su?grade=12&subject=tin-hoc&q=${encodeURIComponent(
+                  `Em đang tự giải bài lập trình ${track.shortName}: "${lesson.title}". Xin đừng viết sẵn lời giải hoàn chỉnh, hãy gợi mở tư duy từng bước giúp em tự làm nhé!`
+                )}`}
+                className="inline-flex items-center gap-1 rounded-lg bg-purple-600 px-3 py-1.5 text-[11px] font-bold text-white hover:bg-purple-500 transition"
+              >
+                <Bot className="h-3.5 w-3.5" /> Hỏi AI Gia sư Socratic
+              </Link>
+            </div>
           </div>
         </div>
 
@@ -588,23 +685,33 @@ function CodingAcademyInner() {
                 <Terminal className="h-4 w-4 text-indigo-600" /> Kết quả Chấm Test Tự động
               </h4>
               {runResult && (
-                <span
-                  className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-extrabold ${
-                    runResult.allPassed
-                      ? "bg-emerald-100 text-emerald-800"
-                      : "bg-rose-100 text-rose-700"
-                  }`}
-                >
-                  {runResult.allPassed ? (
-                    <>
-                      <CheckCircle2 className="h-3.5 w-3.5" /> ĐẠT 100% — ĐÃ MỞ KHÓA BÀI TIẾP THEO!
-                    </>
-                  ) : (
-                    <>
-                      <XCircle className="h-3.5 w-3.5" /> CHƯA ĐẠT — KHÔNG THỂ QUA BÀI
-                    </>
+                <div className="flex flex-wrap items-center gap-2">
+                  {runResult.allPassed && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-1 text-[11px] font-extrabold text-amber-800">
+                      <Sparkles className="h-3.5 w-3.5" />
+                      {revealedTier === 0
+                        ? "Tự lực xuất sắc (0/3 gợi mở)"
+                        : `Tư duy tốt (dùng ${revealedTier}/3 gợi mở)`}
+                    </span>
                   )}
-                </span>
+                  <span
+                    className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-extrabold ${
+                      runResult.allPassed
+                        ? "bg-emerald-100 text-emerald-800"
+                        : "bg-rose-100 text-rose-700"
+                    }`}
+                  >
+                    {runResult.allPassed ? (
+                      <>
+                        <CheckCircle2 className="h-3.5 w-3.5" /> ĐẠT 100% — ĐÃ MỞ KHÓA BÀI TIẾP THEO!
+                      </>
+                    ) : (
+                      <>
+                        <XCircle className="h-3.5 w-3.5" /> CHƯA ĐẠT — KHÔNG THỂ QUA BÀI
+                      </>
+                    )}
+                  </span>
+                </div>
               )}
             </div>
 
