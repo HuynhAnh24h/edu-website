@@ -12,6 +12,7 @@ import {
   KeyRound,
   LogIn,
   Play,
+  Radio,
   School,
   Sparkles,
   Users,
@@ -20,6 +21,7 @@ import { CORE_API_URL, Lesson } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 import { getSubjectMeta } from "@/lib/subjects";
 import { MathContent } from "@/components/MathContent";
+import { LiveClassroomStudio, LiveSessionInfo } from "@/components/LiveClassroomStudio";
 
 interface ClassroomSummary {
   id: string;
@@ -35,6 +37,8 @@ interface ClassroomSummary {
   student_count: number;
   lesson_count: number;
   exam_count: number;
+  is_live?: boolean;
+  live_session?: LiveSessionInfo | null;
 }
 
 interface AssignmentItem {
@@ -70,6 +74,7 @@ export default function ClassroomsPage() {
     student_count: number;
   } | null>(null);
   const [readingLesson, setReadingLesson] = useState<Lesson | null>(null);
+  const [inLiveRoom, setInLiveRoom] = useState(false);
 
   const notify = (type: "ok" | "err", msg: string) => {
     setToast({ type, msg });
@@ -101,9 +106,10 @@ export default function ClassroomsPage() {
     void loadList();
   }, [loadList]);
 
-  const openClassroom = async (classId: string) => {
+  const openClassroom = async (classId: string, openLive = false) => {
     setActiveClassId(classId);
     setReadingLesson(null);
+    setInLiveRoom(openLive);
     const headers: Record<string, string> = {};
     if (accessToken) headers.Authorization = `Bearer ${accessToken}`;
     const res = await fetch(`${CORE_API_URL}/api/v1/classrooms/${encodeURIComponent(classId)}`, { headers });
@@ -165,19 +171,85 @@ export default function ClassroomsPage() {
 
     return (
       <div className="space-y-6">
-        <button
-          type="button"
-          onClick={() => {
-            setActiveClassId(null);
-            setClassDetail(null);
-            setReadingLesson(null);
-          }}
-          className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600 hover:underline"
-        >
-          <ArrowLeft className="h-4 w-4" /> Quay lại danh sách Lớp học
-        </button>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <button
+            type="button"
+            onClick={() => {
+              setActiveClassId(null);
+              setClassDetail(null);
+              setReadingLesson(null);
+              setInLiveRoom(false);
+            }}
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600 hover:underline"
+          >
+            <ArrowLeft className="h-4 w-4" /> Quay lại danh sách Lớp học
+          </button>
 
-        <div className="rounded-2xl bg-slate-900 p-6 text-white shadow-sm">
+          {inLiveRoom && (
+            <button
+              type="button"
+              onClick={() => setInLiveRoom(false)}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-50"
+            >
+              <BookOpen className="h-3.5 w-3.5 text-indigo-600" /> Chuyển sang Giáo án &amp; Bài tập lớp
+            </button>
+          )}
+        </div>
+
+        {/* Màn hình Phòng học Live trực tuyến (khi học sinh bấm Vào Phòng Live) */}
+        {inLiveRoom ? (
+          <LiveClassroomStudio
+            classroomId={classDetail.classroom.id}
+            classroomName={classDetail.classroom.name}
+            accessToken={accessToken}
+            userName={user?.full_name || "Học sinh"}
+            isHost={false}
+            assignments={classDetail.assignments}
+            onNotify={notify}
+            onOpenLesson={(lessonId) => {
+              setInLiveRoom(false);
+              void openLessonContent(lessonId);
+            }}
+          />
+        ) : (
+          <>
+            {/* Banner thông báo lớp đang phát trực tuyến */}
+            {classDetail.classroom.is_live && (
+              <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-rose-200 bg-gradient-to-r from-rose-600 via-rose-500 to-indigo-600 p-5 text-white shadow-md">
+                <div className="space-y-1">
+                  <div className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-0.5 text-[11px] font-extrabold uppercase tracking-wider">
+                    <span className="h-2 w-2 rounded-full bg-white animate-ping" />
+                    ĐANG PHÁT TRỰC TIẾP TRONG LỚP HỌC
+                  </div>
+                  <h2 className="text-lg font-extrabold">
+                    {classDetail.classroom.live_session?.title || "Buổi học trực tuyến đang diễn ra!"}
+                  </h2>
+                  <p className="text-xs text-rose-100">
+                    {classDetail.classroom.live_session?.attendance_count || 1} thành viên đã điểm danh • Video trực tiếp + Live Chat + Giáo án ngay trong web
+                  </p>
+                </div>
+
+                {classDetail.classroom.is_enrolled ? (
+                  <button
+                    type="button"
+                    onClick={() => setInLiveRoom(true)}
+                    className="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-extrabold text-rose-600 shadow-lg hover:bg-rose-50 transition"
+                  >
+                    <Radio className="h-4 w-4 animate-pulse" /> Vào Phòng học Live ngay
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => void handleJoin({ classroom_id: classDetail.classroom.id })}
+                    className="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-extrabold text-indigo-700 shadow-lg hover:bg-indigo-50 transition"
+                  >
+                    Đăng ký lớp để vào xem Live
+                  </button>
+                )}
+              </div>
+            )}
+
+            <div className="rounded-2xl bg-slate-900 p-6 text-white shadow-sm">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="space-y-1.5">
               <div className="flex flex-wrap items-center gap-2 text-xs font-bold">
@@ -323,6 +395,8 @@ export default function ClassroomsPage() {
             )}
           </div>
         </div>
+          </>
+        )}
       </div>
     );
   }
@@ -458,9 +532,17 @@ export default function ClassroomsPage() {
                       <SubIcon className="h-3.5 w-3.5" />
                       Lớp {cls.grade_id} • {cls.subject_name}
                     </span>
-                    <span className="rounded bg-slate-100 px-2 py-0.5 font-mono text-[11px] font-bold text-slate-700">
-                      {cls.code}
-                    </span>
+                    <div className="flex items-center gap-1.5">
+                      {cls.is_live && (
+                        <span className="inline-flex items-center gap-1 rounded-md bg-rose-600 px-2 py-0.5 text-[10px] font-extrabold text-white">
+                          <span className="h-1.5 w-1.5 rounded-full bg-white animate-ping" />
+                          LIVE
+                        </span>
+                      )}
+                      <span className="rounded bg-slate-100 px-2 py-0.5 font-mono text-[11px] font-bold text-slate-700">
+                        {cls.code}
+                      </span>
+                    </div>
                   </div>
 
                   <h2 className="mt-3 text-base font-bold text-slate-900">{cls.name}</h2>
@@ -484,13 +566,32 @@ export default function ClassroomsPage() {
                   </div>
 
                   {cls.is_enrolled ? (
-                    <button
-                      type="button"
-                      onClick={() => void openClassroom(cls.id)}
-                      className="w-full rounded-xl bg-emerald-600 py-2 text-xs font-bold text-white hover:bg-emerald-500 transition"
-                    >
-                      Vào lớp học ngay
-                    </button>
+                    cls.is_live ? (
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => void openClassroom(cls.id, true)}
+                          className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-rose-600 py-2 text-xs font-bold text-white shadow hover:bg-rose-500 transition"
+                        >
+                          <Radio className="h-3.5 w-3.5 animate-pulse" /> Vào Phòng Live
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => void openClassroom(cls.id, false)}
+                          className="rounded-xl border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                        >
+                          Giáo án
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => void openClassroom(cls.id)}
+                        className="w-full rounded-xl bg-emerald-600 py-2 text-xs font-bold text-white hover:bg-emerald-500 transition"
+                      >
+                        Vào lớp học ngay
+                      </button>
+                    )
                   ) : cls.allow_self_enroll ? (
                     <div className="flex gap-2">
                       <button

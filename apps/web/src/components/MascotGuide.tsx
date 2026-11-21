@@ -26,10 +26,10 @@ interface TourStep {
 
 const CLASSROOM_TOUR_STEPS: TourStep[] = [
   {
-    badge: "Bước 1 / 4 • Lớp học theo giáo án",
+    badge: "Bước 1 / 4 • Lớp học & Phòng Live trực tuyến",
     title: "Chào mừng bạn gia nhập Lớp học!",
     description:
-      "Mình là Cú Bông Edu — trợ lý đồng hành cùng bạn từ Lớp 1 đến Lớp 12. Trong mỗi lớp học, giáo viên đã sắp xếp sẵn Giáo án từng buổi và Bài kiểm tra theo đúng tiến độ.",
+      "Mình là Cú Bông Edu — trợ lý đồng hành cùng bạn từ Lớp 1 đến Lớp 12. Khi giáo viên bật phát trực tiếp, bạn sẽ thấy nút đỏ 'Vào Phòng Live' để học video trực tiếp, chat hỏi đáp và điểm danh tự động!",
     actionLabel: "Mở danh sách Lớp học",
     actionHref: "/lop-hoc",
   },

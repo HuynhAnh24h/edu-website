@@ -19,6 +19,7 @@ import {
   Menu,
   Paperclip,
   Plus,
+  Radio,
   Save,
   School,
   ShieldAlert,
@@ -79,6 +80,7 @@ interface DashboardClassroom {
 type DashboardTab =
   | "overview"
   | "classrooms"
+  | "live"
   | "lessons"
   | "questions"
   | "exams"
@@ -93,6 +95,10 @@ const TAB_META: Record<DashboardTab, { title: string; subtitle: string }> = {
   classrooms: {
     title: "Quản lý Lớp học & Học sinh",
     subtitle: "Tạo lớp học, chia sẻ mã đăng ký, xếp giáo án từng buổi và chấm điểm bài kiểm tra trực tuyến.",
+  },
+  live: {
+    title: "Phòng học Trực tuyến & Livestream",
+    subtitle: "Mở lớp Video 2 chiều WebRTC (0đ) hoặc phát Livestream YouTube/OBS kèm Live Chat & Điểm danh tự động.",
   },
   lessons: {
     title: "Soạn Bài giảng (Kiểu Word)",
@@ -543,6 +549,12 @@ export default function CMSAdminPage() {
           desc: "Học sinh, Giáo án, Kiểm tra",
           icon: School,
         },
+        {
+          id: "live",
+          label: "Phòng học Live / Stream",
+          desc: "Video 2 chiều, OBS, Điểm danh",
+          icon: Radio,
+        },
       ],
     },
     {
@@ -746,10 +758,10 @@ export default function CMSAdminPage() {
             </span>
             <button
               type="button"
-              onClick={() => setActiveTab("classrooms")}
-              className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 hover:border-indigo-300 hover:text-indigo-700 transition"
+              onClick={() => setActiveTab("live")}
+              className="inline-flex items-center gap-1.5 rounded-xl bg-rose-600 px-3 py-1.5 text-xs font-bold text-white shadow-xs hover:bg-rose-500 transition"
             >
-              <School className="h-3.5 w-3.5" /> Lớp học
+              <Radio className="h-3.5 w-3.5" /> Phát Live
             </button>
             <button
               type="button"
@@ -999,10 +1011,12 @@ export default function CMSAdminPage() {
             </div>
           )}
 
-          {/* === TAB 1: QUẢN LÝ LỚP HỌC, HỌC SINH & GIAO BÀI KIỂM TRA === */}
-          {activeTab === "classrooms" && (
+          {/* === TAB 1 & 1B: QUẢN LÝ LỚP HỌC, PHÒNG LIVE, HỌC SINH & GIAO BÀI KIỂM TRA === */}
+          {(activeTab === "classrooms" || activeTab === "live") && (
             <ClassroomManager
               accessToken={accessToken}
+              teacherName={user.full_name}
+              initialSubTab={activeTab === "live" ? "live" : "curriculum"}
               subjects={subjects}
               onNotify={(type, msg) => {
                 showToast(type, msg);

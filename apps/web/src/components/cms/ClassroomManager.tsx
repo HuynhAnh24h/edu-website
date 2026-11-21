@@ -8,17 +8,23 @@ import {
   Check,
   ClipboardCheck,
   Copy,
+  Globe,
   GraduationCap,
+  History,
   Plus,
+  Radio,
   School,
   ShieldCheck,
   Trash2,
   Trophy,
+  Tv,
   UserPlus,
   Users,
+  Video,
 } from "lucide-react";
 import { CORE_API_URL, ExamSummary, Lesson } from "@/lib/api";
 import { getSubjectMeta } from "@/lib/subjects";
+import { LiveClassroomStudio, LiveSessionInfo } from "@/components/LiveClassroomStudio";
 
 interface Subject {
   id: number;
@@ -39,6 +45,12 @@ interface ClassroomItem {
   student_count: number;
   lesson_count: number;
   exam_count: number;
+  is_live?: boolean;
+  live_session?: LiveSessionInfo | null;
+}
+
+interface LiveHistoryItem extends LiveSessionInfo {
+  message_count?: number;
 }
 
 interface StudentMember {
@@ -72,12 +84,16 @@ interface GradeRow {
 
 interface ClassroomManagerProps {
   accessToken: string | null;
+  teacherName?: string;
+  initialSubTab?: "live" | "curriculum" | "students" | "grades";
   subjects: Subject[];
   onNotify: (type: "ok" | "err", msg: string) => void;
 }
 
 export function ClassroomManager({
   accessToken,
+  teacherName = "Giáo viên",
+  initialSubTab = "curriculum",
   subjects,
   onNotify,
 }: ClassroomManagerProps) {
@@ -89,9 +105,21 @@ export function ClassroomManager({
     assignments: AssignmentItem[];
     gradebook: GradeRow[];
   } | null>(null);
-  const [subTab, setSubTab] = useState<"students" | "curriculum" | "grades">("curriculum");
+  const [subTab, setSubTab] = useState<"live" | "students" | "curriculum" | "grades">(initialSubTab);
   const [showCreate, setShowCreate] = useState(false);
   const [copiedCode, setCopiedCode] = useState("");
+
+  // State khởi tạo Livestream / Phòng học trực tuyến
+  const [liveMode, setLiveMode] = useState<"webrtc" | "youtube" | "stream_url">("webrtc");
+  const [liveTitle, setLiveTitle] = useState("");
+  const [liveStreamUrl, setLiveStreamUrl] = useState("");
+  const [livePinnedNote, setLivePinnedNote] = useState("");
+  const [startingLive, setStartingLive] = useState(false);
+  const [liveHistory, setLiveHistory] = useState<LiveHistoryItem[]>([]);
+
+  useEffect(() => {
+    setSubTab(initialSubTab);
+  }, [initialSubTab]);
 
   // Form tạo lớp mới
   const [newName, setNewName] = useState("");
@@ -138,12 +166,16 @@ export function ClassroomManager({
           gradebook: data.gradebook || [],
         });
 
-        // Tải danh sách bài giảng cùng khối lớp & đề thi để giáo viên chọn giao
-        const [lesRes, exRes] = await Promise.all([
+        // Tải danh sách bài giảng cùng khối lớp, đề thi & lịch sử buổi Live
+        const [lesRes, exRes, histRes] = await Promise.all([
           fetch(
             `${CORE_API_URL}/api/v1/lessons?grade=${data.classroom.grade_id}&subject=${data.classroom.subject_code}&mode=index`
           ),
           fetch(`${CORE_API_URL}/api/v1/exams`),
+          fetch(
+            `${CORE_API_URL}/api/v1/cms/classrooms/${encodeURIComponent(classId)}/live/history`,
+            { headers: { Authorization: `Bearer ${accessToken}` } }
+          ),
         ]);
         if (lesRes.ok) {
           const ld = await lesRes.json();
@@ -156,6 +188,10 @@ export function ClassroomManager({
           const eList = (ed.exams || []) as ExamSummary[];
           setAvailableExams(eList);
           setPickedExamId(eList[0]?.id || "");
+        }
+        if (histRes.ok) {
+          const hd = await histRes.json();
+          setLiveHistory(hd.sessions || []);
         }
       }
     },
@@ -320,6 +356,43 @@ export function ClassroomManager({
     }
   };
 
+  const handleStartLive = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!accessToken || !detail) return;
+    setStartingLive(true);
+    try {
+      const res = await fetch(
+        `${CORE_API_URL}/api/v1/cms/classrooms/${encodeURIComponent(detail.classroom.id)}/live/start`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({
+            title: liveTitle.trim() || `Dạy trực tuyến — ${detail.classroom.name}`,
+            mode: liveMode,
+            stream_url: liveStreamUrl.trim(),
+            pinned_note: livePinnedNote.trim(),
+          }),
+        }
+      );
+      const data = await res.json();
+      if (!res.ok) {
+        onNotify("err", data.error || "Không thể mở Phòng học Live");
+        return;
+      }
+      setLiveTitle("");
+      setLiveStreamUrl("");
+      setLivePinnedNote("");
+      onNotify("ok", "Đã bật PHÁT TRỰC TIẾP! Học sinh trong lớp sẽ thấy nút Vào Phòng Live ngay lập tức.");
+      await loadDetail(detail.classroom.id);
+      await loadMyClassrooms();
+    } finally {
+      setStartingLive(false);
+    }
+  };
+
   const copyCode = (code: string) => {
     void navigator.clipboard?.writeText(code);
     setCopiedCode(code);
@@ -455,9 +528,17 @@ export function ClassroomManager({
                   <SubIcon className="h-3.5 w-3.5" />
                   Lớp {cls.grade_id} • {cls.subject_name}
                 </span>
-                <span className="rounded bg-slate-900 px-2 py-0.5 font-mono text-[11px] font-bold text-white">
-                  {cls.code}
-                </span>
+                <div className="flex items-center gap-1.5">
+                  {cls.is_live && (
+                    <span className="inline-flex items-center gap-1 rounded bg-rose-600 px-1.5 py-0.5 text-[10px] font-extrabold text-white">
+                      <span className="h-1.5 w-1.5 rounded-full bg-white animate-ping" />
+                      LIVE
+                    </span>
+                  )}
+                  <span className="rounded bg-slate-900 px-2 py-0.5 font-mono text-[11px] font-bold text-white">
+                    {cls.code}
+                  </span>
+                </div>
               </div>
               <h3 className="mt-2 line-clamp-1 text-sm font-bold text-slate-900">{cls.name}</h3>
               <div className="mt-2.5 flex items-center gap-3 text-[11px] font-semibold text-slate-500">
@@ -520,12 +601,18 @@ export function ClassroomManager({
             </div>
           </div>
 
-          {/* 3 Tab quản lý lớp */}
-          <div className="flex border-b border-slate-200 bg-white px-5">
+          {/* 4 Tab quản lý lớp (có Phòng học Live / Livestream) */}
+          <div className="flex flex-wrap border-b border-slate-200 bg-white px-5">
             {[
-              { id: "curriculum", label: `Giáo án & Bài kiểm tra (${detail.assignments.length})`, icon: BookOpen },
-              { id: "students", label: `Học sinh trong lớp (${detail.students.length})`, icon: Users },
-              { id: "grades", label: `Bảng điểm kiểm tra (${detail.gradebook.length})`, icon: Trophy },
+              {
+                id: "live",
+                label: detail.classroom.is_live ? "Phòng học Live (ĐANG PHÁT)" : "Phòng học Live / Livestream",
+                icon: Radio,
+                isLive: detail.classroom.is_live,
+              },
+              { id: "curriculum", label: `Giáo án & Bài kiểm tra (${detail.assignments.length})`, icon: BookOpen, isLive: false },
+              { id: "students", label: `Học sinh trong lớp (${detail.students.length})`, icon: Users, isLive: false },
+              { id: "grades", label: `Bảng điểm kiểm tra (${detail.gradebook.length})`, icon: Trophy, isLive: false },
             ].map((t) => {
               const Icon = t.icon;
               return (
@@ -535,11 +622,15 @@ export function ClassroomManager({
                   onClick={() => setSubTab(t.id as typeof subTab)}
                   className={`inline-flex items-center gap-1.5 border-b-2 px-4 py-3 text-xs font-bold transition ${
                     subTab === t.id
-                      ? "border-indigo-600 text-indigo-700"
-                      : "border-transparent text-slate-500 hover:text-slate-800"
+                      ? t.isLive
+                        ? "border-rose-600 text-rose-600"
+                        : "border-indigo-600 text-indigo-700"
+                      : t.isLive
+                        ? "border-transparent text-rose-600 hover:bg-rose-50/60"
+                        : "border-transparent text-slate-500 hover:text-slate-800"
                   }`}
                 >
-                  <Icon className="h-4 w-4" />
+                  <Icon className={`h-4 w-4 ${t.isLive ? "animate-pulse text-rose-600" : ""}`} />
                   {t.label}
                 </button>
               );
@@ -547,6 +638,201 @@ export function ClassroomManager({
           </div>
 
           <div className="p-5">
+            {/* SUBTAB 0: PHÒNG HỌC LIVE ĐA CHẾ ĐỘ + LIVE CHAT + ĐIỂM DANH */}
+            {subTab === "live" && (
+              <div className="space-y-6">
+                {detail.classroom.is_live ? (
+                  <LiveClassroomStudio
+                    classroomId={detail.classroom.id}
+                    classroomName={detail.classroom.name}
+                    accessToken={accessToken}
+                    userName={teacherName}
+                    isHost={true}
+                    assignments={detail.assignments}
+                    onNotify={onNotify}
+                    onSessionEnded={() => {
+                      void loadDetail(detail.classroom.id);
+                      void loadMyClassrooms();
+                    }}
+                  />
+                ) : (
+                  <form
+                    onSubmit={handleStartLive}
+                    className="rounded-2xl border border-indigo-200 bg-gradient-to-br from-slate-50 via-white to-indigo-50/40 p-6 space-y-5"
+                  >
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div>
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-100 px-3 py-1 text-[11px] font-bold text-rose-700">
+                          <Radio className="h-3.5 w-3.5" /> PHÒNG HỌC TRỰC TUYẾN &amp; LIVESTREAM 0Đ
+                        </span>
+                        <h4 className="mt-2 text-lg font-extrabold text-slate-900">
+                          Mở buổi Dạy trực tuyến ngay trong lớp {detail.classroom.name}
+                        </h4>
+                        <p className="text-xs text-slate-500">
+                          Chọn chế độ phát bên dưới — học sinh đã đăng ký lớp sẽ tự động thấy nút <strong>Vào Phòng Live</strong>, được điểm danh tự động và hỏi đáp Live Chat ngay cạnh màn hình!
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Chọn 3 chế độ Livestream */}
+                    <div className="grid gap-3 sm:grid-cols-3">
+                      {[
+                        {
+                          id: "webrtc" as const,
+                          icon: Video,
+                          title: "Video 2 chiều (WebRTC)",
+                          badge: "Khuyên dùng • 0đ",
+                          desc: "Bật Camera, Mic, Chia sẻ Slide, Giơ tay ngay trên web không cần cài app.",
+                        },
+                        {
+                          id: "youtube" as const,
+                          icon: Tv,
+                          title: "Livestream YouTube / OBS",
+                          badge: "Lớp siêu đông",
+                          desc: "Phát từ OBS lên YouTube (Không công khai) rồi dán link để học sinh xem mượt.",
+                        },
+                        {
+                          id: "stream_url" as const,
+                          icon: Globe,
+                          title: "Link Stream / HLS / Cloudflare",
+                          badge: "Đa nền tảng",
+                          desc: "Dán link .m3u8, .mp4, Cloudflare Stream iframe hoặc link nhúng bất kỳ.",
+                        },
+                      ].map((m) => {
+                        const Icon = m.icon;
+                        const active = liveMode === m.id;
+                        return (
+                          <button
+                            key={m.id}
+                            type="button"
+                            onClick={() => setLiveMode(m.id)}
+                            className={`rounded-2xl border p-4 text-left transition ${
+                              active
+                                ? "border-indigo-600 bg-indigo-50/70 ring-1 ring-indigo-600"
+                                : "border-slate-200 bg-white hover:border-indigo-300"
+                            }`}
+                          >
+                            <div className="flex items-center justify-between gap-2">
+                              <Icon className={`h-5 w-5 ${active ? "text-indigo-600" : "text-slate-500"}`} />
+                              <span className="rounded-md bg-slate-900 px-2 py-0.5 text-[10px] font-bold text-white">
+                                {m.badge}
+                              </span>
+                            </div>
+                            <p className="mt-2.5 text-sm font-bold text-slate-900">{m.title}</p>
+                            <p className="mt-1 text-[11px] leading-relaxed text-slate-500">{m.desc}</p>
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <div>
+                        <label className="mb-1 block text-xs font-bold text-slate-700">
+                          Tiêu đề buổi học Live
+                        </label>
+                        <input
+                          value={liveTitle}
+                          onChange={(e) => setLiveTitle(e.target.value)}
+                          placeholder={`VD: Livestream Chữa đề ${detail.classroom.subject_name} Lớp ${detail.classroom.grade_id}`}
+                          className="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label className="mb-1 block text-xs font-bold text-slate-700">
+                          Thông báo ghim cho học sinh (tùy chọn)
+                        </label>
+                        <input
+                          value={livePinnedNote}
+                          onChange={(e) => setLivePinnedNote(e.target.value)}
+                          placeholder="VD: Các em điểm danh & chuẩn bị làm bài kiểm tra 15p cuối giờ nhé!"
+                          className="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm"
+                        />
+                      </div>
+                    </div>
+
+                    {(liveMode === "youtube" || liveMode === "stream_url") && (
+                      <div>
+                        <label className="mb-1 block text-xs font-bold text-slate-700">
+                          {liveMode === "youtube"
+                            ? "Đường link YouTube Live / Video *"
+                            : "Đường link phát trực tiếp (.m3u8 / .mp4 / Cloudflare Stream Embed) *"}
+                        </label>
+                        <input
+                          required
+                          value={liveStreamUrl}
+                          onChange={(e) => setLiveStreamUrl(e.target.value)}
+                          placeholder={
+                            liveMode === "youtube"
+                              ? "https://www.youtube.com/live/... hoặc https://youtu.be/..."
+                              : "https://customer-xxx.cloudflarestream.com/.../iframe hoặc link .m3u8"
+                          }
+                          className="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 font-mono text-xs"
+                        />
+                      </div>
+                    )}
+
+                    <div className="flex justify-end">
+                      <button
+                        type="submit"
+                        disabled={startingLive}
+                        className="inline-flex items-center gap-2 rounded-xl bg-rose-600 px-6 py-3 text-sm font-bold text-white shadow-md hover:bg-rose-500 disabled:opacity-50 transition"
+                      >
+                        <Radio className="h-4 w-4" />
+                        {startingLive ? "Đang khởi tạo phòng Live..." : "Bắt đầu Phát Trực Tiếp Ngay"}
+                      </button>
+                    </div>
+                  </form>
+                )}
+
+                {/* Lịch sử các buổi Live & Sĩ số điểm danh */}
+                <div className="rounded-2xl border border-slate-200 bg-slate-50/60 p-4">
+                  <h4 className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-slate-600">
+                    <History className="h-4 w-4 text-indigo-600" />
+                    Lịch sử các buổi học trực tuyến &amp; Điểm danh ({liveHistory.length})
+                  </h4>
+                  {liveHistory.length === 0 ? (
+                    <p className="mt-2 text-xs text-slate-500">
+                      Chưa có lịch sử buổi học trực tuyến nào trong lớp này.
+                    </p>
+                  ) : (
+                    <div className="mt-3 space-y-2">
+                      {liveHistory.map((h) => (
+                        <div
+                          key={h.id}
+                          className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-white p-3 text-xs ring-1 ring-slate-200"
+                        >
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span
+                                className={`rounded px-2 py-0.5 text-[10px] font-bold uppercase ${
+                                  h.status === "live"
+                                    ? "bg-rose-100 text-rose-700"
+                                    : "bg-slate-100 text-slate-600"
+                                }`}
+                              >
+                                {h.status === "live" ? "Đang phát" : "Đã kết thúc"}
+                              </span>
+                              <span className="font-bold text-slate-900">{h.title}</span>
+                            </div>
+                            <p className="mt-0.5 text-[11px] text-slate-500">
+                              Chế độ: {h.mode} • Bắt đầu:{" "}
+                              {new Date(h.started_at.replace(" ", "T") + "Z").toLocaleString("vi-VN")}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-3 font-semibold text-slate-600">
+                            <span className="inline-flex items-center gap-1 text-emerald-700">
+                              <Users className="h-3.5 w-3.5" /> {h.attendance_count || 0} điểm danh
+                            </span>
+                            <span>{h.message_count || 0} tin nhắn</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* SUBTAB 1: GIAO GIÁO ÁN & BÀI KIỂM TRA TRỰC TUYẾN */}
             {subTab === "curriculum" && (
               <div className="grid gap-6 lg:grid-cols-2">
