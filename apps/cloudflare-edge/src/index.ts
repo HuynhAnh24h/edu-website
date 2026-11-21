@@ -343,16 +343,61 @@ export default {
         return jsonRes({ subjects: results }, 200, { "Cache-Control": "public, max-age=3600" });
       }
 
+      if (path === "/api/v1/curriculum/summary" && method === "GET") {
+        const { results } = await env.DB.prepare(
+          "SELECT grade_id, subject_code, subject_name, COUNT(*) as lesson_count FROM lessons GROUP BY grade_id, subject_code, subject_name ORDER BY grade_id ASC, subject_code ASC"
+        ).all();
+        const totalRow = await env.DB.prepare("SELECT COUNT(*) as total FROM lessons").first<{ total: number }>();
+        return jsonRes(
+          { total_lessons: totalRow?.total ?? 0, summary: results },
+          200,
+          { "Cache-Control": "public, max-age=120" }
+        );
+      }
+
+      const singleLessonMatch = path.match(/^\/api\/v1\/lessons\/([^/]+)$/);
+      if (singleLessonMatch && method === "GET") {
+        const lid = decodeURIComponent(singleLessonMatch[1]);
+        const r = await env.DB.prepare("SELECT * FROM lessons WHERE id = ? LIMIT 1")
+          .bind(lid)
+          .first<Record<string, unknown>>();
+        if (!r) return jsonRes({ error: "Không tìm thấy bài giảng" }, 404);
+        return jsonRes(
+          {
+            lesson: {
+              id: r.id,
+              grade_id: r.grade_id,
+              subject_code: r.subject_code,
+              subject_name: r.subject_name,
+              textbook: r.textbook,
+              chapter: r.chapter,
+              title: r.title,
+              slug: r.slug,
+              summary: r.summary,
+              content_mdx: r.content_mdx,
+              duration_min: r.duration_min,
+              materials: JSON.parse(String(r.materials_json || "[]")),
+            },
+          },
+          200,
+          { "Cache-Control": "public, max-age=300" }
+        );
+      }
+
       if (path === "/api/v1/lessons" && method === "GET") {
         const g = Number(url.searchParams.get("grade") || 0);
         const sub = url.searchParams.get("subject") || "";
         const tb = url.searchParams.get("textbook") || "";
-        let sql = "SELECT * FROM lessons WHERE 1=1";
+        const indexOnly = url.searchParams.get("mode") === "index";
+        const cols = indexOnly
+          ? "id, grade_id, subject_code, subject_name, textbook, chapter, title, slug, summary, duration_min"
+          : "*";
+        let sql = `SELECT ${cols} FROM lessons WHERE 1=1`;
         const binds: unknown[] = [];
         if (g > 0) { sql += " AND grade_id = ?"; binds.push(g); }
         if (sub && sub !== "all") { sql += " AND subject_code = ?"; binds.push(sub); }
         if (tb && tb !== "all") { sql += " AND textbook = ?"; binds.push(tb); }
-        sql += " ORDER BY grade_id ASC, updated_at DESC";
+        sql += " ORDER BY grade_id ASC, subject_code ASC, chapter ASC, id ASC";
 
         const { results } = await env.DB.prepare(sql).bind(...binds).all<Record<string, unknown>>();
         const lessons = results.map((r) => ({
@@ -365,11 +410,11 @@ export default {
           title: r.title,
           slug: r.slug,
           summary: r.summary,
-          content_mdx: r.content_mdx,
+          content_mdx: indexOnly ? "" : r.content_mdx,
           duration_min: r.duration_min,
-          materials: JSON.parse(String(r.materials_json || "[]")),
+          materials: indexOnly ? [] : JSON.parse(String(r.materials_json || "[]")),
         }));
-        return jsonRes({ lessons });
+        return jsonRes({ lessons }, 200, { "Cache-Control": "public, max-age=120" });
       }
 
       // === 3. EXERCISES ===
@@ -656,21 +701,39 @@ export default {
         if (path === "/api/v1/cms/import/lessons" && method === "POST") {
           const b = (await request.json()) as { lessons?: Record<string, unknown>[] };
           const items = b.lessons || [];
-          let imported = 0;
+          const stmts: D1PreparedStatement[] = [];
           for (const item of items) {
             const sub = String(item.subject_code || "toan");
             const title = String(item.title || "").trim();
             if (!title) continue;
             const slug = slugify(title);
-            const id = `les-${sub}-${item.grade_id}-${slug.slice(0, 16)}`;
-            await env.DB.prepare(
-              "INSERT OR REPLACE INTO lessons (id, grade_id, subject_code, subject_name, textbook, chapter, title, slug, summary, content_mdx, duration_min, materials_json) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-            )
-              .bind(id, Number(item.grade_id || 12), sub, SUBJECT_NAMES[sub] || sub, String(item.textbook || "kntt"), String(item.chapter || "Chương 1"), title, slug, String(item.summary || ""), String(item.content_mdx || ""), Number(item.duration_min || 20), JSON.stringify(item.materials || []))
-              .run();
-            imported++;
+            const ch = String(item.chapter || "Chương 1");
+            const id = String(item.id || `les-g${String(item.grade_id || 12).padStart(2, "0")}-${sub}-${slug.slice(0, 28)}`);
+            stmts.push(
+              env.DB.prepare(
+                "INSERT OR REPLACE INTO lessons (id, grade_id, subject_code, subject_name, textbook, chapter, title, slug, summary, content_mdx, duration_min, materials_json, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))"
+              ).bind(
+                id,
+                Number(item.grade_id || 12),
+                sub,
+                SUBJECT_NAMES[sub] || sub,
+                String(item.textbook || "kntt"),
+                ch,
+                title,
+                slug,
+                String(item.summary || ""),
+                String(item.content_mdx || ""),
+                Number(item.duration_min || 20),
+                JSON.stringify(item.materials || [])
+              )
+            );
           }
-          return jsonRes({ total: items.length, imported, updated: 0 });
+          // Thực thi D1 batch theo từng lô 50 lệnh để đạt tốc độ cao nhất & không quá tải
+          const BATCH = 50;
+          for (let i = 0; i < stmts.length; i += BATCH) {
+            await env.DB.batch(stmts.slice(i, i + BATCH));
+          }
+          return jsonRes({ total: items.length, imported: stmts.length, updated: 0 });
         }
 
         if (path === "/api/v1/cms/import/exams" && method === "POST") {
@@ -758,13 +821,16 @@ export default {
       }
 
       if (path === "/api/v1/ai/knowledge/bulk" && method === "POST") {
-        const b = (await request.json()) as { items?: Array<{ grade_id: number; subject_code: string; textbook?: string; citation: string; content: string }> };
+        const b = (await request.json()) as { items?: Array<{ id?: string; grade_id: number; subject_code: string; textbook?: string; citation: string; content: string }> };
         const items = b.items || [];
         const stmts = items.map((it) =>
-          env.DB.prepare("INSERT INTO knowledge_chunks (id, grade_id, subject_code, textbook, citation, content) VALUES (?, ?, ?, ?, ?, ?)")
-            .bind(`kc-${crypto.randomUUID().slice(0, 8)}`, it.grade_id, it.subject_code, it.textbook || "kntt", it.citation, it.content)
+          env.DB.prepare("INSERT OR REPLACE INTO knowledge_chunks (id, grade_id, subject_code, textbook, citation, content) VALUES (?, ?, ?, ?, ?, ?)")
+            .bind(it.id || `kc-g${it.grade_id}-${it.subject_code}-${slugify(it.citation).slice(0, 32)}`, it.grade_id, it.subject_code, it.textbook || "kntt", it.citation, it.content)
         );
-        if (stmts.length) await env.DB.batch(stmts);
+        const BATCH = 50;
+        for (let i = 0; i < stmts.length; i += BATCH) {
+          await env.DB.batch(stmts.slice(i, i + BATCH));
+        }
         return jsonRes({ total: items.length, indexed: items.length, status: "bulk_indexed_in_d1_edge" });
       }
 

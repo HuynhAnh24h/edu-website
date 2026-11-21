@@ -10,10 +10,17 @@ Pop-Location
 
 Write-Host "=== 2. Kiem tra dang nhap Cloudflare CLI (cf) ===" -ForegroundColor Cyan
 Push-Location "$PSScriptRoot\apps\cloudflare-edge"
+$whoamiRaw = npx cf auth whoami 2>$null | Out-String
+$isAuth = $false
 try {
-    npx cf auth whoami | Out-Null
+    $whoami = $whoamiRaw | ConvertFrom-Json
+    if ($whoami.authenticated -eq $true) { $isAuth = $true }
 } catch {
-    Write-Host "Chua dang nhap Cloudflare CLI! Dang mo trinh duyet dang nhap Cloudflare..." -ForegroundColor Yellow
+    $isAuth = $false
+}
+
+if (-not $isAuth) {
+    Write-Host "Chua dang nhap Cloudflare CLI! Dang mo trinh duyet dang nhap Cloudflare (hay bam Allow)..." -ForegroundColor Yellow
     npx cf auth login
 }
 

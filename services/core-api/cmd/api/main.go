@@ -187,6 +187,49 @@ func main() {
 		writeJSON(w, http.StatusOK, map[string]any{"subjects": subjects})
 	})
 
+	mux.HandleFunc("GET /api/v1/curriculum/summary", func(w http.ResponseWriter, r *http.Request) {
+		lessons, err := repo.ListLessons(r.Context(), 0, "all", "all")
+		if err != nil {
+			writeJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+			return
+		}
+		type sumRow struct {
+			GradeID     int    `json:"grade_id"`
+			SubjectCode string `json:"subject_code"`
+			SubjectName string `json:"subject_name"`
+			LessonCount int    `json:"lesson_count"`
+		}
+		m := make(map[string]*sumRow)
+		for _, l := range lessons {
+			key := strconv.Itoa(l.GradeID) + ":" + l.SubjectCode
+			if _, ok := m[key]; !ok {
+				m[key] = &sumRow{GradeID: l.GradeID, SubjectCode: l.SubjectCode, SubjectName: l.SubjectName}
+			}
+			m[key].LessonCount++
+		}
+		out := make([]sumRow, 0, len(m))
+		for _, v := range m {
+			out = append(out, *v)
+		}
+		writeJSON(w, http.StatusOK, map[string]any{"total_lessons": len(lessons), "summary": out})
+	})
+
+	mux.HandleFunc("GET /api/v1/lessons/{lessonId}", func(w http.ResponseWriter, r *http.Request) {
+		lid := r.PathValue("lessonId")
+		lessons, err := repo.ListLessons(r.Context(), 0, "all", "all")
+		if err != nil {
+			writeJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+			return
+		}
+		for _, l := range lessons {
+			if l.ID == lid {
+				writeJSON(w, http.StatusOK, map[string]any{"lesson": l})
+				return
+			}
+		}
+		writeJSON(w, http.StatusNotFound, map[string]string{"error": "không tìm thấy bài giảng"})
+	})
+
 	mux.HandleFunc("GET /api/v1/lessons", func(w http.ResponseWriter, r *http.Request) {
 		gradeFilter, _ := strconv.Atoi(r.URL.Query().Get("grade"))
 		lessons, err := repo.ListLessons(r.Context(), gradeFilter, r.URL.Query().Get("subject"), r.URL.Query().Get("textbook"))

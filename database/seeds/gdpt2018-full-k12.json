@@ -1,0 +1,2041 @@
+{
+  "lessons": [
+    {
+      "id": "gdpt-g01-toan-chuong-1-cac-01-cac-so-tu-0-den-10",
+      "grade_id": 1,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 1: Các số đến 10",
+      "title": "Các số từ 0 đến 10 & So sánh lớn hơn, bé hơn",
+      "summary": "Đếm, đọc, viết và so sánh các số trong phạm vi 10.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Toán học Lớp 1)\nThứ tự tăng dần: $$0 < 1 < 2 < 3 < 4 < 5 < 6 < 7 < 8 < 9 < 10$$\n\n### 2. Ví dụ minh họa & Lưu ý\nĐầu nhọn dấu `<` hoặc `>` luôn chỉ về phía số bé hơn: $3 < 8$, $9 > 4$.\n\n### 3. Yêu cầu cần đạt\n- Đếm, đọc, viết và so sánh các số trong phạm vi 10.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 20,
+      "materials": [
+        {
+          "id": "mat-gdpt-g01-toan-chuong-1-cac-01-cac-so-tu-0-den-10",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Các số từ 0 đến 10 & So sánh lớn hơn, bé hơn (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g01-toan-chuong-1-cac-01-cac-so-tu-0-den-10",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g01-toan-chuong-1-cac-02-may-va-may-tach-go",
+      "grade_id": 1,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 1: Các số đến 10",
+      "title": "Mấy và mấy — Tách gộp số trong phạm vi 10",
+      "summary": "Phân tích cấu tạo số từ 2 đến 10 làm nền tảng phép cộng trừ.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Toán học Lớp 1)\nVí dụ cấu tạo số $10$: $10 = 1+9 = 2+8 = 3+7 = 4+6 = 5+5$.\n\n### 2. Ví dụ minh họa & Lưu ý\n$7$ gồm $3$ và $4$; gộp $5$ và $2$ được $7$.\n\n### 3. Yêu cầu cần đạt\n- Phân tích cấu tạo số từ 2 đến 10 làm nền tảng phép cộng trừ.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 20,
+      "materials": [
+        {
+          "id": "mat-gdpt-g01-toan-chuong-1-cac-02-may-va-may-tach-go",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Mấy và mấy — Tách gộp số trong phạm vi 10 (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g01-toan-chuong-1-cac-02-may-va-may-tach-go",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g01-toan-chuong-2-phe-01-phep-cong-trong-ph",
+      "grade_id": 1,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 2: Phép cộng, phép trừ trong phạm vi 10",
+      "title": "Phép cộng trong phạm vi 10",
+      "summary": "Hiểu ý nghĩa gộp nhóm và thuộc bảng cộng đến 10.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Toán học Lớp 1)\nTính chất giao hoán: $a + b = b + a$. Ví dụ: $3 + 5 = 5 + 3 = 8$.\n\n### 2. Ví dụ minh họa & Lưu ý\nCó $4$ bông hoa đỏ và $5$ bông hoa vàng. Tổng số hoa là $4 + 5 = 9$ bông.\n\n### 3. Yêu cầu cần đạt\n- Hiểu ý nghĩa gộp nhóm và thuộc bảng cộng đến 10.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 20,
+      "materials": [
+        {
+          "id": "mat-gdpt-g01-toan-chuong-2-phe-01-phep-cong-trong-ph",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Phép cộng trong phạm vi 10 (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g01-toan-chuong-2-phe-01-phep-cong-trong-ph",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g01-toan-chuong-2-phe-02-phep-tru-trong-pha",
+      "grade_id": 1,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 2: Phép cộng, phép trừ trong phạm vi 10",
+      "title": "Phép trừ trong phạm vi 10",
+      "summary": "Hiểu ý nghĩa bớt đi và mối liên hệ với phép cộng.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Toán học Lớp 1)\nNếu $a + b = c$ thì $c - a = b$ và $c - b = a$.\n\n### 2. Ví dụ minh họa & Lưu ý\nCó $9$ quả bóng, cho bạn $3$ quả. Còn lại $9 - 3 = 6$ quả.\n\n### 3. Yêu cầu cần đạt\n- Hiểu ý nghĩa bớt đi và mối liên hệ với phép cộng.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 20,
+      "materials": [
+        {
+          "id": "mat-gdpt-g01-toan-chuong-2-phe-02-phep-tru-trong-pha",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Phép trừ trong phạm vi 10 (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g01-toan-chuong-2-phe-02-phep-tru-trong-pha",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g01-toan-chuong-3-hin-01-hinh-vuong-hinh-tr",
+      "grade_id": 1,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 3: Hình học phẳng & Hình khối cơ bản",
+      "title": "Hình vuông, hình tròn, hình tam giác, hình chữ nhật",
+      "summary": "Nhận dạng 4 hình phẳng quen thuộc qua đồ vật xung quanh.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Toán học Lớp 1)\n- Hình vuông có $4$ cạnh bằng nhau.\n- Hình tam giác có $3$ cạnh.\n- Hình tròn không có góc nhọn.\n\n### 2. Ví dụ minh họa & Lưu ý\nMặt đồng hồ có dạng hình tròn; quyển sách có dạng hình chữ nhật.\n\n### 3. Yêu cầu cần đạt\n- Nhận dạng 4 hình phẳng quen thuộc qua đồ vật xung quanh.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 20,
+      "materials": [
+        {
+          "id": "mat-gdpt-g01-toan-chuong-3-hin-01-hinh-vuong-hinh-tr",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Hình vuông, hình tròn, hình tam giác, hình chữ nhật (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g01-toan-chuong-3-hin-01-hinh-vuong-hinh-tr",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g01-toan-chuong-3-hin-02-khoi-lap-phuong-va",
+      "grade_id": 1,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 3: Hình học phẳng & Hình khối cơ bản",
+      "title": "Khối lập phương và khối hộp chữ nhật",
+      "summary": "Phân biệt hai hình khối 3D cơ bản qua thực hành xếp hình.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Toán học Lớp 1)\nKhối lập phương có $6$ mặt đều là hình vuông bằng nhau (như viên xúc xắc).\n\n### 2. Ví dụ minh họa & Lưu ý\nHộp sữa, hộp bút thường có dạng khối hộp chữ nhật.\n\n### 3. Yêu cầu cần đạt\n- Phân biệt hai hình khối 3D cơ bản qua thực hành xếp hình.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 20,
+      "materials": [
+        {
+          "id": "mat-gdpt-g01-toan-chuong-3-hin-02-khoi-lap-phuong-va",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Khối lập phương và khối hộp chữ nhật (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g01-toan-chuong-3-hin-02-khoi-lap-phuong-va",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g01-toan-chuong-4-cac-01-so-co-hai-chu-so-h",
+      "grade_id": 1,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 4: Các số đến 100 & Đo độ dài, thời gian",
+      "title": "Số có hai chữ số — Hàng chục và hàng đơn vị",
+      "summary": "Đọc, viết, phân tích số từ $11$ đến $99$.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Toán học Lớp 1)\nSố $47$ gồm $4$ chục và $7$ đơn vị: $$47 = 40 + 7$$\n\n### 2. Ví dụ minh họa & Lưu ý\nSố tròn chục nhỏ nhất có hai chữ số là $10$, lớn nhất là $90$.\n\n### 3. Yêu cầu cần đạt\n- Đọc, viết, phân tích số từ $11$ đến $99$.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 20,
+      "materials": [
+        {
+          "id": "mat-gdpt-g01-toan-chuong-4-cac-01-so-co-hai-chu-so-h",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Số có hai chữ số — Hàng chục và hàng đơn vị (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g01-toan-chuong-4-cac-01-so-co-hai-chu-so-h",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g01-toan-chuong-4-cac-02-phep-cong-tru-khon",
+      "grade_id": 1,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 4: Các số đến 100 & Đo độ dài, thời gian",
+      "title": "Phép cộng, trừ không nhớ trong phạm vi 100",
+      "summary": "Đặt tính thẳng cột hàng đơn vị, hàng chục.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Toán học Lớp 1)\nCộng (hoặc trừ) hàng đơn vị trước, sau đó đến hàng chục.\n\n### 2. Ví dụ minh họa & Lưu ý\n$34 + 25 = 59$; $78 - 32 = 46$.\n\n### 3. Yêu cầu cần đạt\n- Đặt tính thẳng cột hàng đơn vị, hàng chục.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 20,
+      "materials": [
+        {
+          "id": "mat-gdpt-g01-toan-chuong-4-cac-02-phep-cong-tru-khon",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Phép cộng, trừ không nhớ trong phạm vi 100 (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g01-toan-chuong-4-cac-02-phep-cong-tru-khon",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g01-toan-chuong-4-cac-03-don-vi-do-xang-ti-",
+      "grade_id": 1,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 4: Các số đến 100 & Đo độ dài, thời gian",
+      "title": "Đơn vị đo xăng-ti-mét (cm) & Xem đồng hồ giờ đúng",
+      "summary": "Biết đo bằng thước kẻ có vạch cm và đọc giờ đúng.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Toán học Lớp 1)\n$1\\text{ cm}$ là khoảng cách giữa hai vạch số liên tiếp trên thước học sinh.\n\n### 2. Ví dụ minh họa & Lưu ý\nKim ngắn chỉ số $7$, kim dài chỉ số $12$ là đúng $7$ giờ.\n\n### 3. Yêu cầu cần đạt\n- Biết đo bằng thước kẻ có vạch cm và đọc giờ đúng.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 20,
+      "materials": [
+        {
+          "id": "mat-gdpt-g01-toan-chuong-4-cac-03-don-vi-do-xang-ti-",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Đơn vị đo xăng-ti-mét (cm) & Xem đồng hồ giờ đúng (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g01-toan-chuong-4-cac-03-don-vi-do-xang-ti-",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g01-ngu-van-chu-de-1-ban-01-29-chu-cai-tieng-v",
+      "grade_id": 1,
+      "subject_code": "ngu-van",
+      "textbook": "kntt",
+      "chapter": "Chủ đề 1: Bảng chữ cái, Thanh điệu & Ghép vần",
+      "title": "29 Chữ cái tiếng Việt và 6 Thanh điệu",
+      "summary": "Nhận diện chuẩn nguyên âm, phụ âm và 6 thanh điệu.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Ngữ văn Lớp 1)\n6 thanh điệu: **Ngang** (`ba`), **Huyền** (`bà`), **Sắc** (`bá`), **Hỏi** (`bả`), **Ngã** (`bã`), **Nặng** (`bạ`).\n\n### 2. Ví dụ minh họa & Lưu ý\nChú ý quy tắc chính tả: `c` đi với `a, o, ô, ơ, u, ư`; `k` đi với `e, ê, i`.\n\n### 3. Yêu cầu cần đạt\n- Nhận diện chuẩn nguyên âm, phụ âm và 6 thanh điệu.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 20,
+      "materials": [
+        {
+          "id": "mat-gdpt-g01-ngu-van-chu-de-1-ban-01-29-chu-cai-tieng-v",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: 29 Chữ cái tiếng Việt và 6 Thanh điệu (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g01-ngu-van-chu-de-1-ban-01-29-chu-cai-tieng-v",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g01-ngu-van-chu-de-1-ban-02-quy-tac-chinh-ta-g",
+      "grade_id": 1,
+      "subject_code": "ngu-van",
+      "textbook": "kntt",
+      "chapter": "Chủ đề 1: Bảng chữ cái, Thanh điệu & Ghép vần",
+      "title": "Quy tắc chính tả g/gh, ng/ngh & Luyện đọc câu",
+      "summary": "Viết đúng chính tả các phụ âm ghép thông dụng lớp 1.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Ngữ văn Lớp 1)\n- `gh, ngh` chỉ đứng trước `e, ê, i`.\n- `g, ng` đứng trước các nguyên âm còn lại.\n\n### 2. Ví dụ minh họa & Lưu ý\nĐúng: *con ghẹ, ghi nhớ, suy nghĩ, con gà, ngôi nhà*.\n\n### 3. Yêu cầu cần đạt\n- Viết đúng chính tả các phụ âm ghép thông dụng lớp 1.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 20,
+      "materials": [
+        {
+          "id": "mat-gdpt-g01-ngu-van-chu-de-1-ban-02-quy-tac-chinh-ta-g",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Quy tắc chính tả g/gh, ng/ngh & Luyện đọc câu (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g01-ngu-van-chu-de-1-ban-02-quy-tac-chinh-ta-g",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g02-toan-chuong-1-phe-01-phep-cong-qua-10-t",
+      "grade_id": 2,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 1: Phép cộng, phép trừ có nhớ trong phạm vi 100",
+      "title": "Phép cộng qua 10 trong phạm vi 20",
+      "summary": "Tách số để gộp cho đủ chục rồi cộng tiếp.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Toán học Lớp 2)\nVí dụ: $8 + 5 = 8 + 2 + 3 = 10 + 3 = 13$.\n\n### 2. Ví dụ minh họa & Lưu ý\nMẹo nhanh: $9 + 6 = 15$, $7 + 8 = 15$.\n\n### 3. Yêu cầu cần đạt\n- Tách số để gộp cho đủ chục rồi cộng tiếp.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 20,
+      "materials": [
+        {
+          "id": "mat-gdpt-g02-toan-chuong-1-phe-01-phep-cong-qua-10-t",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Phép cộng qua 10 trong phạm vi 20 (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g02-toan-chuong-1-phe-01-phep-cong-qua-10-t",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g02-toan-chuong-1-phe-02-phep-cong-tru-co-n",
+      "grade_id": 2,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 1: Phép cộng, phép trừ có nhớ trong phạm vi 100",
+      "title": "Phép cộng, trừ có nhớ trong phạm vi 100",
+      "summary": "Đặt tính dọc có nhớ $1$ sang hàng chục hoặc mượn $1$ chục.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Toán học Lớp 2)\n$$28 + 37 = 65, \\qquad 62 - 27 = 35$$\n\n### 2. Ví dụ minh họa & Lưu ý\nLưu ý nhớ cộng thêm $1$ vào hàng chục khi tổng hàng đơn vị $\\ge 10$.\n\n### 3. Yêu cầu cần đạt\n- Đặt tính dọc có nhớ $1$ sang hàng chục hoặc mượn $1$ chục.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 20,
+      "materials": [
+        {
+          "id": "mat-gdpt-g02-toan-chuong-1-phe-02-phep-cong-tru-co-n",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Phép cộng, trừ có nhớ trong phạm vi 100 (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g02-toan-chuong-1-phe-02-phep-cong-tru-co-n",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g02-toan-chuong-2-phe-01-y-nghia-phep-nhan-",
+      "grade_id": 2,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 2: Phép nhân, Phép chia & Bảng 2, 5",
+      "title": "Ý nghĩa phép nhân & Bảng nhân 2, Bảng nhân 5",
+      "summary": "Chuyển tổng các số hạng bằng nhau thành phép nhân.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Toán học Lớp 2)\n$$a + a + \\dots + a \\text{ (n lần)} = a \\times n$$\n\n### 2. Ví dụ minh họa & Lưu ý\n$5 + 5 + 5 + 5 = 5 \\times 4 = 20$.\n\n### 3. Yêu cầu cần đạt\n- Chuyển tổng các số hạng bằng nhau thành phép nhân.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 20,
+      "materials": [
+        {
+          "id": "mat-gdpt-g02-toan-chuong-2-phe-01-y-nghia-phep-nhan-",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Ý nghĩa phép nhân & Bảng nhân 2, Bảng nhân 5 (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g02-toan-chuong-2-phe-01-y-nghia-phep-nhan-",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g02-toan-chuong-2-phe-02-phep-chia-bang-chi",
+      "grade_id": 2,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 2: Phép nhân, Phép chia & Bảng 2, 5",
+      "title": "Phép chia & Bảng chia 2, Bảng chia 5",
+      "summary": "Hiểu phép chia là phép tính ngược của phép nhân.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Toán học Lớp 2)\nTừ $2 \\times 6 = 12$ suy ra $12 : 2 = 6$ và $12 : 6 = 2$.\n\n### 2. Ví dụ minh họa & Lưu ý\nChia đều $15$ cái kẹo cho $5$ bạn, mỗi bạn được $15 : 5 = 3$ cái.\n\n### 3. Yêu cầu cần đạt\n- Hiểu phép chia là phép tính ngược của phép nhân.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 20,
+      "materials": [
+        {
+          "id": "mat-gdpt-g02-toan-chuong-2-phe-02-phep-chia-bang-chi",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Phép chia & Bảng chia 2, Bảng chia 5 (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g02-toan-chuong-2-phe-02-phep-chia-bang-chi",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g02-toan-chuong-3-cac-01-cac-so-den-1000-ha",
+      "grade_id": 2,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 3: Các số trong phạm vi 1000 & Đo lường",
+      "title": "Các số đến 1000 — Hàng trăm, chục, đơn vị",
+      "summary": "Đọc, viết, so sánh số có ba chữ số.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Toán học Lớp 2)\n$$345 = 300 + 40 + 5$$\n\n### 2. Ví dụ minh họa & Lưu ý\nSo sánh từ trái sang phải: hàng trăm trước, rồi đến hàng chục, hàng đơn vị.\n\n### 3. Yêu cầu cần đạt\n- Đọc, viết, so sánh số có ba chữ số.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 20,
+      "materials": [
+        {
+          "id": "mat-gdpt-g02-toan-chuong-3-cac-01-cac-so-den-1000-ha",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Các số đến 1000 — Hàng trăm, chục, đơn vị (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g02-toan-chuong-3-cac-01-cac-so-den-1000-ha",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g02-toan-chuong-3-cac-02-don-vi-do-ki-lo-ga",
+      "grade_id": 2,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 3: Các số trong phạm vi 1000 & Đo lường",
+      "title": "Đơn vị đo ki-lô-gam (kg), lít (l), mét (m), ki-lô-mét (km)",
+      "summary": "Đổi đơn vị đo thông dụng trong đời sống.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Toán học Lớp 2)\n$$1\\text{ m} = 10\\text{ dm} = 100\\text{ cm}, \\qquad 1\\text{ km} = 1000\\text{ m}$$\n\n### 2. Ví dụ minh họa & Lưu ý\nMột sợi dây dài $2\\text{ m}$ bằng $200\\text{ cm}$.\n\n### 3. Yêu cầu cần đạt\n- Đổi đơn vị đo thông dụng trong đời sống.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 20,
+      "materials": [
+        {
+          "id": "mat-gdpt-g02-toan-chuong-3-cac-02-don-vi-do-ki-lo-ga",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Đơn vị đo ki-lô-gam (kg), lít (l), mét (m), ki-lô-mét (km) (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g02-toan-chuong-3-cac-02-don-vi-do-ki-lo-ga",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g02-ngu-van-chu-de-1-tu--01-tu-chi-su-vat-hoat",
+      "grade_id": 2,
+      "subject_code": "ngu-van",
+      "textbook": "kntt",
+      "chapter": "Chủ đề 1: Từ loại & Tập làm văn tả ngắn",
+      "title": "Từ chỉ sự vật, hoạt động, đặc điểm & Câu kể",
+      "summary": "Phân biệt 3 nhóm từ cơ bản và viết câu hoàn chỉnh.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Ngữ văn Lớp 2)\n- **Sự vật:** *bàn, ghế, học sinh*\n- **Hoạt động:** *chạy, đọc, viết*\n- **Đặc điểm:** *cao, xanh, chăm chỉ*.\n\n### 2. Ví dụ minh họa & Lưu ý\nĐặt câu kiểu *Ai làm gì?*: *Bạn Lan đang đọc sách ở thư viện.*\n\n### 3. Yêu cầu cần đạt\n- Phân biệt 3 nhóm từ cơ bản và viết câu hoàn chỉnh.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 20,
+      "materials": [
+        {
+          "id": "mat-gdpt-g02-ngu-van-chu-de-1-tu--01-tu-chi-su-vat-hoat",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Từ chỉ sự vật, hoạt động, đặc điểm & Câu kể (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g02-ngu-van-chu-de-1-tu--01-tu-chi-su-vat-hoat",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g02-ngu-van-chu-de-1-tu--02-viet-doan-van-ngan",
+      "grade_id": 2,
+      "subject_code": "ngu-van",
+      "textbook": "kntt",
+      "chapter": "Chủ đề 1: Từ loại & Tập làm văn tả ngắn",
+      "title": "Viết đoạn văn ngắn 4–5 câu kể về người thân hoặc đồ vật",
+      "summary": "Biết sắp xếp ý mạch lạc, viết hoa đầu câu và chấm cuối câu.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Ngữ văn Lớp 2)\nBố cục 3 phần mini: Giới thiệu → Kể đặc điểm/hoạt động nổi bật → Tình cảm của em.\n\n### 2. Ví dụ minh họa & Lưu ý\nSử dụng các từ nối tự nhiên như *Hằng ngày, Ngoài ra, Em rất yêu quý...*\n\n### 3. Yêu cầu cần đạt\n- Biết sắp xếp ý mạch lạc, viết hoa đầu câu và chấm cuối câu.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 20,
+      "materials": [
+        {
+          "id": "mat-gdpt-g02-ngu-van-chu-de-1-tu--02-viet-doan-van-ngan",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Viết đoạn văn ngắn 4–5 câu kể về người thân hoặc đồ vật (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g02-ngu-van-chu-de-1-tu--02-viet-doan-van-ngan",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g03-toan-chuong-1-ban-01-hoan-thien-bang-nh",
+      "grade_id": 3,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 1: Bảng nhân chia 3, 4, 6, 7, 8, 9 & Biểu thức số",
+      "title": "Hoàn thiện Bảng nhân chia & Phép chia có dư",
+      "summary": "Thực hiện phép chia có dư với số dư luôn nhỏ hơn số chia.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Toán học Lớp 3)\nTrong phép chia có dư: $$\\text{Số bị chia} = \\text{Thương} \\times \\text{Số chia} + \\text{Số dư} \\quad (0 < \\text{dư} < \\text{số chia})$$\n\n### 2. Ví dụ minh họa & Lưu ý\n$29 : 4 = 7$ (dư $1$) vì $7 \\times 4 + 1 = 29$.\n\n### 3. Yêu cầu cần đạt\n- Thực hiện phép chia có dư với số dư luôn nhỏ hơn số chia.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 20,
+      "materials": [
+        {
+          "id": "mat-gdpt-g03-toan-chuong-1-ban-01-hoan-thien-bang-nh",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Hoàn thiện Bảng nhân chia & Phép chia có dư (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g03-toan-chuong-1-ban-01-hoan-thien-bang-nh",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g03-toan-chuong-1-ban-02-tinh-gia-tri-bieu-",
+      "grade_id": 3,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 1: Bảng nhân chia 3, 4, 6, 7, 8, 9 & Biểu thức số",
+      "title": "Tính giá trị biểu thức số (Thứ tự ưu tiên phép tính)",
+      "summary": "Nắm chắc 3 quy tắc vàng tính giá trị biểu thức.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Toán học Lớp 3)\n1. Trong ngoặc `(...)` trước.\n2. Nhân, chia trước; cộng, trừ sau.\n3. Cùng mức ưu tiên thì từ trái sang phải.\n\n### 2. Ví dụ minh họa & Lưu ý\n$(18 + 12) : 5 \\times 3 = 30 : 5 \\times 3 = 18$.\n\n### 3. Yêu cầu cần đạt\n- Nắm chắc 3 quy tắc vàng tính giá trị biểu thức.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 20,
+      "materials": [
+        {
+          "id": "mat-gdpt-g03-toan-chuong-1-ban-02-tinh-gia-tri-bieu-",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Tính giá trị biểu thức số (Thứ tự ưu tiên phép tính) (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g03-toan-chuong-1-ban-02-tinh-gia-tri-bieu-",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g03-toan-chuong-2-hin-01-chu-vi-dien-tich-h",
+      "grade_id": 3,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 2: Hình học — Chu vi & Diện tích Hình chữ nhật, Hình vuông",
+      "title": "Chu vi & Diện tích Hình chữ nhật, Hình vuông",
+      "summary": "Phân biệt rõ chu vi (độ dài viền) và diện tích (bề mặt).",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Toán học Lớp 3)\n- Hình chữ nhật: $P = (a + b) \\times 2$, $\\quad S = a \\times b$\n- Hình vuông: $P = a \\times 4$, $\\quad S = a \\times a$.\n\n### 2. Ví dụ minh họa & Lưu ý\nHình chữ nhật dài $8\\text{ cm}$, rộng $5\\text{ cm}$ có $P = 26\\text{ cm}$, $S = 40\\text{ cm}^2$.\n\n### 3. Yêu cầu cần đạt\n- Phân biệt rõ chu vi (độ dài viền) và diện tích (bề mặt).\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 20,
+      "materials": [
+        {
+          "id": "mat-gdpt-g03-toan-chuong-2-hin-01-chu-vi-dien-tich-h",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Chu vi & Diện tích Hình chữ nhật, Hình vuông (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g03-toan-chuong-2-hin-01-chu-vi-dien-tich-h",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g03-toan-chuong-2-hin-02-cac-so-den-100-000",
+      "grade_id": 3,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 2: Hình học — Chu vi & Diện tích Hình chữ nhật, Hình vuông",
+      "title": "Các số đến 100.000 & Chữ số La Mã",
+      "summary": "Đọc viết số đến trăm nghìn và đọc số La Mã I đến XX.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Toán học Lớp 3)\nKý hiệu La Mã cơ bản: $\\text{I}=1, \\text{V}=5, \\text{X}=10$. Ví dụ: $\\text{IV}=4, \\text{IX}=9, \\text{XIV}=14$.\n\n### 2. Ví dụ minh họa & Lưu ý\nThế kỷ $\\text{XXI}$ là thế kỷ thứ $21$.\n\n### 3. Yêu cầu cần đạt\n- Đọc viết số đến trăm nghìn và đọc số La Mã I đến XX.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 20,
+      "materials": [
+        {
+          "id": "mat-gdpt-g03-toan-chuong-2-hin-02-cac-so-den-100-000",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Các số đến 100.000 & Chữ số La Mã (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g03-toan-chuong-2-hin-02-cac-so-den-100-000",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g03-ngu-van-chu-de-1-bie-01-bien-phap-tu-tu-so",
+      "grade_id": 3,
+      "subject_code": "ngu-van",
+      "textbook": "kntt",
+      "chapter": "Chủ đề 1: Biện pháp So sánh & Viết đoạn văn",
+      "title": "Biện pháp tu từ So sánh",
+      "summary": "Nhận biết 2 sự vật được so sánh và từ so sánh (`như, là, tựa, giống`).",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Ngữ văn Lớp 3)\nCấu trúc: **Sự vật A** + *từ so sánh* + **Sự vật B** giúp câu văn giàu hình ảnh.\n\n### 2. Ví dụ minh họa & Lưu ý\n*Mặt trăng tròn vành vạnh **như** chiếc đĩa bạc khổng lồ.*\n\n### 3. Yêu cầu cần đạt\n- Nhận biết 2 sự vật được so sánh và từ so sánh (`như, là, tựa, giống`).\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 20,
+      "materials": [
+        {
+          "id": "mat-gdpt-g03-ngu-van-chu-de-1-bie-01-bien-phap-tu-tu-so",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Biện pháp tu từ So sánh (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g03-ngu-van-chu-de-1-bie-01-bien-phap-tu-tu-so",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g03-tieng-anh-unit-1-5-gia-01-greeting-family-sc",
+      "grade_id": 3,
+      "subject_code": "tieng-anh",
+      "textbook": "kntt",
+      "chapter": "Unit 1–5: Giao tiếp cơ bản & Gia đình, Trường học",
+      "title": "Greeting, Family & School Things (Chào hỏi, Gia đình & Đồ dùng học tập)",
+      "summary": "Làm quen giao tiếp tiếng Anh bắt buộc từ lớp 3 theo GDPT 2018.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Tiếng Anh Lớp 3)\n- *What's your name?* / *How old are you?*\n- *This is my pen / ruler / notebook.*\n- *Who's that? — That's my mother.*\n\n### 2. Ví dụ minh họa & Lưu ý\nLuyện phát âm chuẩn đuôi số nhiều `-s`: *books, pens, pencils*.\n\n### 3. Yêu cầu cần đạt\n- Làm quen giao tiếp tiếng Anh bắt buộc từ lớp 3 theo GDPT 2018.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 20,
+      "materials": [
+        {
+          "id": "mat-gdpt-g03-tieng-anh-unit-1-5-gia-01-greeting-family-sc",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Greeting, Family & School Things (Chào hỏi, Gia đình & Đồ dùng học tập) (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g03-tieng-anh-unit-1-5-gia-01-greeting-family-sc",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g03-tin-hoc-chu-de-1-may-01-cac-bo-phan-co-ban",
+      "grade_id": 3,
+      "subject_code": "tin-hoc",
+      "textbook": "kntt",
+      "chapter": "Chủ đề 1: Máy tính và Em (Bắt buộc từ Lớp 3)",
+      "title": "Các bộ phận cơ bản của máy tính & Gõ bàn phím 10 ngón",
+      "summary": "Phân biệt màn hình, thân máy, bàn phím, chuột và tư thế ngồi đúng.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Tin học Lớp 3)\n4 thành phần chính: **Màn hình** (hiển thị), **Thân máy** (xử lý CPU), **Bàn phím & Chuột** (nhập dữ liệu).\n\n### 2. Ví dụ minh họa & Lưu ý\nHàng phím cơ sở gồm: `A S D F` (tay trái) và `J K L ;` (tay phải) với 2 phím có gai `F` và `J`.\n\n### 3. Yêu cầu cần đạt\n- Phân biệt màn hình, thân máy, bàn phím, chuột và tư thế ngồi đúng.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 20,
+      "materials": [
+        {
+          "id": "mat-gdpt-g03-tin-hoc-chu-de-1-may-01-cac-bo-phan-co-ban",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Các bộ phận cơ bản của máy tính & Gõ bàn phím 10 ngón (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g03-tin-hoc-chu-de-1-may-01-cac-bo-phan-co-ban",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g04-toan-chuong-1-so--01-tim-so-trung-binh-",
+      "grade_id": 4,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 1: Số tự nhiên lớp triệu & Bài toán điển hình",
+      "title": "Tìm số trung bình cộng & Bài toán Tổng – Hiệu",
+      "summary": "Hai dạng toán có lời văn cốt lõi lớp 4.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Toán học Lớp 4)\n- Trung bình cộng của $n$ số: $\\text{TBC} = \\dfrac{\\text{Tổng các số}}{n}$\n- Tổng – Hiệu: $\\text{Số lớn} = \\dfrac{\\text{Tổng} + \\text{Hiệu}}{2}$, $\\text{Số bé} = \\dfrac{\\text{Tổng} - \\text{Hiệu}}{2}$.\n\n### 2. Ví dụ minh họa & Lưu ý\nTổng hai số là $50$, hiệu là $14 \\Rightarrow$ Số lớn $= 32$, Số bé $= 18$.\n\n### 3. Yêu cầu cần đạt\n- Hai dạng toán có lời văn cốt lõi lớp 4.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 20,
+      "materials": [
+        {
+          "id": "mat-gdpt-g04-toan-chuong-1-so--01-tim-so-trung-binh-",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Tìm số trung bình cộng & Bài toán Tổng – Hiệu (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g04-toan-chuong-1-so--01-tim-so-trung-binh-",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g04-toan-chuong-2-pha-01-khai-niem-rut-gon-",
+      "grade_id": 4,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 2: Phân số & Các phép tính với phân số",
+      "title": "Khái niệm, Rút gọn & Quy đồng mẫu số phân số",
+      "summary": "Hiểu bản chất phân số và áp dụng tính chất cơ bản.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Toán học Lớp 4)\n$$\\frac{a}{b} = \\frac{a \\times m}{b \\times m} = \\frac{a : n}{b : n} \\quad (m, n \\neq 0)$$\n\n### 2. Ví dụ minh họa & Lưu ý\nRút gọn $\\dfrac{12}{18} = \\dfrac{12 : 6}{18 : 6} = \\dfrac{2}{3}$.\n\n### 3. Yêu cầu cần đạt\n- Hiểu bản chất phân số và áp dụng tính chất cơ bản.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 20,
+      "materials": [
+        {
+          "id": "mat-gdpt-g04-toan-chuong-2-pha-01-khai-niem-rut-gon-",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Khái niệm, Rút gọn & Quy đồng mẫu số phân số (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g04-toan-chuong-2-pha-01-khai-niem-rut-gon-",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g04-toan-chuong-2-pha-02-cong-tru-nhan-chia",
+      "grade_id": 4,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 2: Phân số & Các phép tính với phân số",
+      "title": "Cộng, trừ, nhân, chia phân số",
+      "summary": "Thành thạo 4 phép tính trên phân số.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Toán học Lớp 4)\n- Cộng/trừ: Quy đồng mẫu rồi cộng/trừ tử.\n- Nhân: $\\dfrac{a}{b} \\times \\dfrac{c}{d} = \\dfrac{a \\times c}{b \\times d}$\n- Chia: Nhân với phân số đảo ngược $\\dfrac{a}{b} : \\dfrac{c}{d} = \\dfrac{a}{b} \\times \\dfrac{d}{c}$.\n\n### 2. Ví dụ minh họa & Lưu ý\n$\\dfrac{2}{3} : \\dfrac{4}{5} = \\dfrac{2}{3} \\times \\dfrac{5}{4} = \\dfrac{10}{12} = \\dfrac{5}{6}$.\n\n### 3. Yêu cầu cần đạt\n- Thành thạo 4 phép tính trên phân số.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 20,
+      "materials": [
+        {
+          "id": "mat-gdpt-g04-toan-chuong-2-pha-02-cong-tru-nhan-chia",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Cộng, trừ, nhân, chia phân số (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g04-toan-chuong-2-pha-02-cong-tru-nhan-chia",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g04-toan-chuong-3-hin-01-hinh-binh-hanh-hin",
+      "grade_id": 4,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 3: Hình bình hành, Hình thoi & Yếu tố Thống kê",
+      "title": "Hình bình hành, Hình thoi & Biểu đồ cột",
+      "summary": "Nhận biết tính chất cặp cạnh song song và đọc số liệu biểu đồ cột.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Toán học Lớp 4)\n- Hình bình hành: 2 cặp cạnh đối song song và bằng nhau.\n- Hình thoi: 4 cạnh bằng nhau, 2 đường chéo vuông góc nhau.\n\n### 2. Ví dụ minh họa & Lưu ý\nBiểu đồ cột giúp so sánh nhanh số lượng giữa các nhóm đối tượng.\n\n### 3. Yêu cầu cần đạt\n- Nhận biết tính chất cặp cạnh song song và đọc số liệu biểu đồ cột.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 20,
+      "materials": [
+        {
+          "id": "mat-gdpt-g04-toan-chuong-3-hin-01-hinh-binh-hanh-hin",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Hình bình hành, Hình thoi & Biểu đồ cột (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g04-toan-chuong-3-hin-01-hinh-binh-hanh-hin",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g04-ngu-van-chu-de-1-dan-01-phan-biet-danh-tu-",
+      "grade_id": 4,
+      "subject_code": "ngu-van",
+      "textbook": "kntt",
+      "chapter": "Chủ đề 1: Danh từ, Động từ, Tính từ & Biện pháp Nhân hóa",
+      "title": "Phân biệt Danh từ, Động từ, Tính từ & Nhân hóa",
+      "summary": "Mở rộng vốn từ và sử dụng nhân hóa trong văn miêu tả.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Ngữ văn Lớp 4)\n**Nhân hóa** là gọi hoặc tả con vật, cây cối, đồ vật bằng từ ngữ vốn dùng cho con người.\n\n### 2. Ví dụ minh họa & Lưu ý\n*Ông mặt trời thức dậy, mỉm cười tỏa nắng xuống cánh đồng.*\n\n### 3. Yêu cầu cần đạt\n- Mở rộng vốn từ và sử dụng nhân hóa trong văn miêu tả.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 20,
+      "materials": [
+        {
+          "id": "mat-gdpt-g04-ngu-van-chu-de-1-dan-01-phan-biet-danh-tu-",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Phân biệt Danh từ, Động từ, Tính từ & Nhân hóa (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g04-ngu-van-chu-de-1-dan-01-phan-biet-danh-tu-",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g04-khtn-chu-de-1-cha-01-vong-tuan-hoan-cua",
+      "grade_id": 4,
+      "subject_code": "khtn",
+      "textbook": "kntt",
+      "chapter": "Chủ đề 1: Chất, Năng lượng & Thực vật, Động vật (Khoa học 4)",
+      "title": "Vòng tuần hoàn của nước, Ánh sáng & Âm thanh",
+      "summary": "Giải thích các hiện tượng tự nhiên gần gũi xung quanh.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Khoa học tự nhiên Lớp 4)\nNước tồn tại ở 3 thể: **Rắn** (nước đá), **Lỏng** (nước uống), **Khí** (hơi nước). Âm thanh truyền qua chất rắn, lỏng, khí (không truyền trong chân không).\n\n### 2. Ví dụ minh họa & Lưu ý\nMặt Trời là nguồn sáng và nguồn nhiệt tự nhiên lớn nhất đối với Trái Đất.\n\n### 3. Yêu cầu cần đạt\n- Giải thích các hiện tượng tự nhiên gần gũi xung quanh.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 20,
+      "materials": [
+        {
+          "id": "mat-gdpt-g04-khtn-chu-de-1-cha-01-vong-tuan-hoan-cua",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Vòng tuần hoàn của nước, Ánh sáng & Âm thanh (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g04-khtn-chu-de-1-cha-01-vong-tuan-hoan-cua",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g04-lich-su-chu-de-1-lic-01-thang-long-ha-noi-",
+      "grade_id": 4,
+      "subject_code": "lich-su",
+      "textbook": "kntt",
+      "chapter": "Chủ đề 1: Lịch sử & Địa lý các vùng miền Việt Nam (Lớp 4)",
+      "title": "Thăng Long – Hà Nội & Các triều đại phong kiến tiêu biểu",
+      "summary": "Tìm hiểu sự kiện Lý Công Uẩn dời đô năm 1010 và các di sản văn hóa.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Lịch sử Lớp 4)\nNăm **1010**, vua Lý Thái Tổ ban *Chiếu dời đô* từ Hoa Lư (Ninh Bình) về thành Đại La và đổi tên thành **Thăng Long**.\n\n### 2. Ví dụ minh họa & Lưu ý\nVăn Miếu – Quốc Tử Giám (1070–1076) là trường đại học đầu tiên của nước ta.\n\n### 3. Yêu cầu cần đạt\n- Tìm hiểu sự kiện Lý Công Uẩn dời đô năm 1010 và các di sản văn hóa.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 20,
+      "materials": [
+        {
+          "id": "mat-gdpt-g04-lich-su-chu-de-1-lic-01-thang-long-ha-noi-",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Thăng Long – Hà Nội & Các triều đại phong kiến tiêu biểu (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g04-lich-su-chu-de-1-lic-01-thang-long-ha-noi-",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g05-toan-chuong-1-so--01-so-thap-phan-4-phe",
+      "grade_id": 5,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 1: Số thập phân & Tỉ số phần trăm",
+      "title": "Số thập phân & 4 Phép tính trên số thập phân",
+      "summary": "Thành thạo cộng, trừ, nhân, chia số thập phân.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Toán học Lớp 5)\nCộng/trừ số thập phân: đặt **dấu phẩy thẳng cột**. Nhân: đếm tổng chữ số phần thập phân để đánh dấu phẩy ở tích.\n\n### 2. Ví dụ minh họa & Lưu ý\n$12{,}5 \\times 0{,}4 = 5{,}00 = 5$.\n\n### 3. Yêu cầu cần đạt\n- Thành thạo cộng, trừ, nhân, chia số thập phân.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 20,
+      "materials": [
+        {
+          "id": "mat-gdpt-g05-toan-chuong-1-so--01-so-thap-phan-4-phe",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Số thập phân & 4 Phép tính trên số thập phân (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g05-toan-chuong-1-so--01-so-thap-phan-4-phe",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g05-toan-chuong-1-so--02-3-dang-toan-co-ban",
+      "grade_id": 5,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 1: Số thập phân & Tỉ số phần trăm",
+      "title": "3 Dạng toán cơ bản về Tỉ số phần trăm",
+      "summary": "Ứng dụng tính lãi suất, giảm giá, tỉ lệ hoàn thành.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Toán học Lớp 5)\n1. Tìm tỉ số phần trăm của $a$ và $b$: $(a : b) \\times 100\\%$.\n2. Tìm $p\\%$ của $A$: $A \\times p : 100$.\n3. Tìm số biết $p\\%$ của nó là $B$: $B \\times 100 : p$.\n\n### 2. Ví dụ minh họa & Lưu ý\nÁo giá $200.000\\text{ đ}$ giảm $15\\%$ còn $200.000 \\times 85\\% = 170.000\\text{ đ}$.\n\n### 3. Yêu cầu cần đạt\n- Ứng dụng tính lãi suất, giảm giá, tỉ lệ hoàn thành.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 20,
+      "materials": [
+        {
+          "id": "mat-gdpt-g05-toan-chuong-1-so--02-3-dang-toan-co-ban",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: 3 Dạng toán cơ bản về Tỉ số phần trăm (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g05-toan-chuong-1-so--02-3-dang-toan-co-ban",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g05-toan-chuong-2-hin-01-dien-tich-tam-giac",
+      "grade_id": 5,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 2: Hình học phẳng, Hình khối & Toán chuyển động đều",
+      "title": "Diện tích Tam giác, Hình thang, Hình tròn & Thể tích Hình hộp",
+      "summary": "Hệ thống công thức hình học trọng tâm cuối cấp Tiểu học.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Toán học Lớp 5)\n- Tam giác: $S = \\dfrac{a \\times h}{2}$ | Hình thang: $S = \\dfrac{(a+b) \\times h}{2}$\n- Hình tròn: $C = d \\times 3{,}14 = r \\times 2 \\times 3{,}14$, $\\quad S = r \\times r \\times 3{,}14$\n- Hình hộp chữ nhật: $V = a \\times b \\times c$.\n\n### 2. Ví dụ minh họa & Lưu ý\nHình tròn bán kính $r = 5\\text{ cm}$ có diện tích $S = 5 \\times 5 \\times 3{,}14 = 78{,}5\\text{ cm}^2$.\n\n### 3. Yêu cầu cần đạt\n- Hệ thống công thức hình học trọng tâm cuối cấp Tiểu học.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 20,
+      "materials": [
+        {
+          "id": "mat-gdpt-g05-toan-chuong-2-hin-01-dien-tich-tam-giac",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Diện tích Tam giác, Hình thang, Hình tròn & Thể tích Hình hộp (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g05-toan-chuong-2-hin-01-dien-tich-tam-giac",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g05-toan-chuong-2-hin-02-toan-chuyen-dong-d",
+      "grade_id": 5,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 2: Hình học phẳng, Hình khối & Toán chuyển động đều",
+      "title": "Toán chuyển động đều (Cùng chiều & Ngược chiều)",
+      "summary": "Trọng tâm ôn thi lên lớp 6 Chất lượng cao.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Toán học Lớp 5)\n$$v = \\frac{s}{t}, \\quad s = v \\times t, \\quad t_{\\text{ngược chiều}} = \\frac{s}{v_1 + v_2}, \\quad t_{\\text{cùng chiều}} = \\frac{s}{v_1 - v_2}$$\n\n### 2. Ví dụ minh họa & Lưu ý\nHai xe cách nhau $180\\text{ km}$ đi ngược chiều với $v_1 = 40, v_2 = 50\\text{ km/h}$ sẽ gặp nhau sau $180 : 90 = 2$ giờ.\n\n### 3. Yêu cầu cần đạt\n- Trọng tâm ôn thi lên lớp 6 Chất lượng cao.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 20,
+      "materials": [
+        {
+          "id": "mat-gdpt-g05-toan-chuong-2-hin-02-toan-chuyen-dong-d",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Toán chuyển động đều (Cùng chiều & Ngược chiều) (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g05-toan-chuong-2-hin-02-toan-chuyen-dong-d",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g05-ngu-van-chu-de-1-cau-01-cau-don-cau-ghep-q",
+      "grade_id": 5,
+      "subject_code": "ngu-van",
+      "textbook": "kntt",
+      "chapter": "Chủ đề 1: Câu ghép, Điệp từ & Văn tả cảnh, tả người",
+      "title": "Câu đơn, Câu ghép & Quan hệ từ nối vế câu",
+      "summary": "Phân biệt câu đơn (1 cụm C–V) và câu ghép (từ 2 cụm C–V trở lên).",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Ngữ văn Lớp 5)\nCặp quan hệ từ hay dùng: *Vì... nên...* (nguyên nhân–kết quả), *Tuy... nhưng...* (tương phản), *Nếu... thì...* (giả thiết).\n\n### 2. Ví dụ minh họa & Lưu ý\n*Tuy trời mưa rất to nhưng các bạn học sinh vẫn đến lớp đúng giờ.*\n\n### 3. Yêu cầu cần đạt\n- Phân biệt câu đơn (1 cụm C–V) và câu ghép (từ 2 cụm C–V trở lên).\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 20,
+      "materials": [
+        {
+          "id": "mat-gdpt-g05-ngu-van-chu-de-1-cau-01-cau-don-cau-ghep-q",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Câu đơn, Câu ghép & Quan hệ từ nối vế câu (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g05-ngu-van-chu-de-1-cau-01-cau-don-cau-ghep-q",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g05-tieng-anh-unit-1-10-th-01-present-simple-pas",
+      "grade_id": 5,
+      "subject_code": "tieng-anh",
+      "textbook": "kntt",
+      "chapter": "Unit 1–10: Thì Hiện tại đơn, Quá khứ đơn & Tương lai đơn",
+      "title": "Present Simple, Past Simple & Future Simple (Ôn thi lên Lớp 6)",
+      "summary": "Nắm vững 3 thì cốt lõi cuối bậc Tiểu học.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Tiếng Anh Lớp 5)\n- Hiện tại đơn: `S + V(s/es)` (*every day, usually*)\n- Quá khứ đơn: `S + V2/V-ed` (*yesterday, last week*)\n- Tương lai đơn: `S + will + V` (*tomorrow, next summer*).\n\n### 2. Ví dụ minh họa & Lưu ý\n*Last weekend, I **visited** Ha Long Bay with my family.*\n\n### 3. Yêu cầu cần đạt\n- Nắm vững 3 thì cốt lõi cuối bậc Tiểu học.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 20,
+      "materials": [
+        {
+          "id": "mat-gdpt-g05-tieng-anh-unit-1-10-th-01-present-simple-pas",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Present Simple, Past Simple & Future Simple (Ôn thi lên Lớp 6) (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g05-tieng-anh-unit-1-10-th-01-present-simple-pas",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g05-tin-hoc-chu-de-5-gia-01-cau-truc-tuan-tu-r",
+      "grade_id": 5,
+      "subject_code": "tin-hoc",
+      "textbook": "kntt",
+      "chapter": "Chủ đề 5: Giải quyết vấn đề với Scratch (Lập trình kéo thả)",
+      "title": "Cấu trúc Tuần tự, Rẽ nhánh & Vòng lặp trong Scratch",
+      "summary": "Tạo chương trình hoạt hình và trò chơi đơn giản bằng khối lệnh.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Tin học Lớp 5)\n3 cấu trúc điều khiển nền tảng: **Tuần tự** (chạy từ trên xuống), **Lặp** (`repeat / forever`), **Rẽ nhánh** (`if ... then ... else`).\n\n### 2. Ví dụ minh họa & Lưu ý\nDùng khối `khi bấm vào cờ xanh` kết hợp vòng lặp để điều khiển nhân vật di chuyển.\n\n### 3. Yêu cầu cần đạt\n- Tạo chương trình hoạt hình và trò chơi đơn giản bằng khối lệnh.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 20,
+      "materials": [
+        {
+          "id": "mat-gdpt-g05-tin-hoc-chu-de-5-gia-01-cau-truc-tuan-tu-r",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Cấu trúc Tuần tự, Rẽ nhánh & Vòng lặp trong Scratch (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g05-tin-hoc-chu-de-5-gia-01-cau-truc-tuan-tu-r",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g06-toan-chuong-1-tap-01-luy-thua-voi-so-mu",
+      "grade_id": 6,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 1: Tập hợp các số tự nhiên & Tính chia hết",
+      "title": "Lũy thừa với số mũ tự nhiên & Thứ tự thực hiện phép tính",
+      "summary": "Nắm chắc định nghĩa lũy thừa và quy tắc nhân chia cùng cơ số.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Toán học Lớp 6)\n$$a^n = \\underbrace{a \\cdot a \\cdots a}_{n \\text{ thừa số}}, \\quad a^m \\cdot a^n = a^{m+n}, \\quad a^m : a^n = a^{m-n}, \\quad a^0 = 1 \\;(a \\neq 0)$$\n\n### 2. Ví dụ minh họa & Lưu ý\n$2^3 \\cdot 2^2 = 2^5 = 32$.\n\n### 3. Yêu cầu cần đạt\n- Nắm chắc định nghĩa lũy thừa và quy tắc nhân chia cùng cơ số.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 25,
+      "materials": [
+        {
+          "id": "mat-gdpt-g06-toan-chuong-1-tap-01-luy-thua-voi-so-mu",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Lũy thừa với số mũ tự nhiên & Thứ tự thực hiện phép tính (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g06-toan-chuong-1-tap-01-luy-thua-voi-so-mu",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g06-toan-chuong-1-tap-02-so-nguyen-to-hop-s",
+      "grade_id": 6,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 1: Tập hợp các số tự nhiên & Tính chia hết",
+      "title": "Số nguyên tố, Hợp số, ƯCLN và BCNN",
+      "summary": "Phân tích ra thừa số nguyên tố để tìm ƯCLN, BCNN.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Toán học Lớp 6)\n- **ƯCLN:** Tích các thừa số nguyên tố **chung** với số mũ **nhỏ nhất**.\n- **BCNN:** Tích các thừa số nguyên tố **chung và riêng** với số mũ **lớn nhất**.\n\n### 2. Ví dụ minh họa & Lưu ý\n$12 = 2^2 \\cdot 3$, $18 = 2 \\cdot 3^2 \\Rightarrow \\text{ƯCLN}(12,18) = 6$, $\\text{BCNN}(12,18) = 36$.\n\n### 3. Yêu cầu cần đạt\n- Phân tích ra thừa số nguyên tố để tìm ƯCLN, BCNN.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 25,
+      "materials": [
+        {
+          "id": "mat-gdpt-g06-toan-chuong-1-tap-02-so-nguyen-to-hop-s",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Số nguyên tố, Hợp số, ƯCLN và BCNN (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g06-toan-chuong-1-tap-02-so-nguyen-to-hop-s",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g06-toan-chuong-2-so--01-tap-hop-so-nguyen-",
+      "grade_id": 6,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 2: Số nguyên & Phân số mở rộng",
+      "title": "Tập hợp số nguyên Z, Phép tính & Quy tắc dấu ngoặc",
+      "summary": "Làm quen số nguyên âm và quy tắc cộng trừ nhân chia số nguyên.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Toán học Lớp 6)\n- Nhân hai số **cùng dấu** cho kết quả **dương** (`(-).(-) = (+)`).\n- Nhân hai số **khác dấu** cho kết quả **âm**.\n- Bỏ ngoặc có dấu `(-)` đằng trước phải **đổi dấu** mọi số hạng bên trong.\n\n### 2. Ví dụ minh họa & Lưu ý\n$-(15 - 23 + 7) = -15 + 23 - 7 = 1$.\n\n### 3. Yêu cầu cần đạt\n- Làm quen số nguyên âm và quy tắc cộng trừ nhân chia số nguyên.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 25,
+      "materials": [
+        {
+          "id": "mat-gdpt-g06-toan-chuong-2-so--01-tap-hop-so-nguyen-",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Tập hợp số nguyên Z, Phép tính & Quy tắc dấu ngoặc (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g06-toan-chuong-2-so--01-tap-hop-so-nguyen-",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g06-toan-chuong-3-hin-01-diem-duong-thang-t",
+      "grade_id": 6,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 3: Hình học trực quan & Điểm, Đường thẳng, Góc",
+      "title": "Điểm, Đường thẳng, Tia, Đoạn thẳng & Trung điểm",
+      "summary": "Làm quen các khái niệm hình học phẳng chuẩn THCS.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Toán học Lớp 6)\nĐiểm $M$ là trung điểm của đoạn thẳng $AB$ khi $M$ nằm giữa $A, B$ và $MA = MB = \\dfrac{AB}{2}$.\n\n### 2. Ví dụ minh họa & Lưu ý\nGóc nhọn ($<90^\\circ$), góc vuông ($=90^\\circ$), góc tù ($90^\\circ < \\alpha < 180^\\circ$), góc bẹt ($=180^\\circ$).\n\n### 3. Yêu cầu cần đạt\n- Làm quen các khái niệm hình học phẳng chuẩn THCS.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 25,
+      "materials": [
+        {
+          "id": "mat-gdpt-g06-toan-chuong-3-hin-01-diem-duong-thang-t",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Điểm, Đường thẳng, Tia, Đoạn thẳng & Trung điểm (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g06-toan-chuong-3-hin-01-diem-duong-thang-t",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g06-khtn-chu-de-1-3-c-01-do-luong-hon-hop-c",
+      "grade_id": 6,
+      "subject_code": "khtn",
+      "textbook": "kntt",
+      "chapter": "Chủ đề 1–3: Chất, Tế bào & Lực (KHTN 6 GDPT 2018)",
+      "title": "Đo lường, Hỗn hợp – Chất tinh khiết & Tách chất",
+      "summary": "Nắm các phương pháp lọc, cô cạn, chiết tách chất ra khỏi hỗn hợp.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Khoa học tự nhiên Lớp 6)\n- **Lọc:** Tách chất rắn không tan khỏi chất lỏng.\n- **Cô cạn:** Tách chất rắn tan không bay hơi (muối ăn khỏi nước).\n- **Chiết:** Tách hai chất lỏng không hòa tan (dầu ăn và nước).\n\n### 2. Ví dụ minh họa & Lưu ý\nNhiệt độ Kelvin: $T(\\text{K}) = t(^\\circ\\text{C}) + 273$.\n\n### 3. Yêu cầu cần đạt\n- Nắm các phương pháp lọc, cô cạn, chiết tách chất ra khỏi hỗn hợp.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 25,
+      "materials": [
+        {
+          "id": "mat-gdpt-g06-khtn-chu-de-1-3-c-01-do-luong-hon-hop-c",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Đo lường, Hỗn hợp – Chất tinh khiết & Tách chất (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g06-khtn-chu-de-1-3-c-01-do-luong-hon-hop-c",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g06-khtn-chu-de-1-3-c-02-te-bao-don-vi-co-s",
+      "grade_id": 6,
+      "subject_code": "khtn",
+      "textbook": "kntt",
+      "chapter": "Chủ đề 1–3: Chất, Tế bào & Lực (KHTN 6 GDPT 2018)",
+      "title": "Tế bào — Đơn vị cơ sở của sự sống & Các loại Lực",
+      "summary": "Phân biệt tế bào nhân sơ/nhân thực và công thức trọng lượng.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Khoa học tự nhiên Lớp 6)\nTrọng lượng của vật: $$P = 10 \\times m \\quad (P: \\text{Newton},\\; m: \\text{kg})$$\n\n### 2. Ví dụ minh họa & Lưu ý\nVật có khối lượng $m = 5\\text{ kg}$ chịu trọng lực $P = 50\\text{ N}$.\n\n### 3. Yêu cầu cần đạt\n- Phân biệt tế bào nhân sơ/nhân thực và công thức trọng lượng.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 25,
+      "materials": [
+        {
+          "id": "mat-gdpt-g06-khtn-chu-de-1-3-c-02-te-bao-don-vi-co-s",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Tế bào — Đơn vị cơ sở của sự sống & Các loại Lực (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g06-khtn-chu-de-1-3-c-02-te-bao-don-vi-co-s",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g06-ngu-van-chu-de-1-tru-01-dac-trung-truyen-t",
+      "grade_id": 6,
+      "subject_code": "ngu-van",
+      "textbook": "kntt",
+      "chapter": "Chủ đề 1: Truyền thuyết, Cổ tích & Biện pháp Ẩn dụ, Hoán dụ",
+      "title": "Đặc trưng Truyền thuyết, Cổ tích & Phân biệt Ẩn dụ – Hoán dụ",
+      "summary": "Đọc hiểu văn bản tự sự dân gian và phân tích biện pháp tu từ.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Ngữ văn Lớp 6)\n- **Ẩn dụ:** Dựa trên nét **tương đồng** (*Người cha mái tóc bạc* chỉ Bác Hồ).\n- **Hoán dụ:** Dựa trên mối quan hệ **gần gũi** (*Áo nâu liền với áo xanh* chỉ nông dân và công nhân).\n\n### 2. Ví dụ minh họa & Lưu ý\nTruyền thuyết (*Thánh Gióng, Sơn Tinh – Thủy Tinh*) thường gắn với sự kiện lịch sử và yếu tố kỳ ảo.\n\n### 3. Yêu cầu cần đạt\n- Đọc hiểu văn bản tự sự dân gian và phân tích biện pháp tu từ.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 25,
+      "materials": [
+        {
+          "id": "mat-gdpt-g06-ngu-van-chu-de-1-tru-01-dac-trung-truyen-t",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Đặc trưng Truyền thuyết, Cổ tích & Phân biệt Ẩn dụ – Hoán dụ (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g06-ngu-van-chu-de-1-tru-01-dac-trung-truyen-t",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g06-lich-su-chu-de-1-lic-01-cac-quoc-gia-co-da",
+      "grade_id": 6,
+      "subject_code": "lich-su",
+      "textbook": "kntt",
+      "chapter": "Chủ đề 1: Lịch sử Thế giới Cổ đại & Việt Nam thời dựng nước",
+      "title": "Các quốc gia Cổ đại phương Đông, phương Tây & Văn Lang – Âu Lạc",
+      "summary": "Nắm mốc thời gian lịch sử (TCN/CN) và nền văn minh sông Hồng.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Lịch sử Lớp 6)\nNhà nước **Văn Lang** (thời các vua Hùng, thế kỷ VII TCN) là nhà nước đầu tiên của người Việt cổ, tiếp nối bởi **Âu Lạc** (An Dương Vương, thành Cổ Loa).\n\n### 2. Ví dụ minh họa & Lưu ý\nChiến thắng **Bạch Đằng năm 938** của Ngô Quyền chấm dứt hơn 1000 năm Bắc thuộc.\n\n### 3. Yêu cầu cần đạt\n- Nắm mốc thời gian lịch sử (TCN/CN) và nền văn minh sông Hồng.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 25,
+      "materials": [
+        {
+          "id": "mat-gdpt-g06-lich-su-chu-de-1-lic-01-cac-quoc-gia-co-da",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Các quốc gia Cổ đại phương Đông, phương Tây & Văn Lang – Âu Lạc (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g06-lich-su-chu-de-1-lic-01-cac-quoc-gia-co-da",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g06-dia-ly-chu-de-1-tra-01-he-thong-kinh-vi-t",
+      "grade_id": 6,
+      "subject_code": "dia-ly",
+      "textbook": "kntt",
+      "chapter": "Chủ đề 1: Trái Đất — Hệ Mặt Trời, Kinh vĩ tuyến & Khí hậu",
+      "title": "Hệ thống Kinh – Vĩ tuyến & Chuyển động của Trái Đất",
+      "summary": "Xác định tọa độ địa lí và giải thích hiện tượng ngày đêm, các mùa.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Địa lý Lớp 6)\n- Trái Đất tự quay quanh trục (24 giờ) $\\Rightarrow$ sinh ra **ngày và đêm**, giờ khu vực (24 múi giờ, Việt Nam là **UTC+7**).\n- Trái Đất quay quanh Mặt Trời (365 ngày 6 giờ) với trục nghiêng $66^\\circ 33'$ $\\Rightarrow$ sinh ra **4 mùa**.\n\n### 2. Ví dụ minh họa & Lưu ý\nXích đạo là vĩ tuyến $0^\\circ$ chia Trái Đất thành Bắc bán cầu và Nam bán cầu.\n\n### 3. Yêu cầu cần đạt\n- Xác định tọa độ địa lí và giải thích hiện tượng ngày đêm, các mùa.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 25,
+      "materials": [
+        {
+          "id": "mat-gdpt-g06-dia-ly-chu-de-1-tra-01-he-thong-kinh-vi-t",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Hệ thống Kinh – Vĩ tuyến & Chuyển động của Trái Đất (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g06-dia-ly-chu-de-1-tra-01-he-thong-kinh-vi-t",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g07-toan-chuong-1-so--01-tap-hop-so-huu-ti-",
+      "grade_id": 7,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 1: Số hữu tỉ, Số thực & Tỉ lệ thức",
+      "title": "Tập hợp Số hữu tỉ Q, Số vô tỉ & Căn bậc hai số học",
+      "summary": "Phân biệt số hữu tỉ, số thập phân vô hạn không tuần hoàn và số thực $\\mathbb{R}$.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Toán học Lớp 7)\nVới $a \\ge 0$, căn bậc hai số học $\\sqrt{a} = x \\Leftrightarrow x \\ge 0$ và $x^2 = a$.\n\n### 2. Ví dụ minh họa & Lưu ý\n$\\sqrt{25} = 5$; $\\sqrt{2} \\approx 1{,}4142\\dots$ là số vô tỉ.\n\n### 3. Yêu cầu cần đạt\n- Phân biệt số hữu tỉ, số thập phân vô hạn không tuần hoàn và số thực $\\mathbb{R}$.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 25,
+      "materials": [
+        {
+          "id": "mat-gdpt-g07-toan-chuong-1-so--01-tap-hop-so-huu-ti-",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Tập hợp Số hữu tỉ Q, Số vô tỉ & Căn bậc hai số học (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g07-toan-chuong-1-so--01-tap-hop-so-huu-ti-",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g07-toan-chuong-1-so--02-ti-le-thuc-tinh-ch",
+      "grade_id": 7,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 1: Số hữu tỉ, Số thực & Tỉ lệ thức",
+      "title": "Tỉ lệ thức & Tính chất dãy tỉ số bằng nhau",
+      "summary": "Công cụ giải toán chia tỉ lệ cực mạnh của Đại số 7.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Toán học Lớp 7)\n$$\\frac{a}{b} = \\frac{c}{d} = \\frac{a + c}{b + d} = \\frac{a - c}{b - d}$$\n\n### 2. Ví dụ minh họa & Lưu ý\nNếu $\\dfrac{x}{2} = \\dfrac{y}{3}$ và $x + y = 25$ thì $\\dfrac{x}{2} = \\dfrac{y}{3} = \\dfrac{25}{5} = 5 \\Rightarrow x = 10, y = 15$.\n\n### 3. Yêu cầu cần đạt\n- Công cụ giải toán chia tỉ lệ cực mạnh của Đại số 7.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 25,
+      "materials": [
+        {
+          "id": "mat-gdpt-g07-toan-chuong-1-so--02-ti-le-thuc-tinh-ch",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Tỉ lệ thức & Tính chất dãy tỉ số bằng nhau (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g07-toan-chuong-1-so--02-ti-le-thuc-tinh-ch",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g07-toan-chuong-2-goc-01-hai-duong-thang-so",
+      "grade_id": 7,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 2: Góc, Đường thẳng song song & Tam giác bằng nhau",
+      "title": "Hai đường thẳng song song & Tổng ba góc trong tam giác",
+      "summary": "Chứng minh song song và tính số đo góc.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Toán học Lớp 7)\n- Tổng ba góc trong một tam giác luôn bằng $180^\\circ$: $\\widehat{A} + \\widehat{B} + \\widehat{C} = 180^\\circ$.\n- Góc ngoài tam giác bằng tổng hai góc trong không kề với nó.\n\n### 2. Ví dụ minh họa & Lưu ý\n3 trường hợp bằng nhau của tam giác: **c.c.c**, **c.g.c**, **g.c.g**.\n\n### 3. Yêu cầu cần đạt\n- Chứng minh song song và tính số đo góc.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 25,
+      "materials": [
+        {
+          "id": "mat-gdpt-g07-toan-chuong-2-goc-01-hai-duong-thang-so",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Hai đường thẳng song song & Tổng ba góc trong tam giác (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g07-toan-chuong-2-goc-01-hai-duong-thang-so",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g07-khtn-chu-de-1-3-n-01-cau-tao-nguyen-tu-",
+      "grade_id": 7,
+      "subject_code": "khtn",
+      "textbook": "kntt",
+      "chapter": "Chủ đề 1–3: Nguyên tử, Tốc độ, Âm thanh & Ánh sáng (KHTN 7)",
+      "title": "Cấu tạo Nguyên tử, Bảng tuần hoàn & Liên kết hóa học",
+      "summary": "Hiểu cấu tạo vỏ electron – hạt nhân (proton, neutron) và hóa trị.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Khoa học tự nhiên Lớp 7)\nSố proton ($p$) = số electron ($e$) = số hiệu nguyên tử $Z$. Khối lượng nguyên tử tính theo đơn vị **amu**.\n\n### 2. Ví dụ minh họa & Lưu ý\nLiên kết **ion** (cho–nhận electron, VD $\\text{NaCl}$) và liên kết **cộng hóa trị** (dùng chung electron, VD $\\text{H}_2\\text{O}$).\n\n### 3. Yêu cầu cần đạt\n- Hiểu cấu tạo vỏ electron – hạt nhân (proton, neutron) và hóa trị.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 25,
+      "materials": [
+        {
+          "id": "mat-gdpt-g07-khtn-chu-de-1-3-n-01-cau-tao-nguyen-tu-",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Cấu tạo Nguyên tử, Bảng tuần hoàn & Liên kết hóa học (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g07-khtn-chu-de-1-3-n-01-cau-tao-nguyen-tu-",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g07-khtn-chu-de-1-3-n-02-toc-do-do-thi-quan",
+      "grade_id": 7,
+      "subject_code": "khtn",
+      "textbook": "kntt",
+      "chapter": "Chủ đề 1–3: Nguyên tử, Tốc độ, Âm thanh & Ánh sáng (KHTN 7)",
+      "title": "Tốc độ, Đồ thị quãng đường – thời gian & Phản xạ ánh sáng",
+      "summary": "Tính tốc độ và nắm Định luật phản xạ ánh sáng.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Khoa học tự nhiên Lớp 7)\n- Tốc độ: $v = \\dfrac{s}{t}$ ($1\\text{ m/s} = 3{,}6\\text{ km/h}$).\n- Định luật phản xạ: góc phản xạ bằng góc tới ($i' = i$).\n\n### 2. Ví dụ minh họa & Lưu ý\nXe chạy $72\\text{ km/h}$ tương đương $72 : 3{,}6 = 20\\text{ m/s}$.\n\n### 3. Yêu cầu cần đạt\n- Tính tốc độ và nắm Định luật phản xạ ánh sáng.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 25,
+      "materials": [
+        {
+          "id": "mat-gdpt-g07-khtn-chu-de-1-3-n-02-toc-do-do-thi-quan",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Tốc độ, Đồ thị quãng đường – thời gian & Phản xạ ánh sáng (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g07-khtn-chu-de-1-3-n-02-toc-do-do-thi-quan",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g07-tieng-anh-unit-1-12-so-01-comparison-so-sanh",
+      "grade_id": 7,
+      "subject_code": "tieng-anh",
+      "textbook": "kntt",
+      "chapter": "Unit 1–12: So sánh, Động từ khuyết thiếu & Câu bị động cơ bản",
+      "title": "Comparison (So sánh bằng/hơn/nhất) & Quantifiers",
+      "summary": "Thành thạo cấu trúc so sánh `as...as`, `different from`, `the same as`.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Tiếng Anh Lớp 7)\n- So sánh bằng: `as + adj/adv + as`\n- Khác với: `different from`\n- Giống như: `the same as`.\n\n### 2. Ví dụ minh họa & Lưu ý\n*This painting is **not as expensive as** that one.*\n\n### 3. Yêu cầu cần đạt\n- Thành thạo cấu trúc so sánh `as...as`, `different from`, `the same as`.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 25,
+      "materials": [
+        {
+          "id": "mat-gdpt-g07-tieng-anh-unit-1-12-so-01-comparison-so-sanh",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Comparison (So sánh bằng/hơn/nhất) & Quantifiers (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g07-tieng-anh-unit-1-12-so-01-comparison-so-sanh",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g07-tin-hoc-chu-de-4-ung-01-cong-thuc-cac-ham-",
+      "grade_id": 7,
+      "subject_code": "tin-hoc",
+      "textbook": "kntt",
+      "chapter": "Chủ đề 4: Ứng dụng Bảng tính điện tử (Excel / Sheets)",
+      "title": "Công thức & Các hàm SUM, AVERAGE, MAX, MIN, COUNT",
+      "summary": "Xử lý số liệu bảng điểm và định dạng tự động bằng bảng tính.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Tin học Lớp 7)\nMọi công thức bắt đầu bằng dấu `=`. Ví dụ: `=AVERAGE(C2:C10)`, `=SUM(D2:D10)`.\n\n### 2. Ví dụ minh họa & Lưu ý\nĐịa chỉ tuyệt đối `$A$1` không thay đổi khi sao chép công thức sang ô khác.\n\n### 3. Yêu cầu cần đạt\n- Xử lý số liệu bảng điểm và định dạng tự động bằng bảng tính.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 25,
+      "materials": [
+        {
+          "id": "mat-gdpt-g07-tin-hoc-chu-de-4-ung-01-cong-thuc-cac-ham-",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Công thức & Các hàm SUM, AVERAGE, MAX, MIN, COUNT (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g07-tin-hoc-chu-de-4-ung-01-cong-thuc-cac-ham-",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g08-toan-chuong-1-da--01-7-hang-dang-thuc-d",
+      "grade_id": 8,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 1: Đa thức, 7 Hằng đẳng thức & Phân thức đại số",
+      "title": "7 Hằng đẳng thức đáng nhớ & Phân tích đa thức thành nhân tử",
+      "summary": "Nền tảng đại số quan trọng nhất cấp THCS.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Toán học Lớp 8)\n1. $(A\\pm B)^2 = A^2 \\pm 2AB + B^2$\n2. $A^2 - B^2 = (A-B)(A+B)$\n3. $(A\\pm B)^3 = A^3 \\pm 3A^2B + 3AB^2 \\pm B^3$\n4. $A^3 \\pm B^3 = (A\\pm B)(A^2 \\mp AB + B^2)$.\n\n### 2. Ví dụ minh họa & Lưu ý\nPhân tích: $x^2 - 9 = (x - 3)(x + 3)$; $x^2 - 4x + 4 = (x - 2)^2$.\n\n### 3. Yêu cầu cần đạt\n- Nền tảng đại số quan trọng nhất cấp THCS.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 25,
+      "materials": [
+        {
+          "id": "mat-gdpt-g08-toan-chuong-1-da--01-7-hang-dang-thuc-d",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: 7 Hằng đẳng thức đáng nhớ & Phân tích đa thức thành nhân tử (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g08-toan-chuong-1-da--01-7-hang-dang-thuc-d",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g08-toan-chuong-1-da--02-phan-thuc-dai-so-h",
+      "grade_id": 8,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 1: Đa thức, 7 Hằng đẳng thức & Phân thức đại số",
+      "title": "Phân thức đại số & Hàm số bậc nhất y = ax + b",
+      "summary": "Rút gọn phân thức và vẽ đồ thị đường thẳng $y = ax + b$ ($a \\neq 0$).",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Toán học Lớp 8)\nHai đường thẳng $y = ax + b$ và $y = a'x + b'$ **song song** khi $a = a', b \\neq b'$ và **cắt nhau** khi $a \\neq a'$.\n\n### 2. Ví dụ minh họa & Lưu ý\nHệ số $a$ gọi là **hệ số góc** của đường thẳng.\n\n### 3. Yêu cầu cần đạt\n- Rút gọn phân thức và vẽ đồ thị đường thẳng $y = ax + b$ ($a \\neq 0$).\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 25,
+      "materials": [
+        {
+          "id": "mat-gdpt-g08-toan-chuong-1-da--02-phan-thuc-dai-so-h",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Phân thức đại số & Hàm số bậc nhất y = ax + b (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g08-toan-chuong-1-da--02-phan-thuc-dai-so-h",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g08-toan-chuong-2-tu--01-dinh-ly-pythagore-",
+      "grade_id": 8,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 2: Tứ giác, Định lý Thalès & Tam giác đồng dạng",
+      "title": "Định lý Pythagore, Định lý Thalès & 3 Trường hợp Tam giác đồng dạng",
+      "summary": "Chứng minh tỉ lệ đoạn thẳng và tính độ dài trong hình học 8.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Toán học Lớp 8)\n- Pythagore (tam giác vuông tại $A$): $$BC^2 = AB^2 + AC^2$$\n- Thalès ($MN \\parallel BC$): $$\\frac{AM}{AB} = \\frac{AN}{AC} = \\frac{MN}{BC}$$\n\n### 2. Ví dụ minh họa & Lưu ý\n3 trường hợp đồng dạng: **c.c.c**, **c.g.c**, **g.g**.\n\n### 3. Yêu cầu cần đạt\n- Chứng minh tỉ lệ đoạn thẳng và tính độ dài trong hình học 8.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 25,
+      "materials": [
+        {
+          "id": "mat-gdpt-g08-toan-chuong-2-tu--01-dinh-ly-pythagore-",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Định lý Pythagore, Định lý Thalès & 3 Trường hợp Tam giác đồng dạng (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g08-toan-chuong-2-tu--01-dinh-ly-pythagore-",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g08-khtn-chu-de-1-4-p-01-mol-ti-khoi-khi-no",
+      "grade_id": 8,
+      "subject_code": "khtn",
+      "textbook": "kntt",
+      "chapter": "Chủ đề 1–4: Phản ứng hóa học, Acid–Base, Áp suất & Điện học (KHTN 8)",
+      "title": "Mol, Tỉ khối khí, Nồng độ dung dịch & Acid – Base – Oxide – Muối",
+      "summary": "Nắm chuẩn danh pháp IUPAC mới theo GDPT 2018 và công thức tính toán hóa học.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Khoa học tự nhiên Lớp 8)\n- Số mol: $n = \\dfrac{m}{M} = \\dfrac{V_{\\text{đkc}}}{24{,}79} = C_M \\cdot V$\n- Nồng độ phần trăm: $C\\% = \\dfrac{m_{\\text{ct}}}{m_{\\text{dd}}} \\cdot 100\\%$\n- Thang pH: $\\text{pH} < 7$ (Acid), $\\text{pH} = 7$ (Trung tính), $\\text{pH} > 7$ (Base).\n\n### 2. Ví dụ minh họa & Lưu ý\nĐổi mới GDPT 2018: thể tích 1 mol khí ở điều kiện chuẩn ($25^\\circ\\text{C}, 1\\text{ bar}$) là **$24{,}79\\text{ lít}$**.\n\n### 3. Yêu cầu cần đạt\n- Nắm chuẩn danh pháp IUPAC mới theo GDPT 2018 và công thức tính toán hóa học.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 25,
+      "materials": [
+        {
+          "id": "mat-gdpt-g08-khtn-chu-de-1-4-p-01-mol-ti-khoi-khi-no",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Mol, Tỉ khối khí, Nồng độ dung dịch & Acid – Base – Oxide – Muối (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g08-khtn-chu-de-1-4-p-01-mol-ti-khoi-khi-no",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g08-khtn-chu-de-1-4-p-02-khoi-luong-rieng-a",
+      "grade_id": 8,
+      "subject_code": "khtn",
+      "textbook": "kntt",
+      "chapter": "Chủ đề 1–4: Phản ứng hóa học, Acid–Base, Áp suất & Điện học (KHTN 8)",
+      "title": "Khối lượng riêng, Áp suất chất lỏng & Lực đẩy Archimedes",
+      "summary": "Các công thức Vật lý cốt lõi lớp 8.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Khoa học tự nhiên Lớp 8)\n- Khối lượng riêng: $D = \\dfrac{m}{V}$\n- Áp suất: $p = \\dfrac{F}{S}$\n- Lực đẩy Archimedes: $$F_A = d \\cdot V = 10 \\cdot D \\cdot V$$\n\n### 2. Ví dụ minh họa & Lưu ý\nVật nổi khi $F_A > P$, chìm khi $F_A < P$.\n\n### 3. Yêu cầu cần đạt\n- Các công thức Vật lý cốt lõi lớp 8.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 25,
+      "materials": [
+        {
+          "id": "mat-gdpt-g08-khtn-chu-de-1-4-p-02-khoi-luong-rieng-a",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Khối lượng riêng, Áp suất chất lỏng & Lực đẩy Archimedes (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g08-khtn-chu-de-1-4-p-02-khoi-luong-rieng-a",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g08-ngu-van-chu-de-1-tho-01-tho-that-ngon-bat-",
+      "grade_id": 8,
+      "subject_code": "ngu-van",
+      "textbook": "kntt",
+      "chapter": "Chủ đề 1: Thơ Đường luật, Hài kịch & Văn nghị luận",
+      "title": "Thơ thất ngôn bát cú Đường luật & Cấu trúc bài văn Nghị luận",
+      "summary": "Nhận biết luật bằng trắc, đối, niêm và kỹ năng lập luận chặt chẽ.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Ngữ văn Lớp 8)\nThơ thất ngôn bát cú gồm 8 câu × 7 chữ chia 4 cặp: **Đề – Thực – Luận – Kết** (cặp Thực và Luận phải đối nhau).\n\n### 2. Ví dụ minh họa & Lưu ý\nMỗi luận điểm nghị luận cần có **lí lẽ** sắc bén đi kèm **bằng chứng** xác thực.\n\n### 3. Yêu cầu cần đạt\n- Nhận biết luật bằng trắc, đối, niêm và kỹ năng lập luận chặt chẽ.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 25,
+      "materials": [
+        {
+          "id": "mat-gdpt-g08-ngu-van-chu-de-1-tho-01-tho-that-ngon-bat-",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Thơ thất ngôn bát cú Đường luật & Cấu trúc bài văn Nghị luận (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g08-ngu-van-chu-de-1-tho-01-tho-that-ngon-bat-",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g09-toan-chuong-1-he--01-giai-he-phuong-tri",
+      "grade_id": 9,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 1: Hệ phương trình bậc nhất hai ẩn & Bất phương trình",
+      "title": "Giải Hệ phương trình bậc nhất hai ẩn & Giải bài toán bằng cách lập hệ",
+      "summary": "Phương pháp thế, cộng đại số và mô hình hóa bài toán năng suất/chuyển động thi vào 10.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Toán học Lớp 9)\n$$\\begin{cases} a_1 x + b_1 y = c_1 \\\\ a_2 x + b_2 y = c_2 \\end{cases}$$\n\n### 2. Ví dụ minh họa & Lưu ý\nMẹo thi vào 10: luôn đặt **điều kiện của ẩn** (ví dụ $x > 0$, $x \\in \\mathbb{N}^*$) và đối chiếu kết luận.\n\n### 3. Yêu cầu cần đạt\n- Phương pháp thế, cộng đại số và mô hình hóa bài toán năng suất/chuyển động thi vào 10.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 25,
+      "materials": [
+        {
+          "id": "mat-gdpt-g09-toan-chuong-1-he--01-giai-he-phuong-tri",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Giải Hệ phương trình bậc nhất hai ẩn & Giải bài toán bằng cách lập hệ (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g09-toan-chuong-1-he--01-giai-he-phuong-tri",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g09-toan-chuong-2-can-01-cac-phep-bien-doi-",
+      "grade_id": 9,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 2: Căn bậc hai, Căn bậc ba & Rút gọn biểu thức",
+      "title": "Các phép biến đổi Căn thức bậc hai (Câu 1 đề thi vào 10)",
+      "summary": "Thành thạo hằng đẳng thức $\\sqrt{A^2} = |A|$ và trục căn thức ở mẫu.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Toán học Lớp 9)\n$$\\sqrt{A^2} = |A| = \\begin{cases} A & \\text{nếu } A \\ge 0 \\\\ -A & \\text{nếu } A < 0 \\end{cases}, \\qquad \\frac{1}{\\sqrt{a} - \\sqrt{b}} = \\frac{\\sqrt{a} + \\sqrt{b}}{a - b}$$\n\n### 2. Ví dụ minh họa & Lưu ý\nĐiều kiện xác định của $\\sqrt{A}$ là $A \\ge 0$.\n\n### 3. Yêu cầu cần đạt\n- Thành thạo hằng đẳng thức $\\sqrt{A^2} = |A|$ và trục căn thức ở mẫu.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 25,
+      "materials": [
+        {
+          "id": "mat-gdpt-g09-toan-chuong-2-can-01-cac-phep-bien-doi-",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Các phép biến đổi Căn thức bậc hai (Câu 1 đề thi vào 10) (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g09-toan-chuong-2-can-01-cac-phep-bien-doi-",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g09-toan-chuong-3-ham-01-cong-thuc-nghiem-b",
+      "grade_id": 9,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 3: Hàm số y = ax², Phương trình bậc hai & Định lý Viète",
+      "title": "Công thức nghiệm bậc hai & Ứng dụng Định lý Viète (Trọng tâm thi vào 10)",
+      "summary": "Biện luận tham số $m$ và tính giá trị biểu thức đối xứng giữa hai nghiệm.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Toán học Lớp 9)\n$$\\Delta = b^2 - 4ac, \\qquad S = x_1 + x_2 = -\\frac{b}{a}, \\qquad P = x_1 x_2 = \\frac{c}{a}$$\n\n### 2. Ví dụ minh họa & Lưu ý\nCác biến đổi hay gặp: $x_1^2 + x_2^2 = S^2 - 2P$; $(x_1 - x_2)^2 = S^2 - 4P$.\n\n### 3. Yêu cầu cần đạt\n- Biện luận tham số $m$ và tính giá trị biểu thức đối xứng giữa hai nghiệm.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 25,
+      "materials": [
+        {
+          "id": "mat-gdpt-g09-toan-chuong-3-ham-01-cong-thuc-nghiem-b",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Công thức nghiệm bậc hai & Ứng dụng Định lý Viète (Trọng tâm thi vào 10) (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g09-toan-chuong-3-ham-01-cong-thuc-nghiem-b",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g09-toan-chuong-4-ti--01-goc-voi-duong-tron",
+      "grade_id": 9,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 4: Tỉ số lượng giác & Đường tròn, Tứ giác nội tiếp",
+      "title": "Góc với đường tròn & 4 Dấu hiệu chứng minh Tứ giác nội tiếp",
+      "summary": "Chuyên đề hình học chiếm 3 điểm trong đề tuyển sinh lớp 10.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Toán học Lớp 9)\nDấu hiệu hay dùng nhất:\n1. Tổng hai góc đối bằng $180^\\circ$.\n2. Hai đỉnh kề nhau cùng nhìn cạnh chứa hai đỉnh còn lại dưới cùng một góc $\\alpha$ (hay gặp góc $90^\\circ$).\n\n### 2. Ví dụ minh họa & Lưu ý\nGóc nội tiếp bằng nửa số đo cung bị chắn; góc nội tiếp chắn nửa đường tròn bằng $90^\\circ$.\n\n### 3. Yêu cầu cần đạt\n- Chuyên đề hình học chiếm 3 điểm trong đề tuyển sinh lớp 10.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 25,
+      "materials": [
+        {
+          "id": "mat-gdpt-g09-toan-chuong-4-ti--01-goc-voi-duong-tron",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Góc với đường tròn & 4 Dấu hiệu chứng minh Tứ giác nội tiếp (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g09-toan-chuong-4-ti--01-goc-voi-duong-tron",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g09-khtn-chu-de-1-4-c-01-dinh-luat-ohm-cong",
+      "grade_id": 9,
+      "subject_code": "khtn",
+      "textbook": "kntt",
+      "chapter": "Chủ đề 1–4: Cơ năng, Định luật Ohm, Kim loại, Alkane–Alkene & Di truyền (KHTN 9)",
+      "title": "Định luật Ohm, Công – Công suất điện & Khúc xạ ánh sáng",
+      "summary": "Hệ thống công thức Vật lý 9 nền tảng cho THPT.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Khoa học tự nhiên Lớp 9)\n- Định luật Ohm: $I = \\dfrac{U}{R}$\n- Mạch nối tiếp: $R_{\\text{tđ}} = R_1 + R_2$; Song song: $\\dfrac{1}{R_{\\text{tđ}}} = \\dfrac{1}{R_1} + \\dfrac{1}{R_2}$\n- Công suất điện: $P = U \\cdot I = I^2 R = \\dfrac{U^2}{R}$.\n\n### 2. Ví dụ minh họa & Lưu ý\nĐiện năng tiêu thụ: $A = P \\cdot t$ ($1\\text{ kWh} = 3{,}6 \\times 10^6\\text{ J}$).\n\n### 3. Yêu cầu cần đạt\n- Hệ thống công thức Vật lý 9 nền tảng cho THPT.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 25,
+      "materials": [
+        {
+          "id": "mat-gdpt-g09-khtn-chu-de-1-4-c-01-dinh-luat-ohm-cong",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Định luật Ohm, Công – Công suất điện & Khúc xạ ánh sáng (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g09-khtn-chu-de-1-4-c-01-dinh-luat-ohm-cong",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g09-khtn-chu-de-1-4-c-02-hydrocarbon-alkane",
+      "grade_id": 9,
+      "subject_code": "khtn",
+      "textbook": "kntt",
+      "chapter": "Chủ đề 1–4: Cơ năng, Định luật Ohm, Kim loại, Alkane–Alkene & Di truyền (KHTN 9)",
+      "title": "Hydrocarbon (Alkane, Alkene), Ethylic Alcohol, Acetic Acid & Quy luật Mendel",
+      "summary": "Hóa hữu cơ đại cương và Di truyền học cơ bản lớp 9.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Khoa học tự nhiên Lớp 9)\n- Phản ứng ester hóa: $\\text{CH}_3\\text{COOH} + \\text{C}_2\\text{H}_5\\text{OH} \\xrightleftharpoons{\\text{H}_2\\text{SO}_4, t^\\circ} \\text{CH}_3\\text{COOC}_2\\text{H}_5 + \\text{H}_2\\text{O}$\n- Quy luật phân li Mendel: lai 2 cơ thể dị hợp $Aa \\times Aa$ cho tỉ lệ kiểu gen $1AA : 2Aa : 1aa$.\n\n### 2. Ví dụ minh họa & Lưu ý\nAlkene (như ethylene $\\text{C}_2\\text{H}_4$) làm mất màu dung dịch nước bromine.\n\n### 3. Yêu cầu cần đạt\n- Hóa hữu cơ đại cương và Di truyền học cơ bản lớp 9.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 25,
+      "materials": [
+        {
+          "id": "mat-gdpt-g09-khtn-chu-de-1-4-c-02-hydrocarbon-alkane",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Hydrocarbon (Alkane, Alkene), Ethylic Alcohol, Acetic Acid & Quy luật Mendel (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g09-khtn-chu-de-1-4-c-02-hydrocarbon-alkane",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g09-tieng-anh-chuyen-de-to-01-cau-dieu-kien-cau-",
+      "grade_id": 9,
+      "subject_code": "tieng-anh",
+      "textbook": "kntt",
+      "chapter": "Chuyên đề Tổng ôn thi vào Lớp 10 (Ngữ pháp & Đọc hiểu)",
+      "title": "Câu điều kiện, Câu bị động, Câu tường thuật & Mệnh đề quan hệ",
+      "summary": "4 chuyên đề ngữ pháp chắc chắn xuất hiện trong đề thi vào 10.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Tiếng Anh Lớp 9)\n- **Passive Voice:** `S + be + V3/ed (+ by O)`\n- **Conditional Type 2:** `If + S + V2/ed (were), S + would + V`\n- **Relative Clauses:** `who` (người), `which` (vật), `whose` (sở hữu), `that`.\n\n### 2. Ví dụ minh họa & Lưu ý\n*If I **were** you, I **would spend** more time practicing reading comprehension.*\n\n### 3. Yêu cầu cần đạt\n- 4 chuyên đề ngữ pháp chắc chắn xuất hiện trong đề thi vào 10.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 25,
+      "materials": [
+        {
+          "id": "mat-gdpt-g09-tieng-anh-chuyen-de-to-01-cau-dieu-kien-cau-",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Câu điều kiện, Câu bị động, Câu tường thuật & Mệnh đề quan hệ (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g09-tieng-anh-chuyen-de-to-01-cau-dieu-kien-cau-",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g09-ngu-van-chuyen-de-on-01-chien-thuat-doc-hi",
+      "grade_id": 9,
+      "subject_code": "ngu-van",
+      "textbook": "kntt",
+      "chapter": "Chuyên đề Ôn thi vào Lớp 10 (Ngữ liệu ngoài SGK theo GDPT 2018)",
+      "title": "Chiến thuật Đọc hiểu & Nghị luận Văn học với ngữ liệu mới 100%",
+      "summary": "Kỹ năng phân tích tác phẩm thơ/truyện ngoài sách giáo khoa chuẩn định dạng thi mới.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Ngữ văn Lớp 9)\nCấu trúc bài NLVH chuẩn: Mở bài (giới thiệu tác giả/tác phẩm/vấn đề) → Thân bài (Phân tích nội dung + Nghệ thuật + Đánh giá mở rộng) → Kết bài.\n\n### 2. Ví dụ minh họa & Lưu ý\nLuôn bám sát câu chữ trong đề thi, trích dẫn chính xác từ ngữ/hình ảnh nghệ thuật để chứng minh.\n\n### 3. Yêu cầu cần đạt\n- Kỹ năng phân tích tác phẩm thơ/truyện ngoài sách giáo khoa chuẩn định dạng thi mới.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 25,
+      "materials": [
+        {
+          "id": "mat-gdpt-g09-ngu-van-chuyen-de-on-01-chien-thuat-doc-hi",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Chiến thuật Đọc hiểu & Nghị luận Văn học với ngữ liệu mới 100% (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g09-ngu-van-chuyen-de-on-01-chien-thuat-doc-hi",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g10-toan-chuong-1-men-01-menh-de-cac-phep-t",
+      "grade_id": 10,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 1: Mệnh đề, Tập hợp & Bất phương trình bậc nhất hai ẩn",
+      "title": "Mệnh đề, Các phép toán Tập hợp & Miền nghiệm BPT bậc nhất hai ẩn",
+      "summary": "Làm quen tư duy logic toán học THPT và bài toán tối ưu tuyến tính.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Toán học Lớp 10)\n- Giao: $A \\cap B$, Hợp: $A \\cup B$, Hiệu: $A \\setminus B$.\n- Miền nghiệm của hệ BPT bậc nhất 2 ẩn là một đa giác lồi; GTLN/GTNN của $F(x,y) = ax + by$ đạt tại các **đỉnh** của đa giác.\n\n### 2. Ví dụ minh họa & Lưu ý\nPhủ định của $\\forall x \\in X, P(x)$ là $\\exists x \\in X, \\overline{P(x)}$.\n\n### 3. Yêu cầu cần đạt\n- Làm quen tư duy logic toán học THPT và bài toán tối ưu tuyến tính.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 30,
+      "materials": [
+        {
+          "id": "mat-gdpt-g10-toan-chuong-1-men-01-menh-de-cac-phep-t",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Mệnh đề, Các phép toán Tập hợp & Miền nghiệm BPT bậc nhất hai ẩn (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g10-toan-chuong-1-men-01-menh-de-cac-phep-t",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g10-toan-chuong-2-ham-01-dinh-ly-cosin-dinh",
+      "grade_id": 10,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 2: Hàm số bậc hai, Dấu tam thức bậc hai & Hệ thức lượng",
+      "title": "Định lý Cosin, Định lý Sin & Dấu tam thức bậc hai",
+      "summary": "Giải tam giác tổng quát và giải bất phương trình bậc hai.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Toán học Lớp 10)\n- Định lý Cosin: $a^2 = b^2 + c^2 - 2bc\\cos A$\n- Định lý Sin: $\\dfrac{a}{\\sin A} = \\dfrac{b}{\\sin B} = \\dfrac{c}{\\sin C} = 2R$\n- Dấu tam thức $f(x) = ax^2+bx+c$: **Trong trái, ngoài cùng** (khi $\\Delta > 0$).\n\n### 2. Ví dụ minh họa & Lưu ý\nDiện tích tam giác: $S = \\dfrac{1}{2}ab\\sin C = \\sqrt{p(p-a)(p-b)(p-c)}$ (Heron).\n\n### 3. Yêu cầu cần đạt\n- Giải tam giác tổng quát và giải bất phương trình bậc hai.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 30,
+      "materials": [
+        {
+          "id": "mat-gdpt-g10-toan-chuong-2-ham-01-dinh-ly-cosin-dinh",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Định lý Cosin, Định lý Sin & Dấu tam thức bậc hai (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g10-toan-chuong-2-ham-01-dinh-ly-cosin-dinh",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g10-toan-chuong-3-phu-01-phuong-trinh-duong",
+      "grade_id": 10,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 3: Phương pháp tọa độ Oxy & Đại số tổ hợp",
+      "title": "Phương trình đường thẳng, Đường tròn & Quy tắc đếm, Nhị thức Newton",
+      "summary": "Tọa độ Oxy và các công thức tổ hợp $P_n, A_n^k, C_n^k$.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Toán học Lớp 10)\n- Khoảng cách từ $M(x_0;y_0)$ đến $\\Delta: ax+by+c=0$: $$d(M,\\Delta) = \\frac{|ax_0+by_0+c|}{\\sqrt{a^2+b^2}}$$\n- Tổ hợp: $C_n^k = \\dfrac{n!}{k!(n-k)!}$, Chỉnh hợp: $A_n^k = \\dfrac{n!}{(n-k)!}$.\n\n### 2. Ví dụ minh họa & Lưu ý\nKhai triển $(a+b)^4 = a^4 + 4a^3b + 6a^2b^2 + 4ab^3 + b^4$.\n\n### 3. Yêu cầu cần đạt\n- Tọa độ Oxy và các công thức tổ hợp $P_n, A_n^k, C_n^k$.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 30,
+      "materials": [
+        {
+          "id": "mat-gdpt-g10-toan-chuong-3-phu-01-phuong-trinh-duong",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Phương trình đường thẳng, Đường tròn & Quy tắc đếm, Nhị thức Newton (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g10-toan-chuong-3-phu-01-phuong-trinh-duong",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g10-vat-ly-chuong-1-4-d-01-chuyen-dong-bien-d",
+      "grade_id": 10,
+      "subject_code": "vat-ly",
+      "textbook": "kntt",
+      "chapter": "Chương 1–4: Động học, 3 Định luật Newton, Công – Năng lượng & Động lượng",
+      "title": "Chuyển động biến đổi đều, 3 Định luật Newton & Bảo toàn cơ năng",
+      "summary": "Nền tảng cơ học cổ điển THPT.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Vật lý Lớp 10)\n- Chuyển động thẳng biến đổi đều: $v = v_0 + at$, $d = v_0 t + \\dfrac{1}{2}at^2$, $v^2 - v_0^2 = 2ad$\n- Định luật II Newton: $\\vec{F} = m\\vec{a}$\n- Cơ năng: $W = W_đ + W_t = \\dfrac{1}{2}mv^2 + mgh$.\n\n### 2. Ví dụ minh họa & Lưu ý\nĐộng lượng $\\vec{p} = m\\vec{v}$ được bảo toàn trong hệ kín.\n\n### 3. Yêu cầu cần đạt\n- Nền tảng cơ học cổ điển THPT.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 30,
+      "materials": [
+        {
+          "id": "mat-gdpt-g10-vat-ly-chuong-1-4-d-01-chuyen-dong-bien-d",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Chuyển động biến đổi đều, 3 Định luật Newton & Bảo toàn cơ năng (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g10-vat-ly-chuong-1-4-d-01-chuyen-dong-bien-d",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g10-hoa-hoc-chuong-1-5-c-01-cau-hinh-electron-",
+      "grade_id": 10,
+      "subject_code": "hoa-hoc",
+      "textbook": "kntt",
+      "chapter": "Chương 1–5: Cấu tạo nguyên tử, Liên kết, Phản ứng Oxi hóa – Khử & Enthalpy",
+      "title": "Cấu hình electron, Phản ứng Oxi hóa – Khử & Biến thiên Enthalpy",
+      "summary": "Hóa học đại cương 10 theo chương trình GDPT 2018 (tích hợp nhiệt hóa học).",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Hóa học Lớp 10)\n- Thứ tự mức năng lượng: $1s\\; 2s\\; 2p\\; 3s\\; 3p\\; 4s\\; 3d\\dots$\n- Cân bằng Oxi hóa – Khử theo nguyên tắc **Tổng số e nhường = Tổng số e nhận**.\n- $\\Delta_r H_{298}^\\circ < 0$: phản ứng **tỏa nhiệt**; $\\Delta_r H_{298}^\\circ > 0$: **thu nhiệt**.\n\n### 2. Ví dụ minh họa & Lưu ý\nGhi nhớ: *Khử cho – O nhận* (Chất khử nhường electron, số oxi hóa tăng).\n\n### 3. Yêu cầu cần đạt\n- Hóa học đại cương 10 theo chương trình GDPT 2018 (tích hợp nhiệt hóa học).\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 30,
+      "materials": [
+        {
+          "id": "mat-gdpt-g10-hoa-hoc-chuong-1-5-c-01-cau-hinh-electron-",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Cấu hình electron, Phản ứng Oxi hóa – Khử & Biến thiên Enthalpy (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g10-hoa-hoc-chuong-1-5-c-01-cau-hinh-electron-",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g10-sinh-hoc-chu-de-1-3-s-01-cau-truc-te-bao-ng",
+      "grade_id": 10,
+      "subject_code": "sinh-hoc",
+      "textbook": "kntt",
+      "chapter": "Chủ đề 1–3: Sinh học tế bào, Chuyển hóa năng lượng & Chu kì tế bào",
+      "title": "Cấu trúc tế bào, Nguyên phân – Giảm phân & Vi sinh vật",
+      "summary": "Phân biệt quá trình nguyên phân (tạo 2 tế bào con 2n) và giảm phân (tạo 4 giao tử n).",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Sinh học Lớp 10)\nTừ $1$ tế bào mẹ ($2n$) qua $k$ lần nguyên phân liên tiếp tạo ra $2^k$ tế bào con có bộ NST giống hệt tế bào mẹ.\n\n### 2. Ví dụ minh họa & Lưu ý\nATP là đồng tiền năng lượng của tế bào.\n\n### 3. Yêu cầu cần đạt\n- Phân biệt quá trình nguyên phân (tạo 2 tế bào con 2n) và giảm phân (tạo 4 giao tử n).\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 30,
+      "materials": [
+        {
+          "id": "mat-gdpt-g10-sinh-hoc-chu-de-1-3-s-01-cau-truc-te-bao-ng",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Cấu trúc tế bào, Nguyên phân – Giảm phân & Vi sinh vật (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g10-sinh-hoc-chu-de-1-3-s-01-cau-truc-te-bao-ng",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g10-tin-hoc-chu-de-5-lap-01-cau-truc-dieu-khie",
+      "grade_id": 10,
+      "subject_code": "tin-hoc",
+      "textbook": "kntt",
+      "chapter": "Chủ đề 5: Lập trình Python cơ bản (THPT GDPT 2018)",
+      "title": "Cấu trúc điều khiển, Hàm (`def`), Xâu ký tự & Danh sách trong Python",
+      "summary": "Viết chương trình giải quyết bài toán tin học lớp 10 bằng Python.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Tin học Lớp 10)\n- Vòng lặp `for x in range(1, n+1):` và `while cond:`\n- Định nghĩa hàm: `def tinh_tong(a, b): return a + b`.\n\n### 2. Ví dụ minh họa & Lưu ý\nXâu ký tự (`str`) trong Python là bất biến (immutable); danh sách (`list`) có thể thay đổi phần tử.\n\n### 3. Yêu cầu cần đạt\n- Viết chương trình giải quyết bài toán tin học lớp 10 bằng Python.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 30,
+      "materials": [
+        {
+          "id": "mat-gdpt-g10-tin-hoc-chu-de-5-lap-01-cau-truc-dieu-khie",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Cấu trúc điều khiển, Hàm (`def`), Xâu ký tự & Danh sách trong Python (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g10-tin-hoc-chu-de-5-lap-01-cau-truc-dieu-khie",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g11-toan-chuong-1-ham-01-cong-thuc-luong-gi",
+      "grade_id": 11,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 1: Hàm số lượng giác & Phương trình lượng giác",
+      "title": "Công thức lượng giác & 4 Phương trình lượng giác cơ bản",
+      "summary": "Nền tảng giải tích 11–12 và Vật lý dao động điều hòa.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Toán học Lớp 11)\n- $\\sin(a\\pm b) = \\sin a\\cos b \\pm \\cos a\\sin b$\n- $\\cos 2a = \\cos^2 a - \\sin^2 a = 2\\cos^2 a - 1 = 1 - 2\\sin^2 a$\n- $\\sin x = \\sin\\alpha \\Leftrightarrow x = \\alpha + k2\\pi$ hoặc $x = \\pi - \\alpha + k2\\pi$.\n\n### 2. Ví dụ minh họa & Lưu ý\nHạ bậc: $\\sin^2 x = \\dfrac{1 - \\cos 2x}{2}$, $\\cos^2 x = \\dfrac{1 + \\cos 2x}{2}$.\n\n### 3. Yêu cầu cần đạt\n- Nền tảng giải tích 11–12 và Vật lý dao động điều hòa.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 30,
+      "materials": [
+        {
+          "id": "mat-gdpt-g11-toan-chuong-1-ham-01-cong-thuc-luong-gi",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Công thức lượng giác & 4 Phương trình lượng giác cơ bản (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g11-toan-chuong-1-ham-01-cong-thuc-luong-gi",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g11-toan-chuong-2-day-01-cap-so-cong-csc-ca",
+      "grade_id": 11,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 2: Dãy số, Cấp số cộng, Cấp số nhân & Giới hạn",
+      "title": "Cấp số cộng (CSC), Cấp số nhân (CSN) & Giới hạn hàm số",
+      "summary": "Các công thức số hạng tổng quát và tổng $n$ số hạng đầu.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Toán học Lớp 11)\n- **CSC:** $u_n = u_1 + (n-1)d$, $\\quad S_n = \\dfrac{n(u_1 + u_n)}{2}$\n- **CSN:** $u_n = u_1 \\cdot q^{n-1}$, $\\quad S_n = u_1 \\dfrac{1 - q^n}{1 - q}$ ($q \\neq 1$).\n\n### 2. Ví dụ minh họa & Lưu ý\nHàm số liên tục tại $x_0$ khi $\\lim_{x\\to x_0} f(x) = f(x_0)$.\n\n### 3. Yêu cầu cần đạt\n- Các công thức số hạng tổng quát và tổng $n$ số hạng đầu.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 30,
+      "materials": [
+        {
+          "id": "mat-gdpt-g11-toan-chuong-2-day-01-cap-so-cong-csc-ca",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Cấp số cộng (CSC), Cấp số nhân (CSN) & Giới hạn hàm số (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g11-toan-chuong-2-day-01-cap-so-cong-csc-ca",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g11-toan-chuong-3-ham-01-quy-tac-tinh-dao-h",
+      "grade_id": 11,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 3: Hàm số Mũ – Lôgarit, Đạo hàm & Quan hệ vuông góc không gian",
+      "title": "Quy tắc tính Đạo hàm & Khoảng cách, Góc trong Hình học không gian",
+      "summary": "Trọng tâm nối trực tiếp sang chương trình thi THPT Lớp 12.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Toán học Lớp 11)\n- $(u \\cdot v)' = u'v + uv'$, $\\quad \\left(\\dfrac{u}{v}\\right)' = \\dfrac{u'v - uv'}{v^2}$\n- Đạo hàm hàm hợp: $[f(u)]' = u' \\cdot f'(u)$\n- $(e^x)' = e^x$, $(\\ln x)' = \\dfrac{1}{x}$, $(\\sin x)' = \\cos x$, $(\\cos x)' = -\\sin x$.\n\n### 2. Ví dụ minh họa & Lưu ý\nĐường thẳng $d \\perp (P)$ khi $d$ vuông góc với **2 đường thẳng cắt nhau** nằm trong $(P)$.\n\n### 3. Yêu cầu cần đạt\n- Trọng tâm nối trực tiếp sang chương trình thi THPT Lớp 12.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 30,
+      "materials": [
+        {
+          "id": "mat-gdpt-g11-toan-chuong-3-ham-01-quy-tac-tinh-dao-h",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Quy tắc tính Đạo hàm & Khoảng cách, Góc trong Hình học không gian (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g11-toan-chuong-3-ham-01-quy-tac-tinh-dao-h",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g11-vat-ly-chuong-1-4-d-01-dao-dong-dieu-hoa-",
+      "grade_id": 11,
+      "subject_code": "vat-ly",
+      "textbook": "kntt",
+      "chapter": "Chương 1–4: Dao động điều hòa, Sóng cơ – Sóng điện từ & Điện trường",
+      "title": "Dao động điều hòa, Sóng & Định luật Coulomb – Điện trường",
+      "summary": "Chương trình Vật lý 11 mới (đã đưa Dao động & Sóng từ lớp 12 cũ xuống lớp 11).",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Vật lý Lớp 11)\n- Phương trình dao động: $x = A\\cos(\\omega t + \\varphi)$, $\\quad v = -\\omega A\\sin(\\omega t + \\varphi)$, $\\quad a = -\\omega^2 x$\n- Bước sóng: $\\lambda = v \\cdot T = \\dfrac{v}{f}$\n- Định luật Coulomb: $F = k\\dfrac{|q_1 q_2|}{\\varepsilon r^2}$.\n\n### 2. Ví dụ minh họa & Lưu ý\nHệ thức độc lập thời gian: $A^2 = x^2 + \\dfrac{v^2}{\\omega^2}$.\n\n### 3. Yêu cầu cần đạt\n- Chương trình Vật lý 11 mới (đã đưa Dao động & Sóng từ lớp 12 cũ xuống lớp 11).\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 30,
+      "materials": [
+        {
+          "id": "mat-gdpt-g11-vat-ly-chuong-1-4-d-01-dao-dong-dieu-hoa-",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Dao động điều hòa, Sóng & Định luật Coulomb – Điện trường (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g11-vat-ly-chuong-1-4-d-01-dao-dong-dieu-hoa-",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g11-hoa-hoc-chuong-1-6-c-01-can-bang-hoa-hoc-l",
+      "grade_id": 11,
+      "subject_code": "hoa-hoc",
+      "textbook": "kntt",
+      "chapter": "Chương 1–6: Cân bằng hóa học, Nitrogen – Sulfur & Hóa hữu cơ (Hydrocarbon, Alcohol, Carbonyl)",
+      "title": "Cân bằng hóa học (Le Chatelier) & Đại cương Hóa hữu cơ",
+      "summary": "Chuyển dịch cân bằng, pH dung dịch và đồng phân – danh pháp hữu cơ.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Hóa học Lớp 11)\nHằng số cân bằng: $$K_C = \\frac{[C]^c [D]^d}{[A]^a [B]^b}$$ Chỉ phụ thuộc vào **nhiệt độ**.\n\n### 2. Ví dụ minh họa & Lưu ý\nDanh pháp IUPAC mới: `meth-` (1C), `eth-` (2C), `prop-` (3C), `but-` (4C), `pent-` (5C).\n\n### 3. Yêu cầu cần đạt\n- Chuyển dịch cân bằng, pH dung dịch và đồng phân – danh pháp hữu cơ.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 30,
+      "materials": [
+        {
+          "id": "mat-gdpt-g11-hoa-hoc-chuong-1-6-c-01-can-bang-hoa-hoc-l",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Cân bằng hóa học (Le Chatelier) & Đại cương Hóa hữu cơ (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g11-hoa-hoc-chuong-1-6-c-01-can-bang-hoa-hoc-l",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g11-sinh-hoc-chu-de-1-4-t-01-quang-hop-ho-hap-t",
+      "grade_id": 11,
+      "subject_code": "sinh-hoc",
+      "textbook": "kntt",
+      "chapter": "Chủ đề 1–4: Trao đổi chất ở Thực vật – Động vật, Cảm ứng & Sinh sản",
+      "title": "Quang hợp, Hô hấp tế bào & Hệ tuần hoàn, Miễn dịch ở người",
+      "summary": "Hiểu cơ chế quang hợp (pha sáng, chu trình Calvin) và cơ chế miễn dịch.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Sinh học Lớp 11)\nPhương trình tổng quát quang hợp: $$6\\text{CO}_2 + 12\\text{H}_2\\text{O} \\xrightarrow{\\text{ánh sáng, diệp lục}} \\text{C}_6\\text{H}_{12}\\text{O}_6 + 6\\text{O}_2 + 6\\text{H}_2\\text{O}$$\n\n### 2. Ví dụ minh họa & Lưu ý\nHuyết áp giảm dần từ động mạch $\\to$ mao mạch $\\to$ tĩnh mạch.\n\n### 3. Yêu cầu cần đạt\n- Hiểu cơ chế quang hợp (pha sáng, chu trình Calvin) và cơ chế miễn dịch.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 30,
+      "materials": [
+        {
+          "id": "mat-gdpt-g11-sinh-hoc-chu-de-1-4-t-01-quang-hop-ho-hap-t",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Quang hợp, Hô hấp tế bào & Hệ tuần hoàn, Miễn dịch ở người (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g11-sinh-hoc-chu-de-1-4-t-01-quang-hop-ho-hap-t",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g12-toan-chuong-1-ung-01-tinh-don-dieu-cuc-",
+      "grade_id": 12,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 1: Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số",
+      "title": "Tính đơn điệu, Cực trị, GTLN – GTNN & Đường tiệm cận (Kể cả tiệm cận xiên)",
+      "summary": "Trọng tâm số 1 của đề thi Tốt nghiệp THPT 2025+ (bổ sung lại Tiệm cận xiên theo GDPT 2018).",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Toán học Lớp 12)\n- Tiệm cận đứng $x = x_0$: $\\lim_{x\\to x_0^\\pm} f(x) = \\pm\\infty$\n- Tiệm cận ngang $y = y_0$: $\\lim_{x\\to\\pm\\infty} f(x) = y_0$\n- Tiệm cận xiên $y = ax + b$: $a = \\lim_{x\\to\\pm\\infty} \\dfrac{f(x)}{x}$, $b = \\lim_{x\\to\\pm\\infty}[f(x)-ax]$.\n\n### 2. Ví dụ minh họa & Lưu ý\nHàm phân thức bậc 2 trên bậc 1 $y = \\dfrac{ax^2+bx+c}{dx+e}$ luôn có 1 tiệm cận đứng và 1 tiệm cận xiên.\n\n### 3. Yêu cầu cần đạt\n- Trọng tâm số 1 của đề thi Tốt nghiệp THPT 2025+ (bổ sung lại Tiệm cận xiên theo GDPT 2018).\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 30,
+      "materials": [
+        {
+          "id": "mat-gdpt-g12-toan-chuong-1-ung-01-tinh-don-dieu-cuc-",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Tính đơn điệu, Cực trị, GTLN – GTNN & Đường tiệm cận (Kể cả tiệm cận xiên) (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g12-toan-chuong-1-ung-01-tinh-don-dieu-cuc-",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g12-toan-chuong-2-vec-01-toa-do-vecto-tich-",
+      "grade_id": 12,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 2: Vectơ và Hệ trục tọa độ trong không gian Oxyz",
+      "title": "Tọa độ vectơ, Tích có hướng, Phương trình Mặt phẳng, Đường thẳng & Mặt cầu",
+      "summary": "Chuyên đề hình học Oxyz dễ ăn điểm trọn vẹn trong kỳ thi THPT.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Toán học Lớp 12)\n- Mặt phẳng $(P)$ qua $M_0$ có VTPT $\\vec{n}=(A;B;C)$: $A(x-x_0)+B(y-y_0)+C(z-z_0)=0$\n- Mặt cầu tâm $I(a;b;c)$ bán kính $R$: $(x-a)^2+(y-b)^2+(z-c)^2 = R^2$.\n\n### 2. Ví dụ minh họa & Lưu ý\nGóc giữa đường thẳng $(\\vec{u})$ và mặt phẳng $(\\vec{n})$: $\\sin\\varphi = \\dfrac{|\\vec{u}\\cdot\\vec{n}|}{|\\vec{u}|\\cdot|\\vec{n}|}$.\n\n### 3. Yêu cầu cần đạt\n- Chuyên đề hình học Oxyz dễ ăn điểm trọn vẹn trong kỳ thi THPT.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 30,
+      "materials": [
+        {
+          "id": "mat-gdpt-g12-toan-chuong-2-vec-01-toa-do-vecto-tich-",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Tọa độ vectơ, Tích có hướng, Phương trình Mặt phẳng, Đường thẳng & Mặt cầu (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g12-toan-chuong-2-vec-01-toa-do-vecto-tich-",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g12-toan-chuong-3-cac-01-khoang-bien-thien-",
+      "grade_id": 12,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 3: Các số đặc trưng đo mức độ phân tán mẫu số liệu ghép nhóm",
+      "title": "Khoảng biến thiên, Khoảng tứ phân vị, Phương sai & Độ lệch chuẩn",
+      "summary": "Chuyên đề MỚI 100% của GDPT 2018 thường xuất hiện trong đề thi 2025+.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Toán học Lớp 12)\n- Khoảng tứ phân vị: $\\Delta_Q = Q_3 - Q_1$\n- Phương sai: $s^2 = \\dfrac{1}{n}\\sum n_i (c_i - \\bar{x})^2$\n- Độ lệch chuẩn: $s = \\sqrt{s^2}$.\n\n### 2. Ví dụ minh họa & Lưu ý\nĐộ lệch chuẩn $s$ càng nhỏ thì số liệu càng tập trung đều quanh giá trị trung bình.\n\n### 3. Yêu cầu cần đạt\n- Chuyên đề MỚI 100% của GDPT 2018 thường xuất hiện trong đề thi 2025+.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 30,
+      "materials": [
+        {
+          "id": "mat-gdpt-g12-toan-chuong-3-cac-01-khoang-bien-thien-",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Khoảng biến thiên, Khoảng tứ phân vị, Phương sai & Độ lệch chuẩn (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g12-toan-chuong-3-cac-01-khoang-bien-thien-",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g12-toan-chuong-5-xac-01-xac-suat-co-dieu-k",
+      "grade_id": 12,
+      "subject_code": "toan",
+      "textbook": "kntt",
+      "chapter": "Chương 5: Xác suất có điều kiện & Công thức Bayes",
+      "title": "Xác suất có điều kiện, Công thức Xác suất toàn phần & Công thức Bayes",
+      "summary": "Chuyên đề MỚI 100% xuất hiện ở câu Đúng/Sai và Trả lời ngắn thi THPT 2025+.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Toán học Lớp 12)\n- Xác suất có điều kiện: $$P(A|B) = \\frac{P(A \\cap B)}{P(B)}$$\n- Công thức Bayes: $$P(B|A) = \\frac{P(B) \\cdot P(A|B)}{P(B)P(A|B) + P(\\overline{B})P(A|\\overline{B})}$$\n\n### 2. Ví dụ minh họa & Lưu ý\nVẽ **sơ đồ hình cây** là cách trực quan và ít sai nhất cho mọi bài toán Bayes.\n\n### 3. Yêu cầu cần đạt\n- Chuyên đề MỚI 100% xuất hiện ở câu Đúng/Sai và Trả lời ngắn thi THPT 2025+.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 30,
+      "materials": [
+        {
+          "id": "mat-gdpt-g12-toan-chuong-5-xac-01-xac-suat-co-dieu-k",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Xác suất có điều kiện, Công thức Xác suất toàn phần & Công thức Bayes (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g12-toan-chuong-5-xac-01-xac-suat-co-dieu-k",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g12-vat-ly-chuong-1-4-v-01-khi-li-tuong-3-dan",
+      "grade_id": 12,
+      "subject_code": "vat-ly",
+      "textbook": "kntt",
+      "chapter": "Chương 1–4: Vật lí nhiệt, Khí lí tưởng, Từ trường & Vật lí Hạt nhân",
+      "title": "Khí lí tưởng — 3 Đẳng quá trình & Phương trình Clapeyron",
+      "summary": "Nắm chắc Định luật Boyle, Charles và phương trình trạng thái khí lí tưởng.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Vật lý Lớp 12)\n$$\\frac{p_1 V_1}{T_1} = \\frac{p_2 V_2}{T_2}, \\qquad pV = nRT \\quad (R = 8{,}31\\text{ J/mol.K})$$\n\n### 2. Ví dụ minh họa & Lưu ý\nLuôn đổi nhiệt độ sang Kelvin: $T(\\text{K}) = t(^\\circ\\text{C}) + 273$.\n\n### 3. Yêu cầu cần đạt\n- Nắm chắc Định luật Boyle, Charles và phương trình trạng thái khí lí tưởng.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 30,
+      "materials": [
+        {
+          "id": "mat-gdpt-g12-vat-ly-chuong-1-4-v-01-khi-li-tuong-3-dan",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Khí lí tưởng — 3 Đẳng quá trình & Phương trình Clapeyron (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g12-vat-ly-chuong-1-4-v-01-khi-li-tuong-3-dan",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g12-vat-ly-chuong-1-4-v-02-tu-truong-cam-ung-",
+      "grade_id": 12,
+      "subject_code": "vat-ly",
+      "textbook": "kntt",
+      "chapter": "Chương 1–4: Vật lí nhiệt, Khí lí tưởng, Từ trường & Vật lí Hạt nhân",
+      "title": "Từ trường, Cảm ứng điện từ & Phản ứng Hạt nhân – Phóng xạ",
+      "summary": "Các định luật Faraday, độ hụt khối và định luật phóng xạ.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Vật lý Lớp 12)\n- Suất điện động cảm ứng: $e_c = -\\dfrac{\\Delta\\Phi}{\\Delta t}$ (với $\\Phi = NBS\\cos\\alpha$)\n- Năng lượng liên kết: $E_{\\text{lk}} = \\Delta m \\cdot c^2$\n- Định luật phóng xạ: $$N(t) = N_0 \\cdot 2^{-t/T}$$\n\n### 2. Ví dụ minh họa & Lưu ý\nSau mỗi chu kì bán rã $T$, số hạt nhân phóng xạ giảm đi một nửa.\n\n### 3. Yêu cầu cần đạt\n- Các định luật Faraday, độ hụt khối và định luật phóng xạ.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 30,
+      "materials": [
+        {
+          "id": "mat-gdpt-g12-vat-ly-chuong-1-4-v-02-tu-truong-cam-ung-",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Từ trường, Cảm ứng điện từ & Phản ứng Hạt nhân – Phóng xạ (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g12-vat-ly-chuong-1-4-v-02-tu-truong-cam-ung-",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g12-hoa-hoc-chuong-1-8-e-01-carbohydrate-gluco",
+      "grade_id": 12,
+      "subject_code": "hoa-hoc",
+      "textbook": "kntt",
+      "chapter": "Chương 1–8: Ester, Carbohydrate, Amine–Amino Acid, Polymer & Điện hóa học",
+      "title": "Carbohydrate (Glucose, Fructose, Saccharose, Tinh bột) & Amine – Peptide",
+      "summary": "Phân biệt phản ứng tráng bạc, màu với $\\text{Cu(OH)}_2$ và tính lưỡng tính của Amino Acid.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Hóa học Lớp 12)\n- **Glucose** và **Fructose** đều tham gia phản ứng với thuốc thử Tollens ($\\text{AgNO}_3/\\text{NH}_3$) tạo kết tủa bạc.\n- **Saccharose** không tráng bạc nhưng thủy phân cho Glucose + Fructose.\n- Peptide có từ $2$ liên kết peptide trở lên (tripeptide trở lên) có **phản ứng màu biuret** màu tím.\n\n### 2. Ví dụ minh họa & Lưu ý\nAniline ($\\text{C}_6\\text{H}_5\\text{NH}_2$) tác dụng với nước $\\text{Br}_2$ tạo kết tủa trắng.\n\n### 3. Yêu cầu cần đạt\n- Phân biệt phản ứng tráng bạc, màu với $\\text{Cu(OH)}_2$ và tính lưỡng tính của Amino Acid.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 30,
+      "materials": [
+        {
+          "id": "mat-gdpt-g12-hoa-hoc-chuong-1-8-e-01-carbohydrate-gluco",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Carbohydrate (Glucose, Fructose, Saccharose, Tinh bột) & Amine – Peptide (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g12-hoa-hoc-chuong-1-8-e-01-carbohydrate-gluco",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g12-hoa-hoc-chuong-1-8-e-02-pin-dien-hoa-dien-",
+      "grade_id": 12,
+      "subject_code": "hoa-hoc",
+      "textbook": "kntt",
+      "chapter": "Chương 1–8: Ester, Carbohydrate, Amine–Amino Acid, Polymer & Điện hóa học",
+      "title": "Pin điện hóa & Điện phân (Chuẩn GDPT 2018)",
+      "summary": "Tính sức điện động chuẩn của pin Galvani và thứ tự điện phân.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Hóa học Lớp 12)\n$$E^\\circ_{\\text{pin}} = E^\\circ_{\\text{cathode (+)}} - E^\\circ_{\\text{anode (-)}}$$\n\n### 2. Ví dụ minh họa & Lưu ý\nTại **Anode** luôn xảy ra quá trình **oxi hóa**; tại **Cathode** luôn xảy ra quá trình **khử**.\n\n### 3. Yêu cầu cần đạt\n- Tính sức điện động chuẩn của pin Galvani và thứ tự điện phân.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 30,
+      "materials": [
+        {
+          "id": "mat-gdpt-g12-hoa-hoc-chuong-1-8-e-02-pin-dien-hoa-dien-",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Pin điện hóa & Điện phân (Chuẩn GDPT 2018) (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g12-hoa-hoc-chuong-1-8-e-02-pin-dien-hoa-dien-",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g12-sinh-hoc-chu-de-1-3-d-01-co-che-nhan-doi-dn",
+      "grade_id": 12,
+      "subject_code": "sinh-hoc",
+      "textbook": "kntt",
+      "chapter": "Chủ đề 1–3: Di truyền phân tử, Quy luật di truyền, Tiến hóa & Sinh thái học",
+      "title": "Cơ chế Nhân đôi DNA, Phiên mã, Dịch mã & Đột biến Gen – NST",
+      "summary": "Trọng tâm Sinh học 12 thi Tốt nghiệp THPT.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Sinh học Lớp 12)\n- Nhân đôi DNA theo nguyên tắc **bổ sung** ($A=T, G\\equiv C$) và **bán bảo toàn**.\n- Mã di truyền là mã bộ ba ($4^3 = 64$ bộ ba: $61$ mã hóa amino acid, $3$ bộ ba kết thúc `UAA, UAG, UGA`).\n\n### 2. Ví dụ minh họa & Lưu ý\nQuần thể cân bằng Hardy–Weinberg: $p^2 AA + 2pq Aa + q^2 aa = 1$.\n\n### 3. Yêu cầu cần đạt\n- Trọng tâm Sinh học 12 thi Tốt nghiệp THPT.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 30,
+      "materials": [
+        {
+          "id": "mat-gdpt-g12-sinh-hoc-chu-de-1-3-d-01-co-che-nhan-doi-dn",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Cơ chế Nhân đôi DNA, Phiên mã, Dịch mã & Đột biến Gen – NST (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g12-sinh-hoc-chu-de-1-3-d-01-co-che-nhan-doi-dn",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g12-ngu-van-chuyen-de-to-01-cau-truc-de-thi-ng",
+      "grade_id": 12,
+      "subject_code": "ngu-van",
+      "textbook": "kntt",
+      "chapter": "Chuyên đề Tổng ôn Tốt nghiệp THPT 2025+ (Đọc hiểu + NLXH + NLVH)",
+      "title": "Cấu trúc Đề thi Ngữ văn THPT 2025+ (100% Ngữ liệu ngoài SGK)",
+      "summary": "Phân bổ thời gian 120 phút chuẩn cho Phần I Đọc hiểu (4 điểm) và Phần II Viết (6 điểm).",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Ngữ văn Lớp 12)\n- **Đọc hiểu (4đ — 30 phút):** Nhận diện thể loại, biện pháp tu từ, thông điệp tác giả.\n- **Viết đoạn văn 200 chữ (2đ — 25 phút)** & **Viết bài văn 600 chữ (4đ — 65 phút)**.\n\n### 2. Ví dụ minh họa & Lưu ý\nThí sinh cần rèn kỹ năng đọc nhanh, gạch chân từ khóa và dùng dẫn chứng xã hội mới, xác thực.\n\n### 3. Yêu cầu cần đạt\n- Phân bổ thời gian 120 phút chuẩn cho Phần I Đọc hiểu (4 điểm) và Phần II Viết (6 điểm).\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 30,
+      "materials": [
+        {
+          "id": "mat-gdpt-g12-ngu-van-chuyen-de-to-01-cau-truc-de-thi-ng",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Cấu trúc Đề thi Ngữ văn THPT 2025+ (100% Ngữ liệu ngoài SGK) (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g12-ngu-van-chuyen-de-to-01-cau-truc-de-thi-ng",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g12-tieng-anh-chuyen-de-to-01-chien-thuat-40-cau",
+      "grade_id": 12,
+      "subject_code": "tieng-anh",
+      "textbook": "kntt",
+      "chapter": "Chuyên đề Tổng ôn Tốt nghiệp THPT 2025+ (Cấu trúc 40 câu / 50 phút)",
+      "title": "Chiến thuật 40 câu Đọc điền Thông báo/Tờ rơi, Sắp xếp đoạn văn & Đọc hiểu",
+      "summary": "Nắm chắc định dạng đề Tiếng Anh THPT hoàn toàn mới từ năm 2025.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Tiếng Anh Lớp 12)\nCấu trúc mới tập trung mạnh vào năng lực đọc thực tế:\n- Cloze test Advertisement / Leaflet (12 câu)\n- Rearrangement of dialogues/letters/paragraphs (5 câu)\n- Reading Comprehension (18 câu) & Cloze passage (5 câu).\n\n### 2. Ví dụ minh họa & Lưu ý\nMẹo làm bài sắp xếp hội thoại/đoạn văn: tìm câu mở đầu độc lập và theo dõi từ nối (`However, Therefore, Firstly, In addition`).\n\n### 3. Yêu cầu cần đạt\n- Nắm chắc định dạng đề Tiếng Anh THPT hoàn toàn mới từ năm 2025.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 30,
+      "materials": [
+        {
+          "id": "mat-gdpt-g12-tieng-anh-chuyen-de-to-01-chien-thuat-40-cau",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Chiến thuật 40 câu Đọc điền Thông báo/Tờ rơi, Sắp xếp đoạn văn & Đọc hiểu (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g12-tieng-anh-chuyen-de-to-01-chien-thuat-40-cau",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g12-lich-su-chu-de-1-6-t-01-cach-mang-thang-ta",
+      "grade_id": 12,
+      "subject_code": "lich-su",
+      "textbook": "kntt",
+      "chapter": "Chủ đề 1–6: Thế giới sau 1945, ASEAN, Cách mạng Tháng Tám & Kháng chiến 1945–1975",
+      "title": "Cách mạng Tháng Tám 1945, Điện Biên Phủ 1954 & Đại thắng Mùa Xuân 1975",
+      "summary": "Hệ thống các mốc lịch sử trọng tâm thi tốt nghiệp THPT 2025+.",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Lịch sử Lớp 12)\n- **2/9/1945:** Chủ tịch Hồ Chí Minh đọc *Tuyên ngôn Độc lập*, khai sinh nước Việt Nam Dân chủ Cộng hòa.\n- **7/5/1954:** Chiến thắng Điện Biên Phủ kết thúc kháng chiến chống Pháp.\n- **30/4/1975:** Chiến dịch Hồ Chí Minh toàn thắng, thống nhất đất nước.\n\n### 2. Ví dụ minh họa & Lưu ý\nTừ **12/1986** (Đại hội VI), Việt Nam tiến hành công cuộc **Đổi mới** toàn diện đất nước.\n\n### 3. Yêu cầu cần đạt\n- Hệ thống các mốc lịch sử trọng tâm thi tốt nghiệp THPT 2025+.\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 30,
+      "materials": [
+        {
+          "id": "mat-gdpt-g12-lich-su-chu-de-1-6-t-01-cach-mang-thang-ta",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Cách mạng Tháng Tám 1945, Điện Biên Phủ 1954 & Đại thắng Mùa Xuân 1975 (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g12-lich-su-chu-de-1-6-t-01-cach-mang-thang-ta",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g12-dia-ly-chu-de-1-4-d-01-vi-tri-dia-li-thie",
+      "grade_id": 12,
+      "subject_code": "dia-ly",
+      "textbook": "kntt",
+      "chapter": "Chủ đề 1–4: Địa lí tự nhiên, Dân cư, Các ngành kinh tế & 7 Vùng kinh tế Việt Nam",
+      "title": "Vị trí địa lí, Thiên nhiên nhiệt đới ẩm gió mùa & 7 Vùng kinh tế Việt Nam",
+      "summary": "Trọng tâm Địa lí 12 theo GDPT 2018 (không còn mang Atlat vào phòng thi từ 2025).",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Địa lý Lớp 12)\n- Việt Nam nằm hoàn toàn trong vùng nội chí tuyến Bắc bán cầu, múi giờ số **7**.\n- Khí hậu nhiệt đới ẩm gió mùa có 2 mùa gió chính: **Gió mùa Đông Bắc** và **Gió mùa Tây Nam**.\n\n### 2. Ví dụ minh họa & Lưu ý\nCần thuộc đặc trưng thế mạnh của 7 vùng kinh tế (ĐBSH, ĐBSCL, Đông Nam Bộ, Tây Nguyên, Trung du MNBB, Bắc Trung Bộ, Duyên hải Nam Trung Bộ).\n\n### 3. Yêu cầu cần đạt\n- Trọng tâm Địa lí 12 theo GDPT 2018 (không còn mang Atlat vào phòng thi từ 2025).\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 30,
+      "materials": [
+        {
+          "id": "mat-gdpt-g12-dia-ly-chu-de-1-4-d-01-vi-tri-dia-li-thie",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Vị trí địa lí, Thiên nhiên nhiệt đới ẩm gió mùa & 7 Vùng kinh tế Việt Nam (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g12-dia-ly-chu-de-1-4-d-01-vi-tri-dia-li-thie",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "id": "gdpt-g12-tin-hoc-chu-de-1-6-t-01-tri-tue-nhan-tao-a",
+      "grade_id": 12,
+      "subject_code": "tin-hoc",
+      "textbook": "kntt",
+      "chapter": "Chủ đề 1–6: Trí tuệ nhân tạo (AI), Mạng máy tính, HTML/CSS & Cơ sở dữ liệu",
+      "title": "Trí tuệ nhân tạo (AI), Giao thức TCP/IP & Tạo trang web bằng HTML5/CSS3",
+      "summary": "Kiến thức Tin học 12 theo chương trình mới 2018 (môn thi tự chọn THPT 2025+).",
+      "content_mdx": "### 1. Kiến thức trọng tâm (Chuẩn GDPT 2018 — Tin học Lớp 12)\n- **HTML5:** Thẻ cấu trúc `<header>, <main>, <section>, <table>, <form>`.\n- **CSS3:** Bộ chọn lớp `.class`, bộ chọn định danh `#id`, mô hình hộp (`margin, border, padding, content`).\n- **Mạng:** Địa chỉ IP định danh thiết bị; Router định tuyến gói tin; Switch kết nối mạng LAN.\n\n### 2. Ví dụ minh họa & Lưu ý\nThẻ liên kết trong HTML: `<a href=\"https://eduk12.vn\">Học trực tuyến</a>`.\n\n### 3. Yêu cầu cần đạt\n- Kiến thức Tin học 12 theo chương trình mới 2018 (môn thi tự chọn THPT 2025+).\n- Sau khi đọc xong lý thuyết, em hãy bấm **\"Hỏi AI về bài này\"** ở góc trên để AI Gia sư đặt câu hỏi gợi mở và kiểm tra mức độ hiểu bài nhé!",
+      "duration_min": 30,
+      "materials": [
+        {
+          "id": "mat-gdpt-g12-tin-hoc-chu-de-1-6-t-01-tri-tue-nhan-tao-a",
+          "title": "Tóm tắt lý thuyết & Bài tập tự luyện: Trí tuệ nhân tạo (AI), Giao thức TCP/IP & Tạo trang web bằng HTML5/CSS3 (PDF)",
+          "type": "pdf",
+          "url": "#cdn-r2-gdpt-g12-tin-hoc-chu-de-1-6-t-01-tri-tue-nhan-tao-a",
+          "size_label": "PDF Chuẩn GDPT 2018",
+          "is_free": true
+        }
+      ]
+    }
+  ]
+}
