@@ -13,10 +13,12 @@ import {
   Send,
   Star,
   Trash2,
+  Upload,
 } from "lucide-react";
 import { CORE_API_URL } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 import { connectRealtimeChannel } from "@/lib/realtime";
+import { isImageFileUrl, resolveFileUrl, uploadRealFile } from "@/components/VerifiedBadge";
 
 interface SubmissionReview {
   id: string;
@@ -69,6 +71,7 @@ export function StudentShowcaseSection({
   const [demoUrl, setDemoUrl] = useState("");
   const [repoUrl, setRepoUrl] = useState("");
   const [techStack, setTechStack] = useState("");
+  const [uploadingDemo, setUploadingDemo] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   // Teacher review form per submission
@@ -306,10 +309,32 @@ export function StudentShowcaseSection({
             />
           </div>
 
-          <div className="flex justify-end">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-indigo-200 bg-indigo-50 px-3.5 py-2 text-xs font-bold text-indigo-700 hover:bg-indigo-100 transition">
+              <Upload className="h-3.5 w-3.5" />
+              {uploadingDemo ? "Đang tải tệp lên..." : "Tải Ảnh chụp màn hình / PDF báo cáo (≤ 5MB)"}
+              <input
+                type="file"
+                accept=".pdf,.doc,.docx,.ppt,.pptx,.png,.jpg,.jpeg,.webp"
+                className="hidden"
+                onChange={async (e) => {
+                  const f = e.target.files?.[0];
+                  if (!f || !accessToken) return;
+                  setUploadingDemo(true);
+                  const up = await uploadRealFile(f, accessToken, "student_showcase");
+                  setUploadingDemo(false);
+                  if (up.ok && up.data) {
+                    setDemoUrl(up.data.url);
+                    onNotice("ok", `Đã đính kèm tệp sản phẩm: ${up.data.filename}`);
+                  } else {
+                    onNotice("err", up.error || "Không thể tải tệp lên");
+                  }
+                }}
+              />
+            </label>
             <button
               type="submit"
-              disabled={submitting}
+              disabled={submitting || uploadingDemo}
               className="inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-5 py-2.5 text-xs font-bold text-white shadow hover:bg-indigo-500 disabled:opacity-50"
             >
               <Send className="h-3.5 w-3.5" />
@@ -423,16 +448,44 @@ export function StudentShowcaseSection({
                     </p>
                   </div>
 
+                  {/* Xem trước ảnh sản phẩm nếu học sinh upload ảnh thật */}
+                  {item.demo_url && item.demo_url.startsWith("/api/v1/files/") && isImageFileUrl(item.demo_url) && (
+                    <a
+                      href={resolveFileUrl(item.demo_url)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="block overflow-hidden rounded-xl border border-slate-200 bg-slate-50"
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={resolveFileUrl(item.demo_url)}
+                        alt={item.title}
+                        className="max-h-56 w-full object-contain"
+                      />
+                    </a>
+                  )}
+
                   {/* Links Demo / Source / Chat hỏi trực tiếp */}
                   <div className="flex flex-wrap gap-2">
                     {item.demo_url && (
-                      <Link
-                        href={item.demo_url}
-                        target={item.demo_url.startsWith("http") ? "_blank" : undefined}
-                        className="inline-flex items-center gap-1 rounded-lg bg-indigo-50 px-3 py-1.5 text-[11px] font-bold text-indigo-700 hover:bg-indigo-100"
-                      >
-                        Xem Demo <ExternalLink className="h-3 w-3" />
-                      </Link>
+                      item.demo_url.startsWith("/api/v1/files/") ? (
+                        <a
+                          href={resolveFileUrl(item.demo_url)}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1 rounded-lg bg-indigo-50 px-3 py-1.5 text-[11px] font-bold text-indigo-700 hover:bg-indigo-100"
+                        >
+                          Mở Tệp / Ảnh sản phẩm <ExternalLink className="h-3 w-3" />
+                        </a>
+                      ) : (
+                        <Link
+                          href={item.demo_url}
+                          target={item.demo_url.startsWith("http") ? "_blank" : undefined}
+                          className="inline-flex items-center gap-1 rounded-lg bg-indigo-50 px-3 py-1.5 text-[11px] font-bold text-indigo-700 hover:bg-indigo-100"
+                        >
+                          Xem Demo <ExternalLink className="h-3 w-3" />
+                        </Link>
+                      )
                     )}
                     {item.repo_url && (
                       <a

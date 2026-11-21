@@ -6,8 +6,10 @@ import { useSearchParams } from "next/navigation";
 import {
   AlertTriangle,
   CheckCircle2,
+  FileText,
   Flag,
   MessageCircle,
+  Paperclip,
   Search,
   Send,
   ShieldAlert,
@@ -17,6 +19,7 @@ import {
 import { CORE_API_URL } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 import { connectRealtimeChannel, RealtimeHandle } from "@/lib/realtime";
+import { isImageFileUrl, resolveFileUrl, uploadRealFile, VerifiedBadge } from "@/components/VerifiedBadge";
 
 interface ChatContact {
   id: string;
@@ -24,6 +27,7 @@ interface ChatContact {
   role: string;
   school_name: string;
   current_grade: number | null;
+  is_verified?: boolean;
   last_message: string;
   last_at: string;
 }
@@ -36,6 +40,8 @@ interface DirectMessage {
   receiver_id: string;
   receiver_name: string;
   content: string;
+  attachment_url?: string;
+  attachment_name?: string;
   is_flagged: number;
   is_blocked: number;
   created_at: string;
@@ -62,6 +68,7 @@ function ChatPageInner() {
   const [searchText, setSearchText] = useState("");
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
+  const [uploadingChatFile, setUploadingChatFile] = useState(false);
   const [botWarning, setBotWarning] = useState("");
   const [reportOpen, setReportOpen] = useState(false);
   const [reportCat, setReportCat] = useState<"sexual_harassment" | "violence" | "impersonation">("impersonation");
@@ -148,9 +155,11 @@ function ChatPageInner() {
     `${c.full_name} ${c.school_name}`.toLowerCase().includes(searchText.trim().toLowerCase())
   );
 
-  const handleSend = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!accessToken || !selectedId || !draft.trim()) return;
+  const sendMessagePayload = async (
+    text: string,
+    attachment?: { url: string; name: string }
+  ) => {
+    if (!accessToken || !selectedId) return;
     setSending(true);
     setBotWarning("");
     try {
@@ -160,7 +169,12 @@ function ChatPageInner() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
         },
-        body: JSON.stringify({ receiver_id: selectedId, content: draft.trim() }),
+        body: JSON.stringify({
+          receiver_id: selectedId,
+          content: text,
+          attachment_url: attachment?.url || "",
+          attachment_name: attachment?.name || "",
+        }),
       });
       const d = await res.json();
       if (!res.ok) {
@@ -175,6 +189,27 @@ function ChatPageInner() {
       }
     } finally {
       setSending(false);
+    }
+  };
+
+  const handleSend = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!draft.trim()) return;
+    await sendMessagePayload(draft.trim());
+  };
+
+  const handleChatFileUpload = async (file: File) => {
+    if (!accessToken || !selectedId) return;
+    setUploadingChatFile(true);
+    const up = await uploadRealFile(file, accessToken, "direct_chat");
+    setUploadingChatFile(false);
+    if (up.ok && up.data) {
+      await sendMessagePayload(draft.trim() || `Gửi tệp đính kèm: ${up.data.filename}`, {
+        url: up.data.url,
+        name: up.data.filename,
+      });
+    } else {
+      setBotWarning(up.error || "Không thể tải tệp lên");
     }
   };
 
@@ -299,7 +334,10 @@ function ChatPageInner() {
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between gap-2">
-                      <p className="truncate text-xs font-extrabold text-slate-900">{c.full_name}</p>
+                      <p className="flex items-center gap-1 truncate text-xs font-extrabold text-slate-900">
+                        <span className="truncate">{c.full_name}</span>
+                        {c.is_verified && <VerifiedBadge />}
+                      </p>
                       <span className={`shrink-0 rounded-full px-2 py-0.5 text-[9px] font-bold ${badge.cls}`}>
                         {badge.text}
                       </span>
@@ -325,8 +363,18 @@ function ChatPageInner() {
                     {selectedContact.full_name.slice(0, 1).toUpperCase()}
                   </div>
                   <div>
-                    <div className="flex items-center gap-2">
-                      <h2 className="text-sm font-extrabold text-slate-900">{selectedContact.full_name}</h2>
+                    <div className="flex items-center gap-1.5">
+                      {selectedContact.role !== "student" ? (
+                        <Link
+                          href={`/giao-vien?id=${encodeURIComponent(selectedContact.id)}`}
+                          className="text-sm font-extrabold text-slate-900 hover:text-indigo-600"
+                        >
+                          {selectedContact.full_name}
+                        </Link>
+                      ) : (
+                        <h2 className="text-sm font-extrabold text-slate-900">{selectedContact.full_name}</h2>
+                      )}
+                      {selectedContact.is_verified && <VerifiedBadge />}
                       <span
                         className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
                           roleLabel(selectedContact.role).cls
@@ -432,6 +480,37 @@ function ChatPageInner() {
                             </p>
                           )}
                           <p className="whitespace-pre-wrap">{m.content}</p>
+                          {m.attachment_url && !blocked && (
+                            isImageFileUrl(m.attachment_url) ? (
+                              <a
+                                href={resolveFileUrl(m.attachment_url)}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="mt-2 block"
+                              >
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img
+                                  src={resolveFileUrl(m.attachment_url)}
+                                  alt={m.attachment_name || "Ảnh đính kèm"}
+                                  className="max-h-56 rounded-xl border border-white/20"
+                                />
+                              </a>
+                            ) : (
+                              <a
+                                href={resolveFileUrl(m.attachment_url)}
+                                target="_blank"
+                                rel="noreferrer"
+                                className={`mt-2 inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-[11px] font-bold ${
+                                  isMine
+                                    ? "bg-white/20 text-white hover:bg-white/30"
+                                    : "bg-slate-100 text-indigo-700 hover:bg-slate-200"
+                                }`}
+                              >
+                                <FileText className="h-3.5 w-3.5 shrink-0" />
+                                <span className="truncate max-w-[200px]">{m.attachment_name || "Mở tệp đính kèm"}</span>
+                              </a>
+                            )
+                          )}
                         </div>
                       </div>
                     );
@@ -455,8 +534,25 @@ function ChatPageInner() {
                 </div>
               )}
 
-              {/* Khung nhập tin nhắn */}
+              {/* Khung nhập tin nhắn + Đính kèm Ảnh bài làm / PDF */}
               <form onSubmit={handleSend} className="flex items-center gap-2 border-t border-slate-200 bg-white p-3.5">
+                <label
+                  title="Đính kèm ảnh bài làm, PDF, Word, Slide (≤ 5MB)"
+                  className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-slate-200 bg-slate-50 p-2.5 text-slate-600 hover:bg-slate-100 hover:text-indigo-600 transition"
+                >
+                  <Paperclip className="h-4 w-4" />
+                  <input
+                    type="file"
+                    accept=".pdf,.doc,.docx,.ppt,.pptx,.png,.jpg,.jpeg,.webp"
+                    className="hidden"
+                    disabled={uploadingChatFile || sending}
+                    onChange={(e) => {
+                      const f = e.target.files?.[0];
+                      if (f) void handleChatFileUpload(f);
+                      e.target.value = "";
+                    }}
+                  />
+                </label>
                 <input
                   value={draft}
                   onChange={(e) => {
@@ -467,7 +563,11 @@ function ChatPageInner() {
                       wsRef.current?.send({ type: "typing", is_typing: false });
                     }, 2500);
                   }}
-                  placeholder={`Nhắn tin trực tuyến cho ${selectedContact.full_name}...`}
+                  placeholder={
+                    uploadingChatFile
+                      ? "Đang tải tệp lên..."
+                      : `Nhắn tin trực tuyến cho ${selectedContact.full_name}...`
+                  }
                   className="flex-1 rounded-xl border border-slate-300 px-4 py-2.5 text-xs focus:border-indigo-500 focus:outline-none"
                 />
                 <button

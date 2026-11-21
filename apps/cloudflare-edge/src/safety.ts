@@ -430,14 +430,16 @@ export async function handleSafetyAndChatRoutes(
 
     const peers = await db
       .prepare(
-        `SELECT id, full_name, email, role, school_name, current_grade
-         FROM users
-         WHERE id != ? AND is_active = 1
+        `SELECT u.id, u.full_name, u.email, u.role, u.school_name, u.current_grade,
+                COALESCE(tp.is_verified, 0) as is_verified
+         FROM users u
+         LEFT JOIN teacher_profiles tp ON tp.user_id = u.id
+         WHERE u.id != ? AND u.is_active = 1
          ORDER BY CASE
-           WHEN role = 'teacher' THEN 0
-           WHEN role IN ('super_admin', 'content_admin') THEN 1
+           WHEN u.role = 'teacher' THEN 0
+           WHEN u.role IN ('super_admin', 'content_admin') THEN 1
            ELSE 2
-         END, full_name ASC
+         END, COALESCE(tp.is_verified, 0) DESC, u.full_name ASC
          LIMIT 50`
       )
       .bind(claims.uid)
@@ -448,6 +450,7 @@ export async function handleSafetyAndChatRoutes(
         role: string;
         school_name: string;
         current_grade: number | null;
+        is_verified: number;
       }>();
 
     const myMessages = await db
@@ -476,6 +479,7 @@ export async function handleSafetyAndChatRoutes(
         role: p.role,
         school_name: p.school_name || "",
         current_grade: p.current_grade,
+        is_verified: Number(p.is_verified || 0) === 1,
         last_message: lastMsgMap.get(p.id)?.content || "",
         last_at: lastMsgMap.get(p.id)?.created_at || "",
       }))
@@ -497,7 +501,7 @@ export async function handleSafetyAndChatRoutes(
     const roomKey = makeRoomKey(claims.uid, peerId);
     const rows = await db
       .prepare(
-        `SELECT id, sender_id, sender_name, sender_role, receiver_id, receiver_name, content, is_flagged, is_blocked, created_at
+        `SELECT id, sender_id, sender_name, sender_role, receiver_id, receiver_name, content, COALESCE(attachment_url, '') as attachment_url, COALESCE(attachment_name, '') as attachment_name, is_flagged, is_blocked, created_at
          FROM direct_messages
          WHERE room_key = ?
          ORDER BY created_at ASC
@@ -516,11 +520,19 @@ export async function handleSafetyAndChatRoutes(
       return jsonRes({ error: "Tài khoản của bạn đang bị tạm khóa do vi phạm quy định an toàn." }, 403);
     }
 
-    const body = (await request.json().catch(() => ({}))) as { receiver_id?: string; content?: string };
+    const body = (await request.json().catch(() => ({}))) as {
+      receiver_id?: string;
+      content?: string;
+      attachment_url?: string;
+      attachment_name?: string;
+    };
     const receiverId = (body.receiver_id || "").trim();
-    const content = (body.content || "").trim();
+    const rawAttachUrl = (body.attachment_url || "").trim().slice(0, 300);
+    const attachmentUrl = rawAttachUrl.startsWith("/api/v1/files/") ? rawAttachUrl : "";
+    const attachmentName = (body.attachment_name || "").trim().slice(0, 140);
+    const content = (body.content || "").trim() || (attachmentName ? `Đã gửi tệp đính kèm: ${attachmentName}` : "");
     if (!receiverId || !content) {
-      return jsonRes({ error: "Vui lòng chọn người nhận và nhập nội dung tin nhắn." }, 400);
+      return jsonRes({ error: "Vui lòng chọn người nhận và nhập nội dung hoặc đính kèm tệp." }, 400);
     }
 
     const peer = await db
@@ -610,10 +622,22 @@ export async function handleSafetyAndChatRoutes(
 
     await db
       .prepare(
-        `INSERT INTO direct_messages (id, room_key, sender_id, sender_name, sender_role, receiver_id, receiver_name, receiver_role, content)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+        `INSERT INTO direct_messages (id, room_key, sender_id, sender_name, sender_role, receiver_id, receiver_name, receiver_role, content, attachment_url, attachment_name)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
       )
-      .bind(msgId, roomKey, me.id, me.full_name, me.role, peer.id, peer.full_name, peer.role, content.slice(0, 2000))
+      .bind(
+        msgId,
+        roomKey,
+        me.id,
+        me.full_name,
+        me.role,
+        peer.id,
+        peer.full_name,
+        peer.role,
+        content.slice(0, 2000),
+        attachmentUrl,
+        attachmentName
+      )
       .run();
 
     const cleanMsg = {
@@ -624,6 +648,8 @@ export async function handleSafetyAndChatRoutes(
       receiver_id: peer.id,
       receiver_name: peer.full_name,
       content: content.slice(0, 2000),
+      attachment_url: attachmentUrl,
+      attachment_name: attachmentName,
       is_flagged: 0,
       is_blocked: 0,
       created_at: new Date().toISOString(),

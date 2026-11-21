@@ -40,6 +40,7 @@ import { UserManagementPanel } from "@/components/cms/UserManagementPanel";
 import { CommunityModerationPanel } from "@/components/cms/CommunityModerationPanel";
 import { SafetyCenterPanel } from "@/components/cms/SafetyCenterPanel";
 import { ExamLevelControlPanel } from "@/components/cms/ExamLevelControlPanel";
+import { TeacherVerificationPanel } from "@/components/cms/TeacherVerificationPanel";
 import { CuBongLogoMark } from "@/components/BrandLogo";
 import {
   createEmptyDraftQuestion,
@@ -91,6 +92,7 @@ type DashboardTab =
   | "exams"
   | "import"
   | "exam_levels"
+  | "verifications"
   | "safety"
   | "community"
   | "users";
@@ -127,6 +129,10 @@ const TAB_META: Record<DashboardTab, { title: string; subtitle: string }> = {
   exam_levels: {
     title: "Mở khóa Thi & Tổng hợp Đề theo Cấp",
     subtitle: "Đóng/mở kỳ thi theo thời gian thực cho Tiểu học (1–5), THCS (6–9), THPT (10–12) và tổng hợp đề thi tổng hợp cấp.",
+  },
+  verifications: {
+    title: "Duyệt Giáo viên Tích xanh",
+    subtitle: "Xác minh thẻ giáo viên / giấy xác nhận công tác để cấp Tích xanh và chặn mạo danh từ gốc.",
   },
   safety: {
     title: "Trung tâm An toàn & BOT Quét Vi phạm",
@@ -598,6 +604,12 @@ export default function CMSAdminPage() {
                 label: "Mở khóa & Tổng hợp Đề cấp",
                 desc: "Tiểu học • THCS • THPT",
                 icon: GraduationCap,
+              },
+              {
+                id: "verifications" as DashboardTab,
+                label: "Duyệt Giáo viên Tích xanh",
+                desc: "Xác minh thẻ GV chống mạo danh",
+                icon: CheckCircle2,
               },
               {
                 id: "safety" as DashboardTab,
@@ -1562,6 +1574,11 @@ export default function CMSAdminPage() {
               onToast={showToast}
               onGenerated={() => void loadDashboardOverview()}
             />
+          )}
+
+          {/* === TAB 6-1: DUYỆT GIÁO VIÊN TÍCH XANH (ADMIN) === */}
+          {activeTab === "verifications" && isAdmin && (
+            <TeacherVerificationPanel accessToken={accessToken} onToast={showToast} />
           )}
 
           {/* === TAB 6A: TRUNG TÂM AN TOÀN & BOT QUÉT VI PHẠM (ADMIN) === */}

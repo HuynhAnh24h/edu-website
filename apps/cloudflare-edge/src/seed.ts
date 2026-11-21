@@ -69,7 +69,21 @@ export async function ensureSeeded(db: D1Database): Promise<void> {
     db.prepare(`CREATE TABLE IF NOT EXISTS course_enrollments (course_id TEXT NOT NULL, user_id TEXT NOT NULL, completed_lessons_json TEXT NOT NULL DEFAULT '[]', enrolled_at TEXT NOT NULL DEFAULT (datetime('now')), PRIMARY KEY (course_id, user_id))`),
     db.prepare(`CREATE TABLE IF NOT EXISTS course_reviews (id TEXT PRIMARY KEY, course_id TEXT NOT NULL, user_id TEXT NOT NULL, user_name TEXT NOT NULL, user_role TEXT NOT NULL DEFAULT 'student', rating INTEGER NOT NULL, comment TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT (datetime('now')), updated_at TEXT NOT NULL DEFAULT (datetime('now')), UNIQUE(course_id, user_id))`),
     db.prepare(`CREATE TABLE IF NOT EXISTS exam_level_controls (level TEXT PRIMARY KEY, label TEXT NOT NULL, min_grade INTEGER NOT NULL, max_grade INTEGER NOT NULL, is_unlocked INTEGER NOT NULL DEFAULT 1, exam_id TEXT DEFAULT '', announcement TEXT DEFAULT '', updated_by TEXT DEFAULT '', updated_at TEXT NOT NULL DEFAULT (datetime('now')))`),
+    db.prepare(`CREATE TABLE IF NOT EXISTS teacher_profiles (user_id TEXT PRIMARY KEY, is_verified INTEGER NOT NULL DEFAULT 0, verification_status TEXT NOT NULL DEFAULT 'none', specialty TEXT DEFAULT '', bio TEXT DEFAULT '', years_exp INTEGER NOT NULL DEFAULT 1, proof_file_url TEXT DEFAULT '', proof_note TEXT DEFAULT '', admin_review_note TEXT DEFAULT '', verified_at TEXT, updated_at TEXT NOT NULL DEFAULT (datetime('now')))`),
+    db.prepare(`CREATE TABLE IF NOT EXISTS uploaded_files (id TEXT PRIMARY KEY, uploader_id TEXT NOT NULL, uploader_name TEXT NOT NULL, filename TEXT NOT NULL, mime_type TEXT NOT NULL, size_bytes INTEGER NOT NULL, purpose TEXT NOT NULL DEFAULT 'general', created_at TEXT NOT NULL DEFAULT (datetime('now')))`),
   ]);
+
+  // Nâng cấp cột đính kèm tệp cho direct_messages an toàn nếu bảng cũ chưa có
+  for (const alterSql of [
+    "ALTER TABLE direct_messages ADD COLUMN attachment_url TEXT DEFAULT ''",
+    "ALTER TABLE direct_messages ADD COLUMN attachment_name TEXT DEFAULT ''",
+  ]) {
+    try {
+      await db.prepare(alterSql).run();
+    } catch {
+      // Cột đã tồn tại
+    }
+  }
 
   // Luôn đảm bảo có sẵn 2 lớp học mẫu nếu bảng classrooms chưa có dữ liệu
   const clsRow = await db.prepare("SELECT COUNT(*) as cnt FROM classrooms").first<{ cnt: number }>();
@@ -633,6 +647,46 @@ export async function ensureSeeded(db: D1Database): Promise<void> {
       db.prepare(
         "INSERT OR IGNORE INTO exam_level_controls (level, label, min_grade, max_grade, is_unlocked, announcement) VALUES ('high', 'Cấp THPT (Lớp 10–12)', 10, 12, 1, 'Kỳ thi tổng hợp THPT 2025+ đang mở cho học sinh tham gia!')"
       ),
+    ]);
+  }
+
+  // Seed Hồ sơ Giáo viên Tích xanh mẫu cho 3 thầy cô cộng đồng
+  const tpRow = await db.prepare("SELECT COUNT(*) as cnt FROM teacher_profiles").first<{ cnt: number }>();
+  if (!tpRow || tpRow.cnt === 0) {
+    await db.batch([
+      db
+        .prepare(
+          `INSERT OR IGNORE INTO teacher_profiles (user_id, is_verified, verification_status, specialty, bio, years_exp, verified_at)
+           VALUES (?, 1, 'verified', ?, ?, ?, datetime('now'))`
+        )
+        .bind(
+          "u-teacher-1",
+          "Toán học THPT & Ôn thi vào 10",
+          "12 năm kinh nghiệm giảng dạy Toán Chuyên và luyện thi Tốt nghiệp THPT. Đam mê xây dựng hệ thống bài giảng trực quan, dễ hiểu giúp học sinh mất gốc lấy lại nền tảng nhanh chóng.",
+          12
+        ),
+      db
+        .prepare(
+          `INSERT OR IGNORE INTO teacher_profiles (user_id, is_verified, verification_status, specialty, bio, years_exp, verified_at)
+           VALUES (?, 1, 'verified', ?, ?, ?, datetime('now'))`
+        )
+        .bind(
+          "u-teacher-2",
+          "Ngữ văn THPT & Nghị luận Xã hội",
+          "10 năm giảng dạy Ngữ văn tại trường THPT Chuyên. Chia sẻ phương pháp tư duy phản biện, viết văn sáng tạo từ đời sống thực tế — nói không với văn mẫu sáo rỗng.",
+          10
+        ),
+      db
+        .prepare(
+          `INSERT OR IGNORE INTO teacher_profiles (user_id, is_verified, verification_status, specialty, bio, years_exp, verified_at)
+           VALUES (?, 1, 'verified', ?, ?, ?, datetime('now'))`
+        )
+        .bind(
+          "u-teacher-3",
+          "Tin học & Lập trình Web / Python / Golang",
+          "8 năm đào tạo học sinh giỏi Tin học và hướng dẫn dự án KHKT phần mềm. Tập trung vào thực hành trực tiếp trên trình duyệt và tư duy giải quyết vấn đề.",
+          8
+        ),
     ]);
   }
 

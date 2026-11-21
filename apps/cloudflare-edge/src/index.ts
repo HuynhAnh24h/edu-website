@@ -14,6 +14,7 @@ import { handleCodingRoutes } from "./coding";
 import { handleSocialRoutes } from "./social";
 import { handleSafetyAndChatRoutes } from "./safety";
 import { handleCourseRoutes } from "./courses";
+import { handleTeachersAndFilesRoutes } from "./teachers-files";
 import { pushRealtimeEvent, RealtimeHub } from "./realtime";
 
 export { RealtimeHub };
@@ -301,6 +302,27 @@ export default {
         forwardUrl.searchParams.set("name", claims?.name || "Khách");
         forwardUrl.searchParams.set("role", claims?.role || "guest");
         return stub.fetch(new Request(forwardUrl.toString(), request));
+      }
+
+      // === HỒ SƠ GIÁO VIÊN TÍCH XANH & UPLOAD TỆP HỌC LIỆU THẬT (PDF/WORD/SLIDE/ẢNH) ===
+      if (
+        path.startsWith("/api/v1/files") ||
+        path.startsWith("/api/v1/teachers") ||
+        path.startsWith("/api/v1/admin/teachers")
+      ) {
+        const claims = await getClaims(request, env);
+        const tfResp = await handleTeachersAndFilesRoutes(
+          request,
+          env.DB,
+          env.EDU_KV,
+          path,
+          method,
+          claims,
+          jsonRes,
+          CORS_HEADERS,
+          env.REALTIME_HUB
+        );
+        if (tfResp) return tfResp;
       }
 
       // === CỔNG KHÓA HỌC TRỰC TUYẾN & ĐÁNH GIÁ 5 SAO REAL-TIME ===

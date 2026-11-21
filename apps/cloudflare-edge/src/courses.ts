@@ -36,7 +36,16 @@ export async function handleCourseRoutes(
     const subject = (url.searchParams.get("subject") || "").trim().toLowerCase();
 
     const [coursesRes, reviewsRes, enrollCountsRes, myEnrollsRes] = await Promise.all([
-      db.prepare("SELECT * FROM courses WHERE status = 'published' ORDER BY created_at DESC LIMIT 60").all<Record<string, unknown>>(),
+      db
+        .prepare(
+          `SELECT c.*, COALESCE(tp.is_verified, 0) as teacher_verified
+           FROM courses c
+           LEFT JOIN teacher_profiles tp ON tp.user_id = c.teacher_id
+           WHERE c.status = 'published'
+           ORDER BY COALESCE(tp.is_verified, 0) DESC, c.created_at DESC
+           LIMIT 60`
+        )
+        .all<Record<string, unknown>>(),
       db.prepare("SELECT * FROM course_reviews ORDER BY updated_at DESC").all<Record<string, unknown>>(),
       db.prepare("SELECT course_id, COUNT(*) as cnt FROM course_enrollments GROUP BY course_id").all<{ course_id: string; cnt: number }>(),
       claims
@@ -92,6 +101,7 @@ export async function handleCourseRoutes(
         teacher_id: String(c.teacher_id),
         teacher_name: String(c.teacher_name),
         teacher_school: String(c.teacher_school || ""),
+        teacher_verified: Number(c.teacher_verified || 0) === 1,
         title: String(c.title),
         subject_name: String(c.subject_name),
         grade_label: String(c.grade_label || "Lớp 12"),

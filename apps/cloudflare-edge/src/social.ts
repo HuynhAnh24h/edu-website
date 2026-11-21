@@ -67,13 +67,24 @@ export async function handleSocialRoutes(
   if (path === "/api/v1/social/teachers" && method === "GET") {
     const users = await db
       .prepare(
-        `SELECT id, full_name, role, school_name, created_at
-         FROM users
-         WHERE role IN ('teacher', 'content_admin', 'super_admin') AND is_active = 1
-         ORDER BY CASE WHEN role = 'teacher' THEN 0 ELSE 1 END, created_at ASC
+        `SELECT u.id, u.full_name, u.role, u.school_name, u.created_at,
+                COALESCE(tp.is_verified, 0) as is_verified,
+                COALESCE(tp.specialty, '') as specialty
+         FROM users u
+         LEFT JOIN teacher_profiles tp ON tp.user_id = u.id
+         WHERE u.role IN ('teacher', 'content_admin', 'super_admin') AND u.is_active = 1
+         ORDER BY COALESCE(tp.is_verified, 0) DESC, CASE WHEN u.role = 'teacher' THEN 0 ELSE 1 END, u.created_at ASC
          LIMIT 24`
       )
-      .all<{ id: string; full_name: string; role: string; school_name: string; created_at: string }>();
+      .all<{
+        id: string;
+        full_name: string;
+        role: string;
+        school_name: string;
+        created_at: string;
+        is_verified: number;
+        specialty: string;
+      }>();
 
     const [postCounts, followerCounts, classCounts, myFollows] = await Promise.all([
       db
@@ -104,6 +115,8 @@ export async function handleSocialRoutes(
         full_name: u.full_name,
         role: u.role,
         school_name: u.school_name || "Cộng đồng EduK12",
+        specialty: u.specialty || "",
+        is_verified: Number(u.is_verified || 0) === 1,
         post_count: pMap.get(u.id) || 0,
         follower_count: fMap.get(u.id) || 0,
         classroom_count: cMap.get(u.id) || 0,
@@ -190,8 +203,9 @@ export async function handleSocialRoutes(
     }
 
     const sql = `
-      SELECT p.*
+      SELECT p.*, COALESCE(tp.is_verified, 0) as author_verified
       FROM teacher_posts p
+      LEFT JOIN teacher_profiles tp ON tp.user_id = p.author_id
       ${where.length > 0 ? "WHERE " + where.join(" AND ") : ""}
       ORDER BY p.is_pinned DESC, p.created_at DESC
       LIMIT 60
@@ -250,6 +264,7 @@ export async function handleSocialRoutes(
         author_name: String(p.author_name),
         author_role: String(p.author_role || "teacher"),
         author_school: String(p.author_school || ""),
+        author_verified: Number(p.author_verified || 0) === 1,
         category: String(p.category || "lesson_share"),
         grade_id: Number(p.grade_id || 0),
         subject_code: String(p.subject_code || "chung"),

@@ -17,6 +17,7 @@ import {
   Lightbulb,
   MessageCircle,
   MessageSquarePlus,
+  Paperclip,
   Pin,
   Radio,
   Search,
@@ -24,6 +25,7 @@ import {
   ShieldCheck,
   Sparkles,
   Trash2,
+  Upload,
   UserCheck,
   UserPlus,
   Users,
@@ -32,6 +34,7 @@ import { CORE_API_URL } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 import { StudentShowcaseSection } from "@/components/social/StudentShowcaseSection";
 import { connectRealtimeChannel } from "@/lib/realtime";
+import { isImageFileUrl, resolveFileUrl, uploadRealFile, VerifiedBadge } from "@/components/VerifiedBadge";
 
 interface PostComment {
   id: string;
@@ -49,6 +52,7 @@ interface SocialPost {
   author_name: string;
   author_role: string;
   author_school: string;
+  author_verified?: boolean;
   category: string;
   grade_id: number;
   subject_code: string;
@@ -73,6 +77,7 @@ interface FeaturedTeacher {
   full_name: string;
   role: string;
   school_name: string;
+  is_verified?: boolean;
   post_count: number;
   follower_count: number;
   classroom_count: number;
@@ -177,6 +182,7 @@ export default function TeacherSocialPage() {
   const [attachLabel, setAttachLabel] = useState("");
   const [attachUrl, setAttachUrl] = useState("");
   const [tagsInput, setTagsInput] = useState("");
+  const [uploadingFile, setUploadingFile] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   // Comments inline state
@@ -621,6 +627,14 @@ export default function TeacherSocialPage() {
                 {user.school_name && (
                   <p className="text-[11px] font-medium text-slate-500">{user.school_name}</p>
                 )}
+                {isStaff && (
+                  <Link
+                    href={`/giao-vien?id=${encodeURIComponent(user.id)}`}
+                    className="block rounded-xl border border-sky-200 bg-sky-50 px-3 py-2 text-center text-[11px] font-extrabold text-sky-700 hover:bg-sky-100 transition"
+                  >
+                    Tường Hồ sơ &amp; Tích xanh của tôi →
+                  </Link>
+                )}
                 <div className="grid grid-cols-3 gap-2 border-t border-slate-100 pt-3 text-center">
                   <div>
                     <p className="text-sm font-extrabold text-slate-900">{stats?.my_posts_count ?? 0}</p>
@@ -818,11 +832,36 @@ export default function TeacherSocialPage() {
                     className="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-xs leading-relaxed focus:border-indigo-500 focus:outline-none"
                   />
 
-                  {/* Gắn nhanh tài nguyên */}
+                  {/* Gắn nhanh tài nguyên hoặc Upload tệp PDF / Word / Slide / Ảnh thật */}
                   <div className="space-y-2 rounded-xl bg-slate-50 p-3">
-                    <p className="text-[11px] font-bold text-slate-600">
-                      Đính kèm nhanh học liệu / lớp học (tùy chọn):
-                    </p>
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <p className="text-[11px] font-bold text-slate-600">
+                        Đính kèm tệp học liệu thật (PDF, Word, Slide, Ảnh ≤ 5MB) hoặc lối tắt:
+                      </p>
+                      <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-[11px] font-extrabold text-white shadow-xs hover:bg-emerald-500 transition">
+                        <Upload className="h-3.5 w-3.5" />
+                        {uploadingFile ? "Đang tải tệp lên..." : "Tải tệp từ máy tính"}
+                        <input
+                          type="file"
+                          accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.png,.jpg,.jpeg,.webp"
+                          className="hidden"
+                          onChange={async (e) => {
+                            const f = e.target.files?.[0];
+                            if (!f || !accessToken) return;
+                            setUploadingFile(true);
+                            const up = await uploadRealFile(f, accessToken, "teacher_post");
+                            setUploadingFile(false);
+                            if (up.ok && up.data) {
+                              setAttachLabel(up.data.filename);
+                              setAttachUrl(up.data.url);
+                              showNotice("ok", `Đã tải lên tệp: ${up.data.filename}`);
+                            } else {
+                              showNotice("err", up.error || "Không thể tải tệp lên");
+                            }
+                          }}
+                        />
+                      </label>
+                    </div>
                     <div className="flex flex-wrap gap-1.5">
                       {QUICK_ATTACHMENTS.map((qa) => (
                         <button
@@ -943,9 +982,13 @@ export default function TeacherSocialPage() {
                         </div>
                         <div className="min-w-0">
                           <div className="flex flex-wrap items-center gap-1.5">
-                            <span className="truncate text-sm font-extrabold text-slate-900">
+                            <Link
+                              href={`/giao-vien?id=${encodeURIComponent(post.author_id)}`}
+                              className="truncate text-sm font-extrabold text-slate-900 hover:text-indigo-600"
+                            >
                               {post.author_name}
-                            </span>
+                            </Link>
+                            {post.author_verified && <VerifiedBadge />}
                             <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${authorBadge.cls}`}>
                               {authorBadge.label}
                             </span>
@@ -1055,18 +1098,49 @@ export default function TeacherSocialPage() {
                       </p>
                     </div>
 
-                    {/* Đính kèm học liệu / Lớp học */}
+                    {/* Đính kèm học liệu / Tệp thật PDF, Word, Slide, Ảnh */}
                     {post.attachment_url && (
-                      <Link
-                        href={post.attachment_url}
-                        className="flex items-center justify-between gap-3 rounded-xl border border-indigo-200 bg-indigo-50/70 px-4 py-3 text-xs font-bold text-indigo-800 hover:bg-indigo-100 transition"
-                      >
-                        <span className="flex items-center gap-2">
-                          <BookOpen className="h-4 w-4 text-indigo-600 shrink-0" />
-                          {post.attachment_label || "Mở tài nguyên đính kèm"}
-                        </span>
-                        <ArrowUpRight className="h-4 w-4 shrink-0" />
-                      </Link>
+                      post.attachment_url.startsWith("/api/v1/files/") && isImageFileUrl(post.attachment_url) ? (
+                        <a
+                          href={resolveFileUrl(post.attachment_url)}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="block overflow-hidden rounded-2xl border border-slate-200 bg-slate-50"
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={resolveFileUrl(post.attachment_url)}
+                            alt={post.attachment_label || post.title}
+                            className="max-h-80 w-full object-contain bg-slate-950/5"
+                          />
+                        </a>
+                      ) : post.attachment_url.startsWith("/api/v1/files/") ? (
+                        <a
+                          href={resolveFileUrl(post.attachment_url)}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="flex items-center justify-between gap-3 rounded-xl border border-emerald-200 bg-emerald-50/70 px-4 py-3 text-xs font-bold text-emerald-800 hover:bg-emerald-100 transition"
+                        >
+                          <span className="flex items-center gap-2 min-w-0">
+                            <Paperclip className="h-4 w-4 text-emerald-600 shrink-0" />
+                            <span className="truncate">Tệp đính kèm: {post.attachment_label || "Tài liệu học tập"}</span>
+                          </span>
+                          <span className="shrink-0 rounded-lg bg-emerald-600 px-2.5 py-1 text-[10px] text-white">
+                            Mở / Tải về
+                          </span>
+                        </a>
+                      ) : (
+                        <Link
+                          href={post.attachment_url}
+                          className="flex items-center justify-between gap-3 rounded-xl border border-indigo-200 bg-indigo-50/70 px-4 py-3 text-xs font-bold text-indigo-800 hover:bg-indigo-100 transition"
+                        >
+                          <span className="flex items-center gap-2">
+                            <BookOpen className="h-4 w-4 text-indigo-600 shrink-0" />
+                            {post.attachment_label || "Mở tài nguyên đính kèm"}
+                          </span>
+                          <ArrowUpRight className="h-4 w-4 shrink-0" />
+                        </Link>
+                      )
                     )}
 
                     {/* Thanh tương tác */}
@@ -1193,7 +1267,13 @@ export default function TeacherSocialPage() {
                         {t.full_name.slice(0, 1).toUpperCase()}
                       </div>
                       <div className="min-w-0">
-                        <p className="truncate text-xs font-bold text-slate-900">{t.full_name}</p>
+                        <Link
+                          href={`/giao-vien?id=${encodeURIComponent(t.id)}`}
+                          className="flex items-center gap-1 truncate text-xs font-bold text-slate-900 hover:text-indigo-600"
+                        >
+                          <span className="truncate">{t.full_name}</span>
+                          {t.is_verified && <VerifiedBadge />}
+                        </Link>
                         <p className="truncate text-[10px] text-slate-500">{t.school_name}</p>
                         <p className="text-[10px] font-semibold text-slate-400">
                           {t.post_count} bài • {t.follower_count} theo dõi

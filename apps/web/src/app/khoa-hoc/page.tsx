@@ -22,6 +22,7 @@ import {
 import { CORE_API_URL } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 import { connectRealtimeChannel } from "@/lib/realtime";
+import { VerifiedBadge } from "@/components/VerifiedBadge";
 
 interface CourseModule {
   id: string;
@@ -48,6 +49,7 @@ interface CourseItem {
   teacher_id: string;
   teacher_name: string;
   teacher_school: string;
+  teacher_verified?: boolean;
   title: string;
   subject_name: string;
   grade_label: string;
@@ -408,7 +410,13 @@ export default function CoursesPage() {
               <h1 className="text-2xl font-extrabold sm:text-3xl leading-snug">{selectedCourse.title}</h1>
               <p className="text-xs leading-relaxed text-slate-200 sm:text-sm">{selectedCourse.summary}</p>
               <div className="flex flex-wrap items-center gap-4 pt-1 text-xs">
-                <span className="font-bold">Giảng viên: {selectedCourse.teacher_name}</span>
+                <Link
+                  href={`/giao-vien?id=${encodeURIComponent(selectedCourse.teacher_id)}`}
+                  className="inline-flex items-center gap-1 font-bold hover:underline"
+                >
+                  Giảng viên: {selectedCourse.teacher_name}
+                  {selectedCourse.teacher_verified && <VerifiedBadge />}
+                </Link>
                 <span className="inline-flex items-center gap-1 font-extrabold text-amber-300">
                   <Star className="h-4 w-4 fill-amber-300 text-amber-300" />
                   {selectedCourse.avg_rating > 0 ? selectedCourse.avg_rating.toFixed(1) : "Mới"} ({selectedCourse.review_count} đánh giá)
@@ -914,7 +922,13 @@ export default function CoursesPage() {
                     <span className="rounded-full bg-white/20 px-2.5 py-0.5">{c.grade_label}</span>
                   </div>
                   <h2 className="mt-3 line-clamp-2 text-base font-extrabold leading-snug">{c.title}</h2>
-                  <p className="mt-1 text-[11px] text-white/80">{c.teacher_name}</p>
+                  <Link
+                    href={`/giao-vien?id=${encodeURIComponent(c.teacher_id)}`}
+                    className="mt-1 inline-flex items-center gap-1 text-[11px] text-white/90 hover:underline"
+                  >
+                    <span>{c.teacher_name}</span>
+                    {c.teacher_verified && <VerifiedBadge />}
+                  </Link>
                 </div>
 
                 {/* Thông tin & Điểm 5 sao */}
