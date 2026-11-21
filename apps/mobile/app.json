@@ -32,6 +32,9 @@
       "apiBaseUrl": "https://eduk12-scale.eduk12-scale.workers.dev",
       "privacyPolicyUrl": "https://eduk12-scale.eduk12-scale.workers.dev/chinh-sach-bao-mat/",
       "termsUrl": "https://eduk12-scale.eduk12-scale.workers.dev/dieu-khoan/"
-    }
+    },
+    "plugins": [
+      "expo-asset"
+    ]
   }
 }

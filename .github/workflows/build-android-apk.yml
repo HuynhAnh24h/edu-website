@@ -1,0 +1,100 @@
+name: Build Free Android APK (Direct Download)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/mobile/**"
+      - ".github/workflows/build-android-apk.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/mobile
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Setup Java 17 (Android Gradle)
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - name: Install Mobile Dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: Typecheck TypeScript
+        run: npx tsc --noEmit
+
+      - name: Generate Native Android Project (Expo Prebuild)
+        run: npx expo prebuild --platform android --non-interactive --clean
+
+      - name: Generate Release Signing Keystore & Build Signed APK
+        working-directory: apps/mobile/android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleRelease -Porg.gradle.jvmargs="-Xmx3072m -XX:MaxMetaspaceSize=768m" --no-daemon
+
+      - name: Sign APK for Direct Android Installation
+        run: |
+          set -euo pipefail
+          APK_IN=$(find apps/mobile/android/app/build/outputs/apk/release -name "*.apk" | head -n 1)
+          if [ -z "$APK_IN" ]; then
+            echo "ERROR: No release APK found!"
+            exit 1
+          fi
+          echo "Found APK: $APK_IN"
+          mkdir -p dist-apk
+          # Ký bằng keystore chuẩn để điện thoại Android cài trực tiếp không bị lỗi 'App not installed'
+          BUILD_TOOLS=$(ls -d ${ANDROID_HOME}/build-tools/* | sort -V | tail -n 1)
+          keytool -genkeypair -v \
+            -keystore dist-apk/eduk12-community.jks \
+            -alias eduk12 \
+            -keyalg RSA -keysize 2048 -validity 10000 \
+            -storepass eduk12open -keypass eduk12open \
+            -dname "CN=EduK12 Open, OU=Community, O=EduK12, L=HoChiMinh, C=VN"
+          "$BUILD_TOOLS/zipalign" -f -p 4 "$APK_IN" dist-apk/aligned.apk
+          "$BUILD_TOOLS/apksigner" sign \
+            --ks dist-apk/eduk12-community.jks \
+            --ks-key-alias eduk12 \
+            --ks-pass pass:eduk12open \
+            --key-pass pass:eduk12open \
+            --out dist-apk/EduK12-Open-Android.apk \
+            dist-apk/aligned.apk
+          "$BUILD_TOOLS/apksigner" verify dist-apk/EduK12-Open-Android.apk
+          ls -lh dist-apk/EduK12-Open-Android.apk
+        working-directory: .
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: EduK12-Open-Android-APK
+          path: dist-apk/EduK12-Open-Android.apk
+
+      - name: Publish Direct Download Release on GitHub
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: mobile-apk-latest
+          name: "EduK12 Open — Bản cài đặt Android (.APK)"
+          body: |
+            Bản cài đặt trực tiếp ứng dụng **EduK12 Open** cho điện thoại Android (chưa cần tải qua CH Play).
+            - Đăng nhập học sinh & Bảo mật 2FA
+            - Học Tài liệu Lớp 1–12
+            - Tham gia Lớp học & Lớp Lập trình bằng Mã lớp
+            - Thi trắc nghiệm trực tuyến có lưu nháp offline
+          files: dist-apk/EduK12-Open-Android.apk
+          make_latest: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

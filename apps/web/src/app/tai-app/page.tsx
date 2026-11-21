@@ -100,19 +100,28 @@ export default function DownloadAppPage() {
             </p>
 
             <div className="flex flex-wrap gap-3 pt-1">
-              <button
-                type="button"
-                onClick={() => void handleAndroidInstall()}
+              <a
+                href="https://github.com/HuynhAnh24h/edu-website/releases/download/mobile-apk-latest/EduK12-Open-Android.apk"
+                target="_blank"
+                rel="noreferrer"
                 className="inline-flex items-center gap-2 rounded-2xl bg-emerald-500 px-6 py-3 text-sm font-extrabold text-slate-950 shadow-lg hover:bg-emerald-400 transition"
               >
                 <Download className="h-4 w-4" />
-                {installed ? "Đã cài đặt trên thiết bị này" : "Cài ngay cho Android (1 chạm)"}
+                Tải file Android (.APK) cài trực tiếp
+              </a>
+              <button
+                type="button"
+                onClick={() => void handleAndroidInstall()}
+                className="inline-flex items-center gap-2 rounded-2xl bg-indigo-500 px-5 py-3 text-sm font-bold text-white shadow hover:bg-indigo-400 transition"
+              >
+                <Smartphone className="h-4 w-4" />
+                {installed ? "Đã cài bản Web-App" : "Cài nhanh không cần file APK"}
               </button>
               <a
                 href="#ios-guide"
                 className="inline-flex items-center gap-2 rounded-2xl bg-white/10 px-5 py-3 text-sm font-bold text-white ring-1 ring-white/20 hover:bg-white/20 transition"
               >
-                <Share className="h-4 w-4" /> Hướng dẫn cài cho iPhone (iOS)
+                <Share className="h-4 w-4" /> Cài trên iPhone (iOS)
               </a>
             </div>
 
@@ -160,7 +169,7 @@ export default function DownloadAppPage() {
                 1
               </span>
               <span>
-                Mở trang này bằng trình duyệt <strong>Google Chrome</strong> (hoặc quét mã QR ở trên).
+                <strong>Cách 1 (Khuyên dùng — File cài đặt .APK):</strong> Bấm nút xanh <strong>&quot;Tải file Android (.APK) cài trực tiếp&quot;</strong> ở trên → mở file vừa tải về → chọn <strong>Cài đặt</strong> (nếu máy hỏi, chọn <em>Cho phép cài đặt từ nguồn này</em>).
               </span>
             </li>
             <li className="flex gap-3">
@@ -168,7 +177,7 @@ export default function DownloadAppPage() {
                 2
               </span>
               <span>
-                Bấm nút xanh <strong>&quot;Cài ngay cho Android&quot;</strong> ở trên (hoặc bấm dấu <strong>⋮</strong> góc trên phải → chọn <strong>Cài đặt ứng dụng</strong>).
+                <strong>Cách 2 (Không cần tải file):</strong> Bấm nút <strong>&quot;Cài nhanh không cần file APK&quot;</strong> ở trên (hoặc mở Chrome → bấm dấu <strong>⋮</strong> góc trên phải → <strong>Cài đặt ứng dụng</strong>).
               </span>
             </li>
             <li className="flex gap-3">
@@ -176,10 +185,21 @@ export default function DownloadAppPage() {
                 3
               </span>
               <span>
-                Biểu tượng <strong>Cú Bông EduK12</strong> xuất hiện ngay trên màn hình chính — mở lên học và thi toàn màn hình mượt mà!
+                Biểu tượng <strong>Cú Bông EduK12</strong> sẽ nằm ngay trên màn hình chính điện thoại — mở lên đăng nhập, học bài và làm bài thi mượt mà!
               </span>
             </li>
           </ol>
+          <p className="pt-1 text-[11px] text-slate-500">
+            Xem tất cả phiên bản phát hành mới nhất tại{" "}
+            <a
+              href="https://github.com/HuynhAnh24h/edu-website/releases"
+              target="_blank"
+              rel="noreferrer"
+              className="font-semibold text-emerald-700 hover:underline"
+            >
+              Trang phát hành bản cài đặt EduK12 →
+            </a>
+          </p>
         </div>
 
         {/* Card iOS */}
@@ -262,7 +282,7 @@ export default function DownloadAppPage() {
 
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4 text-xs text-slate-500">
           <span>
-            Sẵn sàng đưa lên <strong>Google Play &amp; App Store</strong> bằng mã nguồn ứng dụng di động tích hợp trong dự án (<code className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[11px]">apps/mobile</code>).
+            Bản tải trực tiếp dùng thử miễn phí 100% — bản chính thức trên <strong>CH Play &amp; App Store</strong> sẽ được cập nhật sớm!
           </span>
           <Link href="/dang-nhap" className="font-bold text-indigo-600 hover:underline">
             Đăng nhập tài khoản học sinh →
