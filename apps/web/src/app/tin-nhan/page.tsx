@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { CORE_API_URL } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
+import { connectRealtimeChannel, RealtimeHandle } from "@/lib/realtime";
 
 interface ChatContact {
   id: string;
@@ -66,6 +67,11 @@ function ChatPageInner() {
   const [reportCat, setReportCat] = useState<"sexual_harassment" | "violence" | "impersonation">("impersonation");
   const [reportReason, setReportReason] = useState("");
   const [reportMsg, setReportMsg] = useState("");
+  const [wsConnected, setWsConnected] = useState(false);
+  const [peerOnline, setPeerOnline] = useState(false);
+  const [peerTypingName, setPeerTypingName] = useState("");
+  const wsRef = useRef<RealtimeHandle | null>(null);
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const endRef = useRef<HTMLDivElement | null>(null);
 
   const loadContacts = useCallback(async () => {
@@ -100,12 +106,37 @@ function ChatPageInner() {
 
   useEffect(() => {
     void loadMessages();
-    if (!accessToken || !selectedId) return;
-    const timer = setInterval(() => {
-      void loadMessages();
-    }, 3500);
-    return () => clearInterval(timer);
-  }, [accessToken, selectedId, loadMessages]);
+    setPeerOnline(false);
+    setPeerTypingName("");
+    if (!accessToken || !selectedId || !user) return;
+
+    const roomKey = [user.id, selectedId].sort().join("__");
+    const conn = connectRealtimeChannel(`chat:${roomKey}`, accessToken, {
+      onStatus: setWsConnected,
+      onEvent: (ev) => {
+        if (ev.type === "chat_message" && ev.message) {
+          const incoming = ev.message as DirectMessage;
+          setMessages((prev) => (prev.some((m) => m.id === incoming.id) ? prev : [...prev, incoming]));
+          setPeerTypingName("");
+          void loadContacts();
+        } else if (ev.type === "presence" && Array.isArray(ev.online)) {
+          const onlineIds = (ev.online as { uid: string }[]).map((o) => o.uid);
+          setPeerOnline(onlineIds.includes(selectedId));
+        } else if (ev.type === "typing") {
+          if (ev.is_typing) {
+            setPeerTypingName(String(ev.name || "Đang nhập"));
+          } else {
+            setPeerTypingName("");
+          }
+        }
+      },
+    });
+    wsRef.current = conn;
+    return () => {
+      conn.close();
+      wsRef.current = null;
+    };
+  }, [accessToken, selectedId, user, loadMessages, loadContacts]);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -304,8 +335,18 @@ function ChatPageInner() {
                         {roleLabel(selectedContact.role).text}
                       </span>
                     </div>
-                    <p className="text-[11px] text-slate-500">
-                      {selectedContact.school_name || "Thành viên EduK12 Open"} • Tự động cập nhật trực tuyến
+                    <p className="flex items-center gap-1.5 text-[11px] text-slate-500">
+                      <span
+                        className={`inline-block h-2 w-2 rounded-full ${
+                          peerOnline ? "bg-emerald-500 animate-pulse" : wsConnected ? "bg-sky-400" : "bg-slate-300"
+                        }`}
+                      />
+                      {peerOnline
+                        ? "Đang trực tuyến (Real-time)"
+                        : wsConnected
+                          ? "Kết nối trực tiếp 24/7"
+                          : "Đang kết nối..."}
+                      {selectedContact.school_name ? ` • ${selectedContact.school_name}` : ""}
                     </p>
                   </div>
                 </div>
@@ -396,6 +437,13 @@ function ChatPageInner() {
                     );
                   })
                 )}
+                {peerTypingName && (
+                  <div className="flex justify-start">
+                    <div className="rounded-2xl border border-slate-200 bg-white px-3.5 py-2 text-[11px] italic text-slate-500">
+                      {peerTypingName} đang nhập tin nhắn...
+                    </div>
+                  </div>
+                )}
                 <div ref={endRef} />
               </div>
 
@@ -411,7 +459,14 @@ function ChatPageInner() {
               <form onSubmit={handleSend} className="flex items-center gap-2 border-t border-slate-200 bg-white p-3.5">
                 <input
                   value={draft}
-                  onChange={(e) => setDraft(e.target.value)}
+                  onChange={(e) => {
+                    setDraft(e.target.value);
+                    wsRef.current?.send({ type: "typing", is_typing: e.target.value.trim().length > 0 });
+                    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+                    typingTimeoutRef.current = setTimeout(() => {
+                      wsRef.current?.send({ type: "typing", is_typing: false });
+                    }, 2500);
+                  }}
                   placeholder={`Nhắn tin trực tuyến cho ${selectedContact.full_name}...`}
                   className="flex-1 rounded-xl border border-slate-300 px-4 py-2.5 text-xs focus:border-indigo-500 focus:outline-none"
                 />

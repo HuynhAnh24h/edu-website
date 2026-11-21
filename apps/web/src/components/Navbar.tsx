@@ -25,6 +25,7 @@ import {
 import { CORE_API_URL } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 import { CuBongLogoMark } from "@/components/BrandLogo";
+import { connectRealtimeChannel } from "@/lib/realtime";
 
 const STUDENT_MORE_LINKS = [
   { href: "/thi", label: "Thi trắc nghiệm", desc: "Luyện đề & chấm điểm tức thì", icon: ShieldCheck },
@@ -51,6 +52,12 @@ export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [notifications, setNotifications] = useState<UserNotification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [liveToast, setLiveToast] = useState<{
+    danger?: boolean;
+    title: string;
+    message: string;
+    link?: string;
+  } | null>(null);
 
   const loadNotifications = useCallback(async () => {
     if (!accessToken) {
@@ -74,10 +81,42 @@ export function Navbar() {
 
   useEffect(() => {
     void loadNotifications();
-    if (!accessToken) return;
-    const t = setInterval(() => void loadNotifications(), 15000);
-    return () => clearInterval(t);
-  }, [accessToken, loadNotifications]);
+    if (!accessToken || !user) return;
+    const conn = connectRealtimeChannel(`user:${user.id}`, accessToken, {
+      onEvent: (ev) => {
+        if (ev.type === "account_locked") {
+          setLiveToast({
+            danger: true,
+            title: String(ev.title || "Tài khoản đã bị khóa"),
+            message: String(ev.message || "Tài khoản của bạn đã bị khóa bởi Quản trị viên."),
+          });
+          void logout();
+          return;
+        }
+        if (ev.type === "notification") {
+          const isDanger = ev.notif_type === "safety_alert" || ev.notif_type === "warning";
+          setLiveToast({
+            danger: isDanger,
+            title: String(ev.title || "Thông báo mới"),
+            message: String(ev.message || ""),
+            link: String(ev.link || "/cong-dong"),
+          });
+          void loadNotifications();
+          setTimeout(() => setLiveToast(null), isDanger ? 9000 : 5000);
+        } else if (ev.type === "chat_notify") {
+          if (!pathname.startsWith("/tin-nhan")) {
+            setLiveToast({
+              title: `Tin nhắn mới từ ${String(ev.from_name || "Thành viên")}`,
+              message: String(ev.preview || ""),
+              link: `/tin-nhan?peer=${encodeURIComponent(String(ev.from_id || ""))}`,
+            });
+            setTimeout(() => setLiveToast(null), 5000);
+          }
+        }
+      },
+    });
+    return () => conn.close();
+  }, [accessToken, user, pathname, loadNotifications, logout]);
 
   const markAllRead = async () => {
     if (!accessToken) return;
@@ -470,6 +509,43 @@ export function Navbar() {
               </Link>
             )}
           </div>
+        </div>
+      )}
+      {/* Banner Thông báo Real-time bật tức thì góc trên phải */}
+      {liveToast && (
+        <div
+          className={`fixed top-20 right-4 z-50 w-80 rounded-2xl border p-4 shadow-2xl transition ${
+            liveToast.danger
+              ? "border-rose-400 bg-rose-600 text-white"
+              : "border-indigo-200 bg-white text-slate-900"
+          }`}
+        >
+          <div className="flex items-start justify-between gap-2">
+            <p className="text-xs font-extrabold">{liveToast.title}</p>
+            <button
+              type="button"
+              onClick={() => setLiveToast(null)}
+              className="text-xs font-bold opacity-80 hover:opacity-100"
+            >
+              ✕
+            </button>
+          </div>
+          {liveToast.message && (
+            <p className={`mt-1 text-[11px] leading-relaxed ${liveToast.danger ? "text-rose-100" : "text-slate-600"}`}>
+              {liveToast.message}
+            </p>
+          )}
+          {liveToast.link && (
+            <Link
+              href={liveToast.link}
+              onClick={() => setLiveToast(null)}
+              className={`mt-2 inline-block text-[11px] font-extrabold underline ${
+                liveToast.danger ? "text-white" : "text-indigo-600"
+              }`}
+            >
+              Xem ngay →
+            </Link>
+          )}
         </div>
       )}
     </header>

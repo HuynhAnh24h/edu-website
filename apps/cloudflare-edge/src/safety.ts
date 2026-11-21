@@ -1,4 +1,5 @@
 import { JwtClaims } from "./crypto";
+import { pushRealtimeEvent } from "./realtime";
 
 type JsonFn = (data: unknown, status?: number, extraHeaders?: Record<string, string>) => Response;
 
@@ -183,7 +184,8 @@ export async function notifyAdmins(
   db: D1Database,
   title: string,
   message: string,
-  link = "/quan-tri"
+  link = "/quan-tri",
+  hub?: DurableObjectNamespace
 ): Promise<void> {
   const admins = await db
     .prepare("SELECT id FROM users WHERE role IN ('super_admin', 'content_admin') AND is_active = 1")
@@ -203,6 +205,22 @@ export async function notifyAdmins(
       )
   );
   if (stmts.length > 0) await db.batch(stmts);
+
+  // Đẩy cảnh báo real-time tới tất cả Admin đang online!
+  if (hub) {
+    await Promise.all([
+      pushRealtimeEvent(hub, "admin:safety", { type: "safety_alert", title, message, link }),
+      ...admins.results.map((a) =>
+        pushRealtimeEvent(hub, `user:${a.id}`, {
+          type: "notification",
+          notif_type: "safety_alert",
+          title,
+          message,
+          link,
+        })
+      ),
+    ]);
+  }
 }
 
 export async function notifyUser(
@@ -211,7 +229,8 @@ export async function notifyUser(
   type: string,
   title: string,
   message: string,
-  link = ""
+  link = "",
+  hub?: DurableObjectNamespace
 ): Promise<void> {
   await db
     .prepare(
@@ -226,6 +245,16 @@ export async function notifyUser(
       link
     )
     .run();
+
+  if (hub) {
+    await pushRealtimeEvent(hub, `user:${userId}`, {
+      type: type === "account_locked" ? "account_locked" : "notification",
+      notif_type: type,
+      title,
+      message,
+      link,
+    });
+  }
 }
 
 export async function createSafetyIncident(
@@ -244,7 +273,8 @@ export async function createSafetyIncident(
     matched_keywords?: string[];
     content_snapshot: string;
     context?: Record<string, unknown>;
-  }
+  },
+  hub?: DurableObjectNamespace
 ): Promise<{ id: string; incident_code: string }> {
   const id = `inc-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
   const code = `EDU-${new Date().toISOString().slice(0, 10).replace(/-/g, "")}-${Math.random()
@@ -300,7 +330,8 @@ export async function createSafetyIncident(
     db,
     `[CẢNH BÁO ${code}] ${catLabel[params.category]}`,
     `Đối tượng: ${params.suspect_name} (${email || params.suspect_user_id}). Nguồn: ${params.source_type}. Vui lòng vào Trung tâm An toàn để gửi thông báo khóa tài khoản và xuất hồ sơ bằng chứng.`,
-    "/quan-tri"
+    "/quan-tri",
+    hub
   );
 
   return { id, incident_code: code };
@@ -371,7 +402,8 @@ export async function handleSafetyAndChatRoutes(
   method: string,
   url: URL,
   claims: JwtClaims | null,
-  jsonRes: JsonFn
+  jsonRes: JsonFn,
+  hub?: DurableObjectNamespace
 ): Promise<Response | null> {
   // Kiểm tra tài khoản đã bị khóa giữa chừng hay chưa cho các hành động ghi
   const verifyActiveUser = async (uid: string) => {
@@ -503,24 +535,28 @@ export async function handleSafetyAndChatRoutes(
     // === BOT QUÉT AN TOÀN TỰ ĐỘNG TRÊN MỌI TIN NHẮN CHAT ===
     const scan = scanContentWithSafetyBot(content);
     if (scan.flagged && scan.category) {
-      const inc = await createSafetyIncident(db, {
-        category: scan.category,
-        severity: scan.severity,
-        source_type: "direct_chat",
-        source_id: msgId,
-        suspect_user_id: me.id,
-        suspect_name: me.full_name,
-        suspect_email: me.email,
-        suspect_role: me.role,
-        matched_keywords: scan.matchedKeywords,
-        content_snapshot: content,
-        context: {
-          room_key: roomKey,
-          receiver_id: peer.id,
-          receiver_name: peer.full_name,
-          receiver_role: peer.role,
+      const inc = await createSafetyIncident(
+        db,
+        {
+          category: scan.category,
+          severity: scan.severity,
+          source_type: "direct_chat",
+          source_id: msgId,
+          suspect_user_id: me.id,
+          suspect_name: me.full_name,
+          suspect_email: me.email,
+          suspect_role: me.role,
+          matched_keywords: scan.matchedKeywords,
+          content_snapshot: content,
+          context: {
+            room_key: roomKey,
+            receiver_id: peer.id,
+            receiver_name: peer.full_name,
+            receiver_role: peer.role,
+          },
         },
-      });
+        hub
+      );
 
       const displayedContent = scan.blockImmediately
         ? "[BOT An toàn EduK12 đã chặn tin nhắn chứa dấu hiệu bạo lực/quấy rối và tự động gửi hồ sơ cảnh báo về Quản trị viên]"
@@ -546,24 +582,27 @@ export async function handleSafetyAndChatRoutes(
         )
         .run();
 
+      const msgPayload = {
+        id: msgId,
+        sender_id: me.id,
+        sender_name: me.full_name,
+        sender_role: me.role,
+        receiver_id: peer.id,
+        receiver_name: peer.full_name,
+        content: displayedContent,
+        is_flagged: 1,
+        is_blocked: scan.blockImmediately ? 1 : 0,
+        created_at: new Date().toISOString(),
+      };
+      await pushRealtimeEvent(hub, `chat:${roomKey}`, { type: "chat_message", message: msgPayload });
+
       return jsonRes(
         {
           blocked: scan.blockImmediately,
           flagged: true,
           incident_code: inc.incident_code,
           warning: `${scan.reason} Mã hồ sơ cảnh báo ${inc.incident_code} đã được chuyển tới Quản trị viên hệ thống!`,
-          message: {
-            id: msgId,
-            sender_id: me.id,
-            sender_name: me.full_name,
-            sender_role: me.role,
-            receiver_id: peer.id,
-            receiver_name: peer.full_name,
-            content: displayedContent,
-            is_flagged: 1,
-            is_blocked: scan.blockImmediately ? 1 : 0,
-            created_at: new Date().toISOString(),
-          },
+          message: msgPayload,
         },
         201
       );
@@ -577,22 +616,35 @@ export async function handleSafetyAndChatRoutes(
       .bind(msgId, roomKey, me.id, me.full_name, me.role, peer.id, peer.full_name, peer.role, content.slice(0, 2000))
       .run();
 
+    const cleanMsg = {
+      id: msgId,
+      sender_id: me.id,
+      sender_name: me.full_name,
+      sender_role: me.role,
+      receiver_id: peer.id,
+      receiver_name: peer.full_name,
+      content: content.slice(0, 2000),
+      is_flagged: 0,
+      is_blocked: 0,
+      created_at: new Date().toISOString(),
+    };
+
+    // Đẩy tin nhắn tức thì qua WebSocket tới phòng chat và người nhận!
+    await Promise.all([
+      pushRealtimeEvent(hub, `chat:${roomKey}`, { type: "chat_message", message: cleanMsg }),
+      pushRealtimeEvent(hub, `user:${peer.id}`, {
+        type: "chat_notify",
+        from_id: me.id,
+        from_name: me.full_name,
+        preview: cleanMsg.content.slice(0, 90),
+      }),
+    ]);
+
     return jsonRes(
       {
         blocked: false,
         flagged: false,
-        message: {
-          id: msgId,
-          sender_id: me.id,
-          sender_name: me.full_name,
-          sender_role: me.role,
-          receiver_id: peer.id,
-          receiver_name: peer.full_name,
-          content: content.slice(0, 2000),
-          is_flagged: 0,
-          is_blocked: 0,
-          created_at: new Date().toISOString(),
-        },
+        message: cleanMsg,
       },
       201
     );
@@ -671,17 +723,21 @@ export async function handleSafetyAndChatRoutes(
 
     const scan = scanContentWithSafetyBot(`${title}\n${description}`);
     if (scan.blockImmediately && scan.category) {
-      const inc = await createSafetyIncident(db, {
-        category: scan.category,
-        severity: scan.severity,
-        source_type: "student_showcase",
-        suspect_user_id: me.id,
-        suspect_name: me.full_name,
-        suspect_email: me.email,
-        suspect_role: me.role,
-        matched_keywords: scan.matchedKeywords,
-        content_snapshot: `${title}\n\n${description}`,
-      });
+      const inc = await createSafetyIncident(
+        db,
+        {
+          category: scan.category,
+          severity: scan.severity,
+          source_type: "student_showcase",
+          suspect_user_id: me.id,
+          suspect_name: me.full_name,
+          suspect_email: me.email,
+          suspect_role: me.role,
+          matched_keywords: scan.matchedKeywords,
+          content_snapshot: `${title}\n\n${description}`,
+        },
+        hub
+      );
       return jsonRes(
         {
           error: `${scan.reason} Bài đăng đã bị chặn và gửi cảnh báo (${inc.incident_code}) cho Quản trị viên.`,
@@ -719,6 +775,7 @@ export async function handleSafetyAndChatRoutes(
       )
       .run();
 
+    await pushRealtimeEvent(hub, "social:feed", { type: "showcase_update", id });
     return jsonRes({ id, message: "Đã đăng bài viết / sản phẩm thành công! Thầy cô đã có thể vào xem và đánh giá." }, 201);
   }
 
@@ -757,15 +814,19 @@ export async function handleSafetyAndChatRoutes(
       .bind(revId, subId, claims.uid, teacher?.full_name || claims.name, score, badge, feedback.slice(0, 2000))
       .run();
 
-    // Thông báo ngay cho học sinh khi thầy cô chấm điểm!
-    await notifyUser(
-      db,
-      sub.student_id,
-      "review",
-      `Thầy/Cô vừa đánh giá sản phẩm của em (${score}/10 — ${badge})`,
-      `${teacher?.full_name || "Giáo viên"} đã nhận xét bài "${sub.title}": ${feedback.slice(0, 140)}`,
-      "/cong-dong"
-    );
+    // Thông báo real-time ngay cho học sinh khi thầy cô chấm điểm!
+    await Promise.all([
+      notifyUser(
+        db,
+        sub.student_id,
+        "review",
+        `Thầy/Cô vừa đánh giá sản phẩm của em (${score}/10 — ${badge})`,
+        `${teacher?.full_name || "Giáo viên"} đã nhận xét bài "${sub.title}": ${feedback.slice(0, 140)}`,
+        "/cong-dong",
+        hub
+      ),
+      pushRealtimeEvent(hub, "social:feed", { type: "showcase_update", id: subId }),
+    ]);
 
     return jsonRes({ id: revId, message: "Đã gửi đánh giá & thông báo tới học sinh!" }, 201);
   }
@@ -822,20 +883,24 @@ export async function handleSafetyAndChatRoutes(
           : "medium";
 
     const reporter = await verifyActiveUser(claims.uid);
-    const inc = await createSafetyIncident(db, {
-      category,
-      severity,
-      source_type: body.source_type || "user_report",
-      source_id: body.source_id || "",
-      suspect_user_id: body.suspect_user_id || "unknown",
-      suspect_name: body.suspect_name || "Tài khoản bị báo cáo",
-      reporter_id: claims.uid,
-      reporter_name: reporter?.full_name || claims.name || "Thành viên báo cáo",
-      matched_keywords: [category],
-      content_snapshot: `[Lý do báo cáo]: ${(body.reason || "Vi phạm quy định cộng đồng").trim()}\n\n[Nội dung bằng chứng]:\n${(
-        body.content_snapshot || ""
-      ).trim()}`,
-    });
+    const inc = await createSafetyIncident(
+      db,
+      {
+        category,
+        severity,
+        source_type: body.source_type || "user_report",
+        source_id: body.source_id || "",
+        suspect_user_id: body.suspect_user_id || "unknown",
+        suspect_name: body.suspect_name || "Tài khoản bị báo cáo",
+        reporter_id: claims.uid,
+        reporter_name: reporter?.full_name || claims.name || "Thành viên báo cáo",
+        matched_keywords: [category],
+        content_snapshot: `[Lý do báo cáo]: ${(body.reason || "Vi phạm quy định cộng đồng").trim()}\n\n[Nội dung bằng chứng]:\n${(
+          body.content_snapshot || ""
+        ).trim()}`,
+      },
+      hub
+    );
 
     return jsonRes(
       {
@@ -913,12 +978,14 @@ export async function handleSafetyAndChatRoutes(
         `Cảnh cáo vi phạm quy định cộng đồng (${incidentCode})`,
         adminNote ||
           "Tài khoản của bạn bị ghi nhận nội dung không phù hợp chuẩn mực giáo dục. Nếu tái phạm, hệ thống sẽ khóa tài khoản vĩnh viễn.",
-        "/cong-dong"
+        "/cong-dong",
+        hub
       );
       await db
         .prepare("UPDATE safety_incidents SET status = 'warned', penalty_action = 'Đã gửi thông báo cảnh cáo', admin_note = ?, updated_at = datetime('now') WHERE id = ?")
         .bind(adminNote, incId)
         .run();
+      await pushRealtimeEvent(hub, "admin:safety", { type: "incident_updated", id: incId });
       return jsonRes({ ok: true, message: "Đã gửi thông báo cảnh cáo tới tài khoản vi phạm." });
     }
 
@@ -934,17 +1001,21 @@ export async function handleSafetyAndChatRoutes(
         `Đã gỡ giáo án kém chất lượng / lạc hậu (${incidentCode})`,
         adminNote ||
           "Bài chia sẻ/giáo án của bạn đã bị gỡ khỏi Mạng xã hội Giáo viên do không đạt chuẩn chất lượng GDPT 2018 hoặc quá sơ sài. Vui lòng rà soát lại nội dung trước khi đăng mới.",
-        "/cong-dong"
+        "/cong-dong",
+        hub
       );
       await db
         .prepare("UPDATE safety_incidents SET status = 'resolved', penalty_action = 'Đã gỡ giáo án kém chất lượng & cảnh cáo', admin_note = ?, updated_at = datetime('now') WHERE id = ?")
         .bind(adminNote, incId)
         .run();
+      await Promise.all([
+        pushRealtimeEvent(hub, "admin:safety", { type: "incident_updated", id: incId }),
+        pushRealtimeEvent(hub, "social:feed", { type: "social_update" }),
+      ]);
       return jsonRes({ ok: true, message: "Đã ẩn/gỡ giáo án kém chất lượng và gửi thông báo nhắc nhở." });
     }
 
     if (action === "revoke_impersonator") {
-      // Hình phạt nghiêm khắc kẻ mạo danh giáo viên: Thu hồi quyền Giáo viên + Gửi thông báo + Khóa acc!
       await notifyUser(
         db,
         suspectId,
@@ -952,7 +1023,8 @@ export async function handleSafetyAndChatRoutes(
         `THÔNG BÁO KHÓA TÀI KHOẢN — MẠO DANH GIÁO VIÊN (${incidentCode})`,
         adminNote ||
           "Hệ thống xác định tài khoản có hành vi mạo danh giáo viên. Quyền giáo viên đã bị thu hồi và tài khoản bị KHÓA VĨNH VIỄN. Toàn bộ dữ liệu liên quan được lưu giữ phục vụ cơ quan chức năng.",
-        ""
+        "",
+        hub
       );
       await db
         .prepare("UPDATE users SET role = 'student', is_active = 0 WHERE id = ? AND role != 'super_admin'")
@@ -966,6 +1038,7 @@ export async function handleSafetyAndChatRoutes(
         .prepare("UPDATE safety_incidents SET status = 'locked', penalty_action = 'Thu hồi quyền Giáo viên (Mạo danh) + Gửi thông báo + Khóa tài khoản', admin_note = ?, updated_at = datetime('now') WHERE id = ?")
         .bind(adminNote, incId)
         .run();
+      await pushRealtimeEvent(hub, "admin:safety", { type: "incident_updated", id: incId });
       return jsonRes({ ok: true, message: "Đã thu hồi quyền mạo danh, gửi thông báo và KHÓA tài khoản ngay lập tức!" });
     }
 
@@ -977,7 +1050,8 @@ export async function handleSafetyAndChatRoutes(
         `THÔNG BÁO KHÓA TÀI KHOẢN KHẨN CẤP (${incidentCode})`,
         adminNote ||
           "Tài khoản của bạn đã bị KHÓA do vi phạm nghiêm trọng chính sách bảo vệ học sinh (bạo lực / quấy rối / mạo danh). Hồ sơ bằng chứng đã được niêm phong trên hệ thống.",
-        ""
+        "",
+        hub
       );
       await db
         .prepare("UPDATE users SET is_active = 0 WHERE id = ? AND role != 'super_admin'")
@@ -987,11 +1061,11 @@ export async function handleSafetyAndChatRoutes(
         .prepare("UPDATE safety_incidents SET status = 'locked', penalty_action = 'Đã gửi thông báo khóa acc & khóa tài khoản ngay', admin_note = ?, updated_at = datetime('now') WHERE id = ?")
         .bind(adminNote, incId)
         .run();
+      await pushRealtimeEvent(hub, "admin:safety", { type: "incident_updated", id: incId });
       return jsonRes({ ok: true, message: "Đã gửi thông báo khóa tài khoản và KHÓA quyền đăng nhập ngay lập tức!" });
     }
 
     if (action === "escalate_police") {
-      // Đảm bảo đã gửi thông báo khóa acc & khóa tài khoản trước khi xuất hồ sơ công an
       await notifyUser(
         db,
         suspectId,
@@ -999,7 +1073,8 @@ export async function handleSafetyAndChatRoutes(
         `THÔNG BÁO KHÓA TÀI KHOẢN & CHUYỂN HỒ SƠ CƠ QUAN CÔNG AN (${incidentCode})`,
         adminNote ||
           "Tài khoản của bạn đã bị khóa vĩnh viễn do hành vi bạo lực/quấy rối/xâm hại nghiêm trọng. Toàn bộ hồ sơ bằng chứng điện tử đã được trích xuất bàn giao cơ quan Công an.",
-        ""
+        "",
+        hub
       );
       await db
         .prepare("UPDATE users SET is_active = 0 WHERE id = ? AND role != 'super_admin'")
@@ -1011,6 +1086,8 @@ export async function handleSafetyAndChatRoutes(
         .prepare("UPDATE safety_incidents SET status = 'escalated_police', penalty_action = ?, admin_note = ?, escalated_at = datetime('now'), updated_at = datetime('now') WHERE id = ?")
         .bind(updatedAction, adminNote, incId)
         .run();
+
+      await pushRealtimeEvent(hub, "admin:safety", { type: "incident_updated", id: incId });
 
       const recentMsgs = await db
         .prepare(

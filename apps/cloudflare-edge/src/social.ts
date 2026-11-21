@@ -1,6 +1,7 @@
 import { JwtClaims } from "./crypto";
 import { SUBJECT_NAMES } from "./seed";
 import { createSafetyIncident, scanContentWithSafetyBot } from "./safety";
+import { pushRealtimeEvent } from "./realtime";
 
 type JsonFn = (data: unknown, status?: number, extraHeaders?: Record<string, string>) => Response;
 
@@ -27,7 +28,8 @@ export async function handleSocialRoutes(
   method: string,
   url: URL,
   claims: JwtClaims | null,
-  jsonRes: JsonFn
+  jsonRes: JsonFn,
+  hub?: DurableObjectNamespace
 ): Promise<Response | null> {
   // 1. GET /api/v1/social/stats — Thống kê nhanh Mạng xã hội Giáo viên
   if (path === "/api/v1/social/stats" && method === "GET") {
@@ -325,18 +327,22 @@ export async function handleSocialRoutes(
     });
 
     if (scan.blockImmediately && scan.category) {
-      const inc = await createSafetyIncident(db, {
-        category: scan.category,
-        severity: scan.severity,
-        source_type: "teacher_post",
-        source_id: postId,
-        suspect_user_id: claims.uid,
-        suspect_name: author?.full_name || claims.name || "Giáo viên",
-        suspect_email: author?.email || claims.email,
-        suspect_role: author?.role || claims.role,
-        matched_keywords: scan.matchedKeywords,
-        content_snapshot: `${title}\n\n${content}`,
-      });
+      const inc = await createSafetyIncident(
+        db,
+        {
+          category: scan.category,
+          severity: scan.severity,
+          source_type: "teacher_post",
+          source_id: postId,
+          suspect_user_id: claims.uid,
+          suspect_name: author?.full_name || claims.name || "Giáo viên",
+          suspect_email: author?.email || claims.email,
+          suspect_role: author?.role || claims.role,
+          matched_keywords: scan.matchedKeywords,
+          content_snapshot: `${title}\n\n${content}`,
+        },
+        hub
+      );
       return jsonRes(
         {
           error: `${scan.reason} Bài đăng đã bị BOT chặn và gửi cảnh báo (${inc.incident_code}) về tài khoản Quản trị viên!`,
@@ -370,20 +376,25 @@ export async function handleSocialRoutes(
 
     // Nếu BOT phát hiện giáo án sơ sài / lạc hậu / nghi vấn mạo danh -> tạo cảnh báo để Admin kiểm tra
     if (scan.flagged && scan.category) {
-      await createSafetyIncident(db, {
-        category: scan.category,
-        severity: scan.severity,
-        source_type: "teacher_post",
-        source_id: postId,
-        suspect_user_id: claims.uid,
-        suspect_name: author?.full_name || claims.name || "Giáo viên",
-        suspect_email: author?.email || claims.email,
-        suspect_role: author?.role || claims.role,
-        matched_keywords: scan.matchedKeywords,
-        content_snapshot: `${title}\n\n${content}`,
-      });
+      await createSafetyIncident(
+        db,
+        {
+          category: scan.category,
+          severity: scan.severity,
+          source_type: "teacher_post",
+          source_id: postId,
+          suspect_user_id: claims.uid,
+          suspect_name: author?.full_name || claims.name || "Giáo viên",
+          suspect_email: author?.email || claims.email,
+          suspect_role: author?.role || claims.role,
+          matched_keywords: scan.matchedKeywords,
+          content_snapshot: `${title}\n\n${content}`,
+        },
+        hub
+      );
     }
 
+    await pushRealtimeEvent(hub, "social:feed", { type: "social_update", post_id: postId });
     return jsonRes({ id: postId, message: "Đã đăng bài chia sẻ lên Mạng xã hội Giáo viên!" }, 201);
   }
 
@@ -458,18 +469,22 @@ export async function handleSocialRoutes(
 
     const cmtScan = scanContentWithSafetyBot(content);
     if (cmtScan.blockImmediately && cmtScan.category) {
-      const inc = await createSafetyIncident(db, {
-        category: cmtScan.category,
-        severity: cmtScan.severity,
-        source_type: "post_comment",
-        source_id: postId,
-        suspect_user_id: claims.uid,
-        suspect_name: userRow?.full_name || claims.name || "Thành viên",
-        suspect_email: userRow?.email || claims.email,
-        suspect_role: userRow?.role || claims.role,
-        matched_keywords: cmtScan.matchedKeywords,
-        content_snapshot: content,
-      });
+      const inc = await createSafetyIncident(
+        db,
+        {
+          category: cmtScan.category,
+          severity: cmtScan.severity,
+          source_type: "post_comment",
+          source_id: postId,
+          suspect_user_id: claims.uid,
+          suspect_name: userRow?.full_name || claims.name || "Thành viên",
+          suspect_email: userRow?.email || claims.email,
+          suspect_role: userRow?.role || claims.role,
+          matched_keywords: cmtScan.matchedKeywords,
+          content_snapshot: content,
+        },
+        hub
+      );
       return jsonRes(
         {
           error: `${cmtScan.reason} Bình luận đã bị chặn và gửi cảnh báo (${inc.incident_code}) về Quản trị viên!`,
@@ -492,6 +507,8 @@ export async function handleSocialRoutes(
         content.slice(0, 1200)
       )
       .run();
+
+    await pushRealtimeEvent(hub, "social:feed", { type: "social_update", post_id: postId });
 
     return jsonRes(
       {

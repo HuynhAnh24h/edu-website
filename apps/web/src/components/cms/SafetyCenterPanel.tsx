@@ -14,6 +14,7 @@ import {
   UserX,
 } from "lucide-react";
 import { CORE_API_URL } from "@/lib/api";
+import { connectRealtimeChannel } from "@/lib/realtime";
 
 interface SafetyIncident {
   id: string;
@@ -99,6 +100,7 @@ export function SafetyCenterPanel({
   const [notes, setNotes] = useState<Record<string, string>>({});
   const [evidencePreview, setEvidencePreview] = useState<{ filename: string; text: string } | null>(null);
   const [actingId, setActingId] = useState<string | null>(null);
+  const [liveConnected, setLiveConnected] = useState(false);
 
   const loadIncidents = useCallback(async () => {
     if (!accessToken) return;
@@ -120,7 +122,20 @@ export function SafetyCenterPanel({
 
   useEffect(() => {
     void loadIncidents();
-  }, [loadIncidents]);
+    if (!accessToken) return;
+    const conn = connectRealtimeChannel("admin:safety", accessToken, {
+      onStatus: setLiveConnected,
+      onEvent: (ev) => {
+        if (ev.type === "safety_alert") {
+          onToast("err", `🚨 CẢNH BÁO REAL-TIME: ${String(ev.title || "Phát hiện vi phạm mới!")}`);
+          void loadIncidents();
+        } else if (ev.type === "incident_updated") {
+          void loadIncidents();
+        }
+      },
+    });
+    return () => conn.close();
+  }, [accessToken, loadIncidents, onToast]);
 
   const handleAction = async (
     inc: SafetyIncident,
@@ -195,13 +210,23 @@ export function SafetyCenterPanel({
             Quy trình chuẩn: (1) BOT tự động chặn &amp; niêm phong bằng chứng → (2) Admin gửi thông báo khóa tài khoản &amp; khóa acc → (3) Xuất Biên bản Hồ sơ Bằng chứng chuyển Cơ quan Công an.
           </p>
         </div>
-        <button
-          type="button"
-          onClick={() => void loadIncidents()}
-          className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2 text-xs font-bold text-slate-700 hover:bg-slate-100"
-        >
-          <RefreshCw className="h-3.5 w-3.5" /> Quét lại cảnh báo
-        </button>
+        <div className="flex items-center gap-2">
+          <span
+            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-bold ${
+              liveConnected ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200" : "bg-slate-100 text-slate-500"
+            }`}
+          >
+            <span className={`h-2 w-2 rounded-full ${liveConnected ? "bg-emerald-500 animate-pulse" : "bg-slate-400"}`} />
+            {liveConnected ? "Real-time trực tiếp" : "Đang kết nối..."}
+          </span>
+          <button
+            type="button"
+            onClick={() => void loadIncidents()}
+            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2 text-xs font-bold text-slate-700 hover:bg-slate-100"
+          >
+            <RefreshCw className="h-3.5 w-3.5" /> Quét lại
+          </button>
+        </div>
       </div>
 
       {/* Xem trước Biên bản Hồ sơ Bằng chứng gửi Công an */}

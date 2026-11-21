@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { CORE_API_URL } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
+import { connectRealtimeChannel } from "@/lib/realtime";
 
 interface SubmissionReview {
   id: string;
@@ -93,6 +94,17 @@ export function StudentShowcaseSection({
   useEffect(() => {
     void loadItems();
   }, [loadItems]);
+
+  useEffect(() => {
+    const conn = connectRealtimeChannel("social:feed", accessToken, {
+      onEvent: (ev) => {
+        if (ev.type === "showcase_update") {
+          void loadItems();
+        }
+      },
+    });
+    return () => conn.close();
+  }, [accessToken, loadItems]);
 
   const handleSubmitProject = async (e: React.FormEvent) => {
     e.preventDefault();

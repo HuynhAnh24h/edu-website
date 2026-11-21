@@ -31,6 +31,7 @@ import {
 import { CORE_API_URL } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 import { StudentShowcaseSection } from "@/components/social/StudentShowcaseSection";
+import { connectRealtimeChannel } from "@/lib/realtime";
 
 interface PostComment {
   id: string;
@@ -226,6 +227,18 @@ export default function TeacherSocialPage() {
   useEffect(() => {
     void loadAll();
   }, [loadAll]);
+
+  // Tự động cập nhật bảng tin Mạng xã hội theo thời gian thực qua WebSocket
+  useEffect(() => {
+    const conn = connectRealtimeChannel("social:feed", accessToken, {
+      onEvent: (ev) => {
+        if (ev.type === "social_update") {
+          void loadAll();
+        }
+      },
+    });
+    return () => conn.close();
+  }, [accessToken, loadAll]);
 
   const handleCreatePost = async (e: React.FormEvent) => {
     e.preventDefault();

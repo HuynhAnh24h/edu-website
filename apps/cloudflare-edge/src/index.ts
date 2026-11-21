@@ -13,12 +13,16 @@ import { handleAuthSecurityRoutes, issueSessionTokens } from "./auth-security";
 import { handleCodingRoutes } from "./coding";
 import { handleSocialRoutes } from "./social";
 import { handleSafetyAndChatRoutes } from "./safety";
+import { RealtimeHub } from "./realtime";
+
+export { RealtimeHub };
 
 export interface Env {
   DB: D1Database;
   EDU_KV: KVNamespace;
   AI: Ai;
   ASSETS: Fetcher;
+  REALTIME_HUB?: DurableObjectNamespace;
   JWT_SECRET?: string;
   GOOGLE_CLIENT_ID?: string;
   GOOGLE_CLIENT_SECRET?: string;
@@ -255,10 +259,62 @@ export default {
         if (codingResp) return codingResp;
       }
 
+      // === WEBSOCKET REAL-TIME GATEWAY (/api/v1/ws?channel=...&token=...) ===
+      if (path === "/api/v1/ws" && method === "GET") {
+        if (!env.REALTIME_HUB) {
+          return jsonRes({ error: "Kênh Real-time chưa được kích hoạt" }, 503);
+        }
+        if (request.headers.get("Upgrade")?.toLowerCase() !== "websocket") {
+          return jsonRes({ error: "Yêu cầu nâng cấp kết nối WebSocket" }, 426);
+        }
+        const channel = (url.searchParams.get("channel") || "").trim();
+        const token = (url.searchParams.get("token") || "").trim();
+        const claims = token ? await verifyJwt(token, getSecret(env)) : null;
+
+        // Phân quyền truy cập kênh WebSocket an toàn
+        if (channel === "social:feed") {
+          // Kênh bảng tin cộng đồng cho phép xem trực tiếp (cả khách & thành viên)
+        } else if (channel.startsWith("user:")) {
+          const targetUid = channel.slice(5);
+          if (!claims || claims.uid !== targetUid) {
+            return jsonRes({ error: "Không có quyền kết nối kênh thông báo này" }, 403);
+          }
+        } else if (channel.startsWith("chat:")) {
+          const roomKey = channel.slice(5);
+          const members = roomKey.split("__");
+          if (!claims || !members.includes(claims.uid)) {
+            return jsonRes({ error: "Không có quyền kết nối phòng chat này" }, 403);
+          }
+        } else if (channel === "admin:safety") {
+          if (!claims || (claims.role !== "super_admin" && claims.role !== "content_admin")) {
+            return jsonRes({ error: "Chỉ Quản trị viên mới được kết nối kênh cảnh báo An toàn" }, 403);
+          }
+        } else {
+          return jsonRes({ error: "Kênh WebSocket không hợp lệ" }, 400);
+        }
+
+        const id = env.REALTIME_HUB.idFromName(channel);
+        const stub = env.REALTIME_HUB.get(id);
+        const forwardUrl = new URL(request.url);
+        forwardUrl.searchParams.set("uid", claims?.uid || "guest");
+        forwardUrl.searchParams.set("name", claims?.name || "Khách");
+        forwardUrl.searchParams.set("role", claims?.role || "guest");
+        return stub.fetch(new Request(forwardUrl.toString(), request));
+      }
+
       // === MẠNG XÃ HỘI GIÁO VIÊN & KIỂM DUYỆT CỘNG ĐỒNG ===
       if (path.startsWith("/api/v1/social")) {
         const claims = await getClaims(request, env);
-        const socialResp = await handleSocialRoutes(request, env.DB, path, method, url, claims, jsonRes);
+        const socialResp = await handleSocialRoutes(
+          request,
+          env.DB,
+          path,
+          method,
+          url,
+          claims,
+          jsonRes,
+          env.REALTIME_HUB
+        );
         if (socialResp) return socialResp;
       }
 
@@ -271,7 +327,16 @@ export default {
         path.startsWith("/api/v1/notifications")
       ) {
         const claims = await getClaims(request, env);
-        const safetyResp = await handleSafetyAndChatRoutes(request, env.DB, path, method, url, claims, jsonRes);
+        const safetyResp = await handleSafetyAndChatRoutes(
+          request,
+          env.DB,
+          path,
+          method,
+          url,
+          claims,
+          jsonRes,
+          env.REALTIME_HUB
+        );
         if (safetyResp) return safetyResp;
       }
 
