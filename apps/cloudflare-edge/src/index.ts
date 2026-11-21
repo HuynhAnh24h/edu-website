@@ -12,6 +12,7 @@ import { handleClassroomRoutes } from "./classrooms";
 import { handleAuthSecurityRoutes, issueSessionTokens } from "./auth-security";
 import { handleCodingRoutes } from "./coding";
 import { handleSocialRoutes } from "./social";
+import { handleSafetyAndChatRoutes } from "./safety";
 
 export interface Env {
   DB: D1Database;
@@ -259,6 +260,19 @@ export default {
         const claims = await getClaims(request, env);
         const socialResp = await handleSocialRoutes(request, env.DB, path, method, url, claims, jsonRes);
         if (socialResp) return socialResp;
+      }
+
+      // === CHAT TRỰC TUYẾN 1-1, SẢN PHẨM HỌC SINH, BOT QUÉT AN TOÀN & XỬ LÝ VI PHẠM ===
+      if (
+        path.startsWith("/api/v1/chat") ||
+        path.startsWith("/api/v1/showcase") ||
+        path.startsWith("/api/v1/safety") ||
+        path.startsWith("/api/v1/admin/safety") ||
+        path.startsWith("/api/v1/notifications")
+      ) {
+        const claims = await getClaims(request, env);
+        const safetyResp = await handleSafetyAndChatRoutes(request, env.DB, path, method, url, claims, jsonRes);
+        if (safetyResp) return safetyResp;
       }
 
       // === HEALTH & TELEMETRY ===

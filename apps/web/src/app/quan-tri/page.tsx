@@ -38,6 +38,7 @@ import { ClassroomManager } from "@/components/cms/ClassroomManager";
 import { RichWordEditor } from "@/components/cms/RichWordEditor";
 import { UserManagementPanel } from "@/components/cms/UserManagementPanel";
 import { CommunityModerationPanel } from "@/components/cms/CommunityModerationPanel";
+import { SafetyCenterPanel } from "@/components/cms/SafetyCenterPanel";
 import { CuBongLogoMark } from "@/components/BrandLogo";
 import {
   createEmptyDraftQuestion,
@@ -88,6 +89,7 @@ type DashboardTab =
   | "questions"
   | "exams"
   | "import"
+  | "safety"
   | "community"
   | "users";
 
@@ -119,6 +121,10 @@ const TAB_META: Record<DashboardTab, { title: string; subtitle: string }> = {
   import: {
     title: "Nhập nhanh & Tách đề Thông minh",
     subtitle: "Nhập hàng loạt bài giảng/câu hỏi hoặc dán văn bản đề thi để hệ thống tự tách thành 3 phần.",
+  },
+  safety: {
+    title: "Trung tâm An toàn & BOT Quét Vi phạm",
+    subtitle: "Xử lý cảnh báo bạo lực, quấy rối tình dục, kẻ mạo danh giáo viên, giáo án kém chất lượng — khóa acc & xuất hồ sơ bằng chứng cho Công an.",
   },
   community: {
     title: "Kiểm duyệt Mạng Xã Hội Giáo Viên",
@@ -181,6 +187,7 @@ export default function CMSAdminPage() {
   const [totalLessons, setTotalLessons] = useState<number>(0);
   const [totalExams, setTotalExams] = useState<number>(0);
   const [totalGraded, setTotalGraded] = useState<number>(0);
+  const [openSafetyCount, setOpenSafetyCount] = useState<number>(0);
   const [myClassrooms, setMyClassrooms] = useState<DashboardClassroom[]>([]);
 
   // === Tab: Soạn Bài giảng kiểu Word + Câu hỏi đính kèm trực quan ===
@@ -258,6 +265,15 @@ export default function CMSAdminPage() {
       if (metRes.ok) {
         const d = await metRes.json();
         setTotalGraded(Number(d.total_graded || 0));
+      }
+      if (isAdmin) {
+        const safRes = await fetch(`${CORE_API_URL}/api/v1/admin/safety/incidents`, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        if (safRes.ok) {
+          const sd = await safRes.json();
+          setOpenSafetyCount(Number(sd.summary?.open_count || 0));
+        }
       }
     } catch {
       // ignore offline transient
@@ -571,6 +587,12 @@ export default function CMSAdminPage() {
           {
             groupLabel: "Quản trị Hệ thống (Admin)",
             items: [
+              {
+                id: "safety" as DashboardTab,
+                label: `BOT An toàn & Xử phạt${openSafetyCount > 0 ? ` (${openSafetyCount})` : ""}`,
+                desc: "Quấy rối, Mạo danh, Hồ sơ CA",
+                icon: ShieldAlert,
+              },
               {
                 id: "community" as DashboardTab,
                 label: "Kiểm duyệt MXH Giáo viên",
@@ -1521,7 +1543,16 @@ export default function CMSAdminPage() {
             />
           )}
 
-          {/* === TAB 6: KIỂM DUYỆT MẠNG XÃ HỘI GIÁO VIÊN (ADMIN) === */}
+          {/* === TAB 6A: TRUNG TÂM AN TOÀN & BOT QUÉT VI PHẠM (ADMIN) === */}
+          {activeTab === "safety" && isAdmin && (
+            <SafetyCenterPanel
+              accessToken={accessToken}
+              onToast={showToast}
+              onSummaryChange={setOpenSafetyCount}
+            />
+          )}
+
+          {/* === TAB 6B: KIỂM DUYỆT MẠNG XÃ HỘI GIÁO VIÊN (ADMIN) === */}
           {activeTab === "community" && isAdmin && (
             <CommunityModerationPanel accessToken={accessToken} onToast={showToast} />
           )}

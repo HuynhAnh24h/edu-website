@@ -60,6 +60,11 @@ export async function ensureSeeded(db: D1Database): Promise<void> {
     db.prepare(`CREATE TABLE IF NOT EXISTS teacher_post_bookmarks (post_id TEXT NOT NULL, user_id TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT (datetime('now')), PRIMARY KEY (post_id, user_id))`),
     db.prepare(`CREATE TABLE IF NOT EXISTS teacher_post_comments (id TEXT PRIMARY KEY, post_id TEXT NOT NULL, user_id TEXT NOT NULL, user_name TEXT NOT NULL, user_role TEXT NOT NULL DEFAULT 'teacher', content TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT (datetime('now')))`),
     db.prepare(`CREATE TABLE IF NOT EXISTS teacher_follows (follower_id TEXT NOT NULL, teacher_id TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT (datetime('now')), PRIMARY KEY (follower_id, teacher_id))`),
+    db.prepare(`CREATE TABLE IF NOT EXISTS direct_messages (id TEXT PRIMARY KEY, room_key TEXT NOT NULL, sender_id TEXT NOT NULL, sender_name TEXT NOT NULL, sender_role TEXT NOT NULL, receiver_id TEXT NOT NULL, receiver_name TEXT NOT NULL, receiver_role TEXT NOT NULL, content TEXT NOT NULL, is_flagged INTEGER NOT NULL DEFAULT 0, flag_reason TEXT DEFAULT '', is_blocked INTEGER NOT NULL DEFAULT 0, created_at TEXT NOT NULL DEFAULT (datetime('now')))`),
+    db.prepare(`CREATE TABLE IF NOT EXISTS student_submissions (id TEXT PRIMARY KEY, student_id TEXT NOT NULL, student_name TEXT NOT NULL, student_grade INTEGER NOT NULL DEFAULT 12, student_school TEXT DEFAULT '', submission_type TEXT NOT NULL DEFAULT 'software_project', subject_name TEXT NOT NULL DEFAULT 'Tin học / Lập trình', title TEXT NOT NULL, description TEXT NOT NULL, demo_url TEXT DEFAULT '', repo_url TEXT DEFAULT '', tech_stack TEXT DEFAULT '', status TEXT NOT NULL DEFAULT 'published', created_at TEXT NOT NULL DEFAULT (datetime('now')))`),
+    db.prepare(`CREATE TABLE IF NOT EXISTS student_submission_reviews (id TEXT PRIMARY KEY, submission_id TEXT NOT NULL, teacher_id TEXT NOT NULL, teacher_name TEXT NOT NULL, score REAL NOT NULL DEFAULT 9.0, badge TEXT NOT NULL DEFAULT 'Xuất sắc', feedback TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT (datetime('now')))`),
+    db.prepare(`CREATE TABLE IF NOT EXISTS safety_incidents (id TEXT PRIMARY KEY, incident_code TEXT UNIQUE NOT NULL, category TEXT NOT NULL, severity TEXT NOT NULL DEFAULT 'high', status TEXT NOT NULL DEFAULT 'open', source_type TEXT NOT NULL, source_id TEXT DEFAULT '', suspect_user_id TEXT NOT NULL, suspect_name TEXT NOT NULL, suspect_email TEXT DEFAULT '', suspect_role TEXT DEFAULT 'student', reporter_id TEXT DEFAULT 'safety_bot', reporter_name TEXT DEFAULT 'BOT Quét An toàn EduK12', matched_keywords TEXT DEFAULT '', content_snapshot TEXT NOT NULL, context_json TEXT DEFAULT '{}', admin_note TEXT DEFAULT '', penalty_action TEXT DEFAULT '', escalated_at TEXT, created_at TEXT NOT NULL DEFAULT (datetime('now')), updated_at TEXT NOT NULL DEFAULT (datetime('now')))`),
+    db.prepare(`CREATE TABLE IF NOT EXISTS user_notifications (id TEXT PRIMARY KEY, user_id TEXT NOT NULL, type TEXT NOT NULL DEFAULT 'info', title TEXT NOT NULL, message TEXT NOT NULL, link TEXT DEFAULT '', is_read INTEGER NOT NULL DEFAULT 0, created_at TEXT NOT NULL DEFAULT (datetime('now')))`),
   ]);
 
   // Luôn đảm bảo có sẵn 2 lớp học mẫu nếu bảng classrooms chưa có dữ liệu
@@ -326,6 +331,104 @@ export async function ensureSeeded(db: D1Database): Promise<void> {
       db.prepare("INSERT OR IGNORE INTO teacher_follows (follower_id, teacher_id) VALUES ('u-teacher-2', 'u-teacher-1')"),
       db.prepare("INSERT OR IGNORE INTO teacher_follows (follower_id, teacher_id) VALUES ('u-teacher-3', 'u-teacher-1')"),
       db.prepare("INSERT OR IGNORE INTO teacher_follows (follower_id, teacher_id) VALUES ('u-student-1', 'u-teacher-1')"),
+    ]);
+  }
+
+  // Seed Sản phẩm Phần mềm & Bài viết Học sinh mẫu + Chat mẫu Học sinh <-> Giáo viên
+  const subRow = await db.prepare("SELECT COUNT(*) as cnt FROM student_submissions").first<{ cnt: number }>();
+  if (!subRow || subRow.cnt === 0) {
+    await db.batch([
+      db
+        .prepare(
+          `INSERT OR IGNORE INTO student_submissions (id, student_id, student_name, student_grade, student_school, submission_type, subject_name, title, description, demo_url, repo_url, tech_stack, status)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'published')`
+        )
+        .bind(
+          "sub-app-flashcard",
+          "u-student-1",
+          "Nguyễn Minh Anh",
+          12,
+          "THPT Chu Văn An",
+          "software_project",
+          "Tin học / Lập trình",
+          "Ứng dụng Web Học Từ Vựng Tiếng Anh 12 bằng Flashcard (HTML/CSS/JS)",
+          "Em tự thiết kế ứng dụng thẻ ghi nhớ 300 từ vựng trọng tâm thi Tốt nghiệp THPT 2025+, có chế độ lật thẻ, đọc phát âm chuẩn và thống kê số từ đã thuộc theo ngày. Nhờ thầy cô xem góp ý giúp em cách tối ưu giao diện điện thoại ạ!",
+          "/lap-trinh",
+          "https://github.com/HuynhAnh24h/edu-website",
+          "HTML5, CSS3, JavaScript"
+        ),
+      db
+        .prepare(
+          `INSERT OR IGNORE INTO student_submissions (id, student_id, student_name, student_grade, student_school, submission_type, subject_name, title, description, demo_url, repo_url, tech_stack, status)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'published')`
+        )
+        .bind(
+          "sub-article-toan12",
+          "u-student-1",
+          "Nguyễn Minh Anh",
+          12,
+          "THPT Chu Văn An",
+          "student_article",
+          "Toán học",
+          "Bài viết tổng hợp: 3 lỗi sai hay gặp nhất khi xét dấu đạo hàm & cực trị",
+          "Sau khi làm 5 đề thi thử trên EduK12, em tổng hợp lại 3 bẫy hay mất điểm ở phần Đúng/Sai: (1) Quên kiểm tra điều kiện xác định của hàm phân thức, (2) Nhầm điểm làm f'(x)=0 nhưng không đổi dấu là cực trị, (3) Đọc nhầm đồ thị f'(x) thành f(x). Em mong thầy cô xem và bổ sung giúp em ạ.",
+          "/tai-lieu",
+          "",
+          "Toán 12 • Chương 1"
+        ),
+      db
+        .prepare(
+          `INSERT OR IGNORE INTO student_submission_reviews (id, submission_id, teacher_id, teacher_name, score, badge, feedback)
+           VALUES (?, ?, ?, ?, ?, ?, ?)`
+        )
+        .bind(
+          "rev-seed-1",
+          "sub-app-flashcard",
+          "u-teacher-3",
+          "Thầy Lê Hoàng Nam (GV Tin học)",
+          9.5,
+          "Xuất sắc",
+          "Ý tưởng rất thực tế và cấu trúc code sạch sẽ! Em có thể bổ sung thêm bộ lọc theo chủ đề Unit 1–10 và lưu tiến độ ôn tập để các bạn lớp 12 dùng lâu dài hơn nhé. Rất đáng khen!"
+        ),
+    ]);
+  }
+
+  const dmRow = await db.prepare("SELECT COUNT(*) as cnt FROM direct_messages").first<{ cnt: number }>();
+  if (!dmRow || dmRow.cnt === 0) {
+    const room = ["u-student-1", "u-teacher-1"].sort().join("__");
+    await db.batch([
+      db
+        .prepare(
+          `INSERT OR IGNORE INTO direct_messages (id, room_key, sender_id, sender_name, sender_role, receiver_id, receiver_name, receiver_role, content)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+        )
+        .bind(
+          "dm-seed-1",
+          room,
+          "u-student-1",
+          "Nguyễn Minh Anh",
+          "student",
+          "u-teacher-1",
+          "Thầy Nguyễn Văn Minh (GV Toán)",
+          "teacher",
+          "Em chào thầy ạ! Thầy cho em hỏi ở câu 2 phần Đúng/Sai đề Toán 12, khi hàm số có mẫu chứa x thì mình cần xét điều kiện xác định trước khi lập bảng biến thiên đúng không ạ?"
+        ),
+      db
+        .prepare(
+          `INSERT OR IGNORE INTO direct_messages (id, room_key, sender_id, sender_name, sender_role, receiver_id, receiver_name, receiver_role, content)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+        )
+        .bind(
+          "dm-seed-2",
+          room,
+          "u-teacher-1",
+          "Thầy Nguyễn Văn Minh (GV Toán)",
+          "teacher",
+          "u-student-1",
+          "Nguyễn Minh Anh",
+          "student",
+          "Đúng rồi em nhé! Bước 1 luôn phải tìm tập xác định D, sau đó đánh dấu gạch đôi tại điểm không xác định trên bảng biến thiên để tránh kết luận nhầm khoảng đồng biến."
+        ),
     ]);
   }
 

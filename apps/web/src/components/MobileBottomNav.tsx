@@ -7,6 +7,7 @@ import {
   Code2,
   Home,
   LayoutDashboard,
+  MessageCircle,
   Radio,
   ShieldCheck,
   Users,
@@ -20,24 +21,24 @@ export function MobileBottomNav() {
   const tabs = isTeacher
     ? [
         { href: "/cong-dong", label: "MXH GV", icon: Users },
+        { href: "/tin-nhan", label: "Tin nhắn", icon: MessageCircle },
         { href: "/lop-hoc", label: "Lớp dạy", icon: Radio },
         { href: "/tai-lieu", label: "Lớp 1–12", icon: BookOpen },
-        { href: "/lap-trinh", label: "Lập trình", icon: Code2 },
         { href: "/quan-tri", label: "Studio", icon: LayoutDashboard },
       ]
     : isAdmin
       ? [
           { href: "/cong-dong", label: "Cộng đồng", icon: Users },
           { href: "/quan-tri", label: "Quản trị", icon: ShieldCheck },
+          { href: "/tin-nhan", label: "Tin nhắn", icon: MessageCircle },
           { href: "/lop-hoc", label: "Lớp Live", icon: Radio },
           { href: "/tai-lieu", label: "Lớp 1–12", icon: BookOpen },
-          { href: "/thi", label: "Đề thi", icon: LayoutDashboard },
         ]
       : [
           { href: "/", label: "Trang chủ", icon: Home },
           { href: "/tai-lieu", label: "Lớp 1–12", icon: BookOpen },
-          { href: "/lap-trinh", label: "Lập trình", icon: Code2 },
-          { href: "/lop-hoc", label: "Lớp Live", icon: Radio },
+          { href: "/cong-dong", label: "Cộng đồng", icon: Users },
+          { href: "/tin-nhan", label: "Chat GV", icon: MessageCircle },
           { href: "/thi", label: "Thi thử", icon: ShieldCheck },
         ];
 

@@ -1,5 +1,6 @@
 import { JwtClaims } from "./crypto";
 import { SUBJECT_NAMES } from "./seed";
+import { createSafetyIncident, scanContentWithSafetyBot } from "./safety";
 
 type JsonFn = (data: unknown, status?: number, extraHeaders?: Record<string, string>) => Response;
 
@@ -312,11 +313,38 @@ export async function handleSocialRoutes(
       : [];
 
     const author = await db
-      .prepare("SELECT full_name, role, school_name FROM users WHERE id = ?")
+      .prepare("SELECT full_name, email, role, school_name FROM users WHERE id = ?")
       .bind(claims.uid)
-      .first<{ full_name: string; role: string; school_name: string }>();
+      .first<{ full_name: string; email: string; role: string; school_name: string }>();
 
     const postId = `post-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+
+    // === BOT QUÉT AN TOÀN & KIỂM ĐỊNH CHẤT LƯỢNG GIÁO ÁN ===
+    const scan = scanContentWithSafetyBot(`${title}\n${content}`, {
+      isLesson: category === "lesson_share" || category === "exam_share",
+    });
+
+    if (scan.blockImmediately && scan.category) {
+      const inc = await createSafetyIncident(db, {
+        category: scan.category,
+        severity: scan.severity,
+        source_type: "teacher_post",
+        source_id: postId,
+        suspect_user_id: claims.uid,
+        suspect_name: author?.full_name || claims.name || "Giáo viên",
+        suspect_email: author?.email || claims.email,
+        suspect_role: author?.role || claims.role,
+        matched_keywords: scan.matchedKeywords,
+        content_snapshot: `${title}\n\n${content}`,
+      });
+      return jsonRes(
+        {
+          error: `${scan.reason} Bài đăng đã bị BOT chặn và gửi cảnh báo (${inc.incident_code}) về tài khoản Quản trị viên!`,
+        },
+        400
+      );
+    }
+
     await db
       .prepare(
         `INSERT INTO teacher_posts (id, author_id, author_name, author_role, author_school, category, grade_id, subject_code, subject_name, title, content, attachment_label, attachment_url, tags_json, is_pinned, status)
@@ -339,6 +367,22 @@ export async function handleSocialRoutes(
         JSON.stringify(tags)
       )
       .run();
+
+    // Nếu BOT phát hiện giáo án sơ sài / lạc hậu / nghi vấn mạo danh -> tạo cảnh báo để Admin kiểm tra
+    if (scan.flagged && scan.category) {
+      await createSafetyIncident(db, {
+        category: scan.category,
+        severity: scan.severity,
+        source_type: "teacher_post",
+        source_id: postId,
+        suspect_user_id: claims.uid,
+        suspect_name: author?.full_name || claims.name || "Giáo viên",
+        suspect_email: author?.email || claims.email,
+        suspect_role: author?.role || claims.role,
+        matched_keywords: scan.matchedKeywords,
+        content_snapshot: `${title}\n\n${content}`,
+      });
+    }
 
     return jsonRes({ id: postId, message: "Đã đăng bài chia sẻ lên Mạng xã hội Giáo viên!" }, 201);
   }
@@ -408,9 +452,31 @@ export async function handleSocialRoutes(
     if (!content) return jsonRes({ error: "Nội dung bình luận không được trống" }, 400);
 
     const userRow = await db
-      .prepare("SELECT full_name, role FROM users WHERE id = ?")
+      .prepare("SELECT full_name, email, role FROM users WHERE id = ?")
       .bind(claims.uid)
-      .first<{ full_name: string; role: string }>();
+      .first<{ full_name: string; email: string; role: string }>();
+
+    const cmtScan = scanContentWithSafetyBot(content);
+    if (cmtScan.blockImmediately && cmtScan.category) {
+      const inc = await createSafetyIncident(db, {
+        category: cmtScan.category,
+        severity: cmtScan.severity,
+        source_type: "post_comment",
+        source_id: postId,
+        suspect_user_id: claims.uid,
+        suspect_name: userRow?.full_name || claims.name || "Thành viên",
+        suspect_email: userRow?.email || claims.email,
+        suspect_role: userRow?.role || claims.role,
+        matched_keywords: cmtScan.matchedKeywords,
+        content_snapshot: content,
+      });
+      return jsonRes(
+        {
+          error: `${cmtScan.reason} Bình luận đã bị chặn và gửi cảnh báo (${inc.incident_code}) về Quản trị viên!`,
+        },
+        400
+      );
+    }
 
     const id = `cmt-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
     await db

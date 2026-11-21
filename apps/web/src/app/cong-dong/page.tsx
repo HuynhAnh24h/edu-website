@@ -9,8 +9,10 @@ import {
   Check,
   Code2,
   FileText,
+  Flag,
   GraduationCap,
   Heart,
+  Laptop,
   LayoutDashboard,
   Lightbulb,
   MessageCircle,
@@ -28,6 +30,7 @@ import {
 } from "lucide-react";
 import { CORE_API_URL } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
+import { StudentShowcaseSection } from "@/components/social/StudentShowcaseSection";
 
 interface PostComment {
   id: string;
@@ -148,6 +151,14 @@ export default function TeacherSocialPage() {
   const [stats, setStats] = useState<SocialStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [notice, setNotice] = useState<{ type: "ok" | "err"; msg: string } | null>(null);
+  const [spaceTab, setSpaceTab] = useState<"teachers" | "showcase">("teachers");
+
+  // Report modal state
+  const [reportTarget, setReportTarget] = useState<SocialPost | null>(null);
+  const [reportCategory, setReportCategory] = useState<
+    "impersonation" | "low_quality_lesson" | "violence" | "sexual_harassment"
+  >("impersonation");
+  const [reportReason, setReportReason] = useState("");
 
   // Filters
   const [feedMode, setFeedMode] = useState<"all" | "following" | "saved" | "mine">("all");
@@ -380,6 +391,38 @@ export default function TeacherSocialPage() {
     }
   };
 
+  const handleReportSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!accessToken || !reportTarget) {
+      showNotice("err", "Vui lòng đăng nhập để gửi báo cáo vi phạm.");
+      return;
+    }
+    const res = await fetch(`${CORE_API_URL}/api/v1/safety/report`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({
+        category: reportCategory,
+        source_type: "teacher_post",
+        source_id: reportTarget.id,
+        suspect_user_id: reportTarget.author_id,
+        suspect_name: reportTarget.author_name,
+        reason: reportReason || "Báo cáo vi phạm từ Mạng xã hội Giáo viên",
+        content_snapshot: `${reportTarget.title}\n\n${reportTarget.content}`,
+      }),
+    });
+    const d = await res.json();
+    if (res.ok) {
+      showNotice("ok", d.message || "Đã gửi báo cáo vi phạm cho Quản trị viên!");
+      setReportTarget(null);
+      setReportReason("");
+    } else {
+      showNotice("err", d.error || "Không thể gửi báo cáo");
+    }
+  };
+
   return (
     <div className="space-y-6 pb-8">
       {/* Banner đầu trang Mạng xã hội Giáo viên */}
@@ -447,7 +490,103 @@ export default function TeacherSocialPage() {
         </div>
       )}
 
-      {/* Bố cục 3 cột chuẩn Mạng xã hội */}
+      {/* Chuyển đổi nhanh 2 Không gian: Bảng tin Giáo viên <-> Bài viết & Sản phẩm Học sinh */}
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-2 shadow-xs">
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => setSpaceTab("teachers")}
+            className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-extrabold transition ${
+              spaceTab === "teachers"
+                ? "bg-slate-900 text-white shadow-xs"
+                : "text-slate-600 hover:bg-slate-100"
+            }`}
+          >
+            <Users className="h-4 w-4" /> Bảng tin Giáo viên (Giáo án &amp; Đề thi)
+          </button>
+          <button
+            type="button"
+            onClick={() => setSpaceTab("showcase")}
+            className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-extrabold transition ${
+              spaceTab === "showcase"
+                ? "bg-indigo-600 text-white shadow-xs"
+                : "text-slate-600 hover:bg-slate-100"
+            }`}
+          >
+            <Laptop className="h-4 w-4" /> Sản phẩm Phần mềm &amp; Bài viết Học sinh
+          </button>
+        </div>
+
+        <Link
+          href="/tin-nhan"
+          className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2 text-xs font-bold text-emerald-800 hover:bg-emerald-100 transition"
+        >
+          <MessageCircle className="h-4 w-4 text-emerald-600" /> Chat trực tuyến Thầy Cô ↔ Học sinh
+        </Link>
+      </div>
+
+      {/* Modal Báo cáo Vi phạm (Mạo danh / Giáo án kém / Quấy rối / Bạo lực) */}
+      {reportTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-xs">
+          <form
+            onSubmit={handleReportSubmit}
+            className="w-full max-w-md rounded-2xl border border-rose-200 bg-white p-6 shadow-2xl space-y-4"
+          >
+            <div>
+              <h3 className="text-base font-extrabold text-rose-700">
+                Báo cáo vi phạm về cho Quản trị viên
+              </h3>
+              <p className="mt-1 text-xs text-slate-600">
+                Đối tượng: <strong>{reportTarget.author_name}</strong> — &quot;{reportTarget.title}&quot;
+              </p>
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-700">Loại vi phạm</label>
+              <select
+                value={reportCategory}
+                onChange={(e) => setReportCategory(e.target.value as typeof reportCategory)}
+                className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-bold"
+              >
+                <option value="impersonation">Mạo danh Giáo viên / Lừa đảo thu tiền</option>
+                <option value="low_quality_lesson">Giáo án cũ lạc hậu / Kém chất lượng</option>
+                <option value="sexual_harassment">Quấy rối tình dục / Nội dung nhạy cảm (Khẩn cấp)</option>
+                <option value="violence">Bạo lực / Đe dọa / Bắt nạt học đường (Khẩn cấp)</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-700">Mô tả chi tiết để Admin xử lý</label>
+              <textarea
+                required
+                rows={3}
+                value={reportReason}
+                onChange={(e) => setReportReason(e.target.value)}
+                placeholder="Nêu rõ dấu hiệu mạo danh, giáo án sai chương trình hoặc hành vi vi phạm..."
+                className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-xs"
+              />
+            </div>
+            <div className="flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setReportTarget(null)}
+                className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600"
+              >
+                Hủy
+              </button>
+              <button
+                type="submit"
+                className="rounded-xl bg-rose-600 px-4 py-2 text-xs font-bold text-white hover:bg-rose-500"
+              >
+                Gửi cảnh báo khẩn cho Admin
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {spaceTab === "showcase" ? (
+        <StudentShowcaseSection onNotice={showNotice} />
+      ) : (
+      /* Bố cục 3 cột chuẩn Mạng xã hội Giáo viên */
       <div className="grid gap-6 lg:grid-cols-12 items-start">
         {/* === CỘT TRÁI: HỒ SƠ CÁ NHÂN + BỘ LỌC BẢNG TIN === */}
         <aside className="space-y-4 lg:col-span-3 lg:sticky lg:top-20">
@@ -812,25 +951,45 @@ export default function TeacherSocialPage() {
 
                       <div className="flex items-center gap-1.5 shrink-0">
                         {!isOwn && (
-                          <button
-                            type="button"
-                            onClick={() => void handleToggleFollow(post.author_id)}
-                            className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-[11px] font-bold transition ${
-                              post.following_author
-                                ? "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                                : "bg-indigo-50 text-indigo-700 hover:bg-indigo-100"
-                            }`}
-                          >
-                            {post.following_author ? (
-                              <>
-                                <UserCheck className="h-3 w-3" /> Đang theo dõi
-                              </>
-                            ) : (
-                              <>
-                                <UserPlus className="h-3 w-3" /> Theo dõi
-                              </>
-                            )}
-                          </button>
+                          <>
+                            <Link
+                              href={`/tin-nhan?peer=${encodeURIComponent(post.author_id)}`}
+                              title="Nhắn tin trực tuyến với thầy/cô"
+                              className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-700 hover:bg-emerald-100 transition"
+                            >
+                              <MessageCircle className="h-3 w-3" /> Nhắn tin
+                            </Link>
+                            <button
+                              type="button"
+                              onClick={() => void handleToggleFollow(post.author_id)}
+                              className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-[11px] font-bold transition ${
+                                post.following_author
+                                  ? "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                                  : "bg-indigo-50 text-indigo-700 hover:bg-indigo-100"
+                              }`}
+                            >
+                              {post.following_author ? (
+                                <>
+                                  <UserCheck className="h-3 w-3" /> Đang theo dõi
+                                </>
+                              ) : (
+                                <>
+                                  <UserPlus className="h-3 w-3" /> Theo dõi
+                                </>
+                              )}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setReportTarget(post);
+                                setReportCategory("low_quality_lesson");
+                              }}
+                              title="Báo cáo mạo danh / giáo án kém / vi phạm"
+                              className="rounded-lg p-1.5 text-slate-400 hover:bg-rose-50 hover:text-rose-600"
+                            >
+                              <Flag className="h-3.5 w-3.5" />
+                            </button>
+                          </>
                         )}
                         {isAdmin && (
                           <button
@@ -1104,6 +1263,7 @@ export default function TeacherSocialPage() {
           </div>
         </aside>
       </div>
+      )}
     </div>
   );
 }

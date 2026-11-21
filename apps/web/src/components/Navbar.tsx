@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
+  Bell,
   BookOpen,
   Bot,
   CheckSquare,
@@ -14,12 +15,14 @@ import {
   LogIn,
   LogOut,
   Menu,
+  MessageCircle,
   Radio,
   ShieldCheck,
   Smartphone,
   Users,
   X,
 } from "lucide-react";
+import { CORE_API_URL } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 import { CuBongLogoMark } from "@/components/BrandLogo";
 
@@ -29,34 +32,84 @@ const STUDENT_MORE_LINKS = [
   { href: "/ai-gia-su", label: "AI Gia sư 24/7", desc: "Hướng dẫn học từng bước", icon: Bot },
 ];
 
+interface UserNotification {
+  id: string;
+  type: string;
+  title: string;
+  message: string;
+  link: string;
+  is_read: number;
+  created_at: string;
+}
+
 export function Navbar() {
   const pathname = usePathname();
-  const { user, isTeacher, isAdmin, isStaff, logout } = useAuth();
+  const { user, accessToken, isTeacher, isAdmin, isStaff, logout } = useAuth();
   const [moreOpen, setMoreOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [notifications, setNotifications] = useState<UserNotification[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  const loadNotifications = useCallback(async () => {
+    if (!accessToken) {
+      setNotifications([]);
+      setUnreadCount(0);
+      return;
+    }
+    try {
+      const res = await fetch(`${CORE_API_URL}/api/v1/notifications`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      if (res.ok) {
+        const d = await res.json();
+        setNotifications(d.notifications || []);
+        setUnreadCount(d.unread_count || 0);
+      }
+    } catch {
+      // ignore offline
+    }
+  }, [accessToken]);
+
+  useEffect(() => {
+    void loadNotifications();
+    if (!accessToken) return;
+    const t = setInterval(() => void loadNotifications(), 15000);
+    return () => clearInterval(t);
+  }, [accessToken, loadNotifications]);
+
+  const markAllRead = async () => {
+    if (!accessToken) return;
+    setUnreadCount(0);
+    setNotifications((prev) => prev.map((n) => ({ ...n, is_read: 1 })));
+    await fetch(`${CORE_API_URL}/api/v1/notifications/read`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${accessToken}` },
+    }).catch(() => {});
+  };
 
   // Phân tách menu điều hướng mượt mà theo đúng vai trò (Giáo viên / Admin / Học sinh)
   const mainLinks = isTeacher
     ? [
-        { href: "/cong-dong", label: "Mạng XH Giáo viên", icon: Users },
-        { href: "/lop-hoc", label: "Lớp đang dạy", icon: Radio },
+        { href: "/cong-dong", label: "MXH Giáo viên", icon: Users },
+        { href: "/tin-nhan", label: "Tin nhắn", icon: MessageCircle },
+        { href: "/lop-hoc", label: "Lớp dạy", icon: Radio },
         { href: "/tai-lieu", label: "Kho 1–12", icon: BookOpen },
-        { href: "/lap-trinh", label: "Lập trình", icon: Code2 },
       ]
     : isAdmin
       ? [
-          { href: "/cong-dong", label: "Mạng XH Giáo viên", icon: Users },
-          { href: "/tai-lieu", label: "Kho 1–12", icon: BookOpen },
+          { href: "/cong-dong", label: "MXH Giáo viên", icon: Users },
+          { href: "/tin-nhan", label: "Tin nhắn", icon: MessageCircle },
           { href: "/lop-hoc", label: "Lớp Live", icon: Radio },
-          { href: "/lap-trinh", label: "Lập trình", icon: Code2 },
+          { href: "/tai-lieu", label: "Kho 1–12", icon: BookOpen },
         ]
       : [
           { href: "/", label: "Trang chủ" },
           { href: "/tai-lieu", label: "Lớp 1–12", icon: BookOpen },
           { href: "/lap-trinh", label: "Lập trình", icon: Code2 },
-          { href: "/lop-hoc", label: "Lớp Live", icon: Radio },
           { href: "/cong-dong", label: user ? "Góc Thầy Cô" : "MXH Giáo viên", icon: Users },
+          { href: "/tin-nhan", label: "Chat Thầy Cô", icon: MessageCircle },
         ];
 
   const isMoreActive = STUDENT_MORE_LINKS.some((l) => pathname.startsWith(l.href));
@@ -81,7 +134,7 @@ export function Navbar() {
               {isTeacher
                 ? "Mạng Xã Hội & Studio Giáo viên"
                 : isAdmin
-                  ? "Cổng Quản trị Hệ thống"
+                  ? "Cổng Quản trị & An toàn"
                   : "Học K–12 & Lập trình Cộng đồng"}
             </p>
           </div>
@@ -109,7 +162,7 @@ export function Navbar() {
             );
           })}
 
-          {/* Dropdown Luyện thi & AI cho Học sinh / Khách */}
+          {/* Dropdown Lớp Live, Thi & AI cho Học sinh / Khách */}
           {!isAdmin && (
             <div className="relative">
               <button
@@ -117,22 +170,26 @@ export function Navbar() {
                 onClick={() => {
                   setMoreOpen((v) => !v);
                   setUserMenuOpen(false);
+                  setNotifOpen(false);
                 }}
                 className={`inline-flex items-center gap-1 rounded-xl px-3 py-2 text-sm font-semibold transition ${
-                  isMoreActive
+                  isMoreActive || pathname.startsWith("/lop-hoc")
                     ? "bg-indigo-50 text-indigo-700"
                     : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
                 }`}
               >
-                <span>Thi &amp; AI</span>
+                <span>Thi &amp; Live</span>
                 <ChevronDown className={`h-3.5 w-3.5 transition ${moreOpen ? "rotate-180" : ""}`} />
               </button>
 
               {moreOpen && (
                 <>
                   <div className="fixed inset-0 z-10" onClick={() => setMoreOpen(false)} />
-                  <div className="absolute right-0 z-20 mt-2 w-60 overflow-hidden rounded-2xl border border-slate-200 bg-white p-1.5 shadow-xl">
-                    {STUDENT_MORE_LINKS.map((m) => {
+                  <div className="absolute right-0 z-20 mt-2 w-64 overflow-hidden rounded-2xl border border-slate-200 bg-white p-1.5 shadow-xl">
+                    {[
+                      { href: "/lop-hoc", label: "Lớp học & Phòng Live", desc: "Học trực tiếp & điểm danh", icon: Radio },
+                      ...STUDENT_MORE_LINKS,
+                    ].map((m) => {
                       const Icon = m.icon;
                       return (
                         <Link
@@ -158,7 +215,7 @@ export function Navbar() {
           )}
         </nav>
 
-        {/* Góc phải: Tải App + Nút không gian chuyên biệt cho GV/Admin + Tài khoản */}
+        {/* Góc phải: Tải App + Chuông Thông báo/Cảnh báo + Nút GV/Admin + Tài khoản */}
         <div className="flex items-center gap-2">
           {!isStaff && (
             <Link
@@ -194,6 +251,74 @@ export function Navbar() {
             </Link>
           )}
 
+          {/* Chuông Thông báo (Cảnh báo BOT cho Admin / Điểm đánh giá cho Học sinh) */}
+          {user && (
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => {
+                  const next = !notifOpen;
+                  setNotifOpen(next);
+                  setUserMenuOpen(false);
+                  setMoreOpen(false);
+                  if (next && unreadCount > 0) void markAllRead();
+                }}
+                className="relative flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 transition"
+                aria-label="Thông báo"
+              >
+                <Bell className="h-4 w-4" />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-rose-600 px-1 text-[9px] font-extrabold text-white">
+                    {unreadCount > 9 ? "9+" : unreadCount}
+                  </span>
+                )}
+              </button>
+
+              {notifOpen && (
+                <>
+                  <div className="fixed inset-0 z-10" onClick={() => setNotifOpen(false)} />
+                  <div className="absolute right-0 z-20 mt-2 w-80 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
+                    <div className="flex items-center justify-between border-b border-slate-100 px-4 py-2.5">
+                      <p className="text-xs font-extrabold text-slate-900">Thông báo &amp; Cảnh báo</p>
+                      <span className="text-[10px] text-slate-400">{notifications.length} gần nhất</span>
+                    </div>
+                    <div className="max-h-80 divide-y divide-slate-100 overflow-y-auto">
+                      {notifications.length === 0 ? (
+                        <p className="p-6 text-center text-xs text-slate-400">
+                          Chưa có thông báo mới.
+                        </p>
+                      ) : (
+                        notifications.map((n) => (
+                          <Link
+                            key={n.id}
+                            href={n.link || "/cong-dong"}
+                            onClick={() => setNotifOpen(false)}
+                            className={`block px-4 py-3 text-xs hover:bg-slate-50 transition ${
+                              n.type === "safety_alert" || n.type === "account_locked"
+                                ? "bg-rose-50/50"
+                                : ""
+                            }`}
+                          >
+                            <p
+                              className={`font-extrabold ${
+                                n.type === "safety_alert" || n.type === "account_locked"
+                                  ? "text-rose-700"
+                                  : "text-slate-900"
+                              }`}
+                            >
+                              {n.title}
+                            </p>
+                            <p className="mt-0.5 line-clamp-2 text-[11px] text-slate-600">{n.message}</p>
+                          </Link>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+
           {user ? (
             <div className="relative">
               <button
@@ -201,6 +326,7 @@ export function Navbar() {
                 onClick={() => {
                   setUserMenuOpen((v) => !v);
                   setMoreOpen(false);
+                  setNotifOpen(false);
                 }}
                 className="flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 py-1 pr-3 pl-1.5 text-xs font-bold text-slate-800 hover:bg-slate-100 transition"
               >
@@ -211,7 +337,7 @@ export function Navbar() {
                 >
                   {user.full_name.slice(0, 1).toUpperCase()}
                 </span>
-                <span className="hidden max-w-[110px] truncate sm:inline">{user.full_name}</span>
+                <span className="hidden max-w-[100px] truncate sm:inline">{user.full_name}</span>
                 <ChevronDown className="h-3.5 w-3.5 text-slate-400" />
               </button>
 
@@ -235,7 +361,15 @@ export function Navbar() {
                       className="mt-1 flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
                     >
                       <Users className="h-3.5 w-3.5 text-indigo-600" />
-                      {isStaff ? "Mạng Xã Hội Giáo Viên" : "Góc Chia sẻ Thầy Cô"}
+                      {isStaff ? "Mạng Xã Hội Giáo Viên" : "Góc Thầy Cô & Sản phẩm HS"}
+                    </Link>
+
+                    <Link
+                      href="/tin-nhan"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                    >
+                      <MessageCircle className="h-3.5 w-3.5 text-emerald-600" /> Chat Trực tuyến
                     </Link>
 
                     {isStaff && (
@@ -245,7 +379,7 @@ export function Navbar() {
                         className="flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-emerald-700 hover:bg-emerald-50"
                       >
                         <LayoutDashboard className="h-3.5 w-3.5" />
-                        {isAdmin ? "Trung tâm Quản trị Admin" : "Studio Giảng dạy"}
+                        {isAdmin ? "Trung tâm Quản trị & An toàn" : "Studio Giảng dạy"}
                       </Link>
                     )}
 
@@ -307,6 +441,7 @@ export function Navbar() {
           <div className="grid gap-1">
             {[
               ...mainLinks,
+              { href: "/lop-hoc", label: "Lớp học & Phòng Live" },
               ...STUDENT_MORE_LINKS,
               { href: "/tai-app", label: "Tải App Mobile (Android & iOS)" },
             ].map((item) => (
@@ -331,7 +466,7 @@ export function Navbar() {
                   isAdmin ? "bg-rose-600" : "bg-emerald-600"
                 }`}
               >
-                {isAdmin ? "Mở Trung tâm Quản trị Admin" : "Mở Studio Giảng dạy"}
+                {isAdmin ? "Mở Trung tâm Quản trị & An toàn" : "Mở Studio Giảng dạy"}
               </Link>
             )}
           </div>

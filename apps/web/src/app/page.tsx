@@ -212,7 +212,13 @@ export default function LandingPage() {
                     href="/cong-dong"
                     className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold text-slate-800 hover:bg-slate-50 transition"
                   >
-                    <Users className="h-4 w-4 text-amber-600" /> Góc Thầy Cô
+                    <Users className="h-4 w-4 text-amber-600" /> Góc Thầy Cô &amp; Sản phẩm
+                  </Link>
+                  <Link
+                    href="/tin-nhan"
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-xs font-bold text-emerald-800 hover:bg-emerald-100 transition"
+                  >
+                    <HeartHandshake className="h-4 w-4 text-emerald-600" /> Chat hỏi Thầy Cô
                   </Link>
                 </>
               )}
