@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { CORE_API_URL, Lesson } from "@/lib/api";
 import { MathContent } from "@/components/MathContent";
+import { getSubjectMeta, SUBJECT_ORDER } from "@/lib/subjects";
 
 interface SummaryRow {
   grade_id: number;
@@ -36,9 +37,10 @@ const TEXTBOOK_LABELS: Record<string, string> = {
 function MaterialsTreeContent() {
   const searchParams = useSearchParams();
   const initialGrade = Number(searchParams.get("grade")) || 12;
+  const initialSubject = searchParams.get("subject") || "all";
 
   const [selectedGrade, setSelectedGrade] = useState<number>(initialGrade);
-  const [selectedSubject, setSelectedSubject] = useState<string>("all");
+  const [selectedSubject, setSelectedSubject] = useState<string>(initialSubject);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [summaryRows, setSummaryRows] = useState<SummaryRow[]>([]);
   const [totalLessonsAll, setTotalLessonsAll] = useState<number>(0);
@@ -63,10 +65,14 @@ function MaterialsTreeContent() {
       .catch(() => {});
   }, []);
 
-  // Các môn học hiện có của khối lớp đang chọn
+  // Các môn học hiện có của khối lớp đang chọn (sắp xếp theo thứ tự chuẩn)
   const subjectsForGrade = useMemo(() => {
     const rows = summaryRows.filter((r) => r.grade_id === selectedGrade);
-    return rows;
+    return rows.sort(
+      (a, b) =>
+        (SUBJECT_ORDER.indexOf(a.subject_code) === -1 ? 99 : SUBJECT_ORDER.indexOf(a.subject_code)) -
+        (SUBJECT_ORDER.indexOf(b.subject_code) === -1 ? 99 : SUBJECT_ORDER.indexOf(b.subject_code))
+    );
   }, [summaryRows, selectedGrade]);
 
   // 2. Tải mục lục gọn nhẹ (mode=index) cho Lớp + Môn đang chọn
@@ -209,37 +215,50 @@ function MaterialsTreeContent() {
           })}
         </div>
 
-        {/* Thanh chọn Môn học thuộc khối lớp đang chọn */}
-        <div className="flex flex-wrap items-center gap-1.5 border-t border-slate-100 pt-2.5">
-          <span className={`rounded-lg border px-2.5 py-1 text-[11px] font-bold ${gradeLevelColor(selectedGrade)}`}>
-            {selectedGrade <= 5 ? "Tiểu học" : selectedGrade <= 9 ? "THCS" : "THPT"} • Lớp {selectedGrade}
-          </span>
-
-          <button
-            onClick={() => setSelectedSubject("all")}
-            className={`rounded-lg px-3 py-1 text-xs font-semibold transition ${
-              selectedSubject === "all"
-                ? "bg-slate-900 text-white"
-                : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-            }`}
-          >
-            Tất cả môn ({subjectsForGrade.reduce((a, b) => a + b.lesson_count, 0) || lessonIndex.length})
-          </button>
-
-          {subjectsForGrade.map((sub) => (
+        {/* Lưới Thẻ Các Môn Học Trực Quan thuộc khối lớp đang chọn */}
+        <div className="space-y-2.5 border-t border-slate-100 pt-3">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <span className={`rounded-lg border px-2.5 py-1 text-[11px] font-bold ${gradeLevelColor(selectedGrade)}`}>
+              {selectedGrade <= 5 ? "Tiểu học" : selectedGrade <= 9 ? "THCS" : "THPT"} • Lớp {selectedGrade} ({subjectsForGrade.length} môn)
+            </span>
             <button
-              key={sub.subject_code}
-              onClick={() => setSelectedSubject(sub.subject_code)}
-              className={`rounded-lg px-3 py-1 text-xs font-semibold transition ${
-                selectedSubject === sub.subject_code
-                  ? "bg-indigo-600 text-white"
-                  : "bg-slate-100 text-slate-700 hover:bg-indigo-50 hover:text-indigo-700"
+              onClick={() => setSelectedSubject("all")}
+              className={`rounded-lg px-3 py-1 text-xs font-bold transition ${
+                selectedSubject === "all"
+                  ? "bg-slate-900 text-white"
+                  : "bg-slate-100 text-slate-700 hover:bg-slate-200"
               }`}
             >
-              {sub.subject_name}{" "}
-              <span className="opacity-75">({sub.lesson_count})</span>
+              📚 Tất cả các môn ({subjectsForGrade.reduce((a, b) => a + b.lesson_count, 0) || lessonIndex.length} bài)
             </button>
-          ))}
+          </div>
+
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-5">
+            {subjectsForGrade.map((sub) => {
+              const meta = getSubjectMeta(sub.subject_code, sub.subject_name);
+              const isSelected = selectedSubject === sub.subject_code;
+              return (
+                <button
+                  key={sub.subject_code}
+                  type="button"
+                  onClick={() => setSelectedSubject(sub.subject_code)}
+                  className={`flex items-center gap-2.5 rounded-xl border px-3 py-2.5 text-left transition ${
+                    isSelected ? meta.activeRing : meta.cardBg
+                  }`}
+                >
+                  <span className="text-xl leading-none">{meta.emoji}</span>
+                  <div className="min-w-0">
+                    <p className={`truncate text-xs font-bold ${isSelected ? "text-white" : "text-slate-900"}`}>
+                      {sub.subject_name}
+                    </p>
+                    <p className={`text-[11px] font-medium ${isSelected ? "text-white/80" : "text-slate-500"}`}>
+                      {sub.lesson_count} bài giảng
+                    </p>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
 

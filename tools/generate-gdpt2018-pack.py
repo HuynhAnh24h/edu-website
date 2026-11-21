@@ -493,6 +493,143 @@ CURRICULUM_SPEC = [
          "- **HTML5:** Thẻ cấu trúc `<header>, <main>, <section>, <table>, <form>`.\n- **CSS3:** Bộ chọn lớp `.class`, bộ chọn định danh `#id`, mô hình hộp (`margin, border, padding, content`).\n- **Mạng:** Địa chỉ IP định danh thiết bị; Router định tuyến gói tin; Switch kết nối mạng LAN.",
          "Thẻ liên kết trong HTML: `<a href=\"https://eduk12.vn\">Học trực tuyến</a>`."),
     ]),
+
+    # ===================== BỔ SUNG ĐỦ MỌI MÔN HỌC CHO TỪNG LỚP (LỚP 4 -> LỚP 11) =====================
+    (4, "tieng-anh", "Unit 1–10: Countries, Daily Routines & Abilities", [
+        ("Hỏi quốc tịch, thói quen hằng ngày & khả năng (Can / Can't)", "Nắm vững mẫu câu giao tiếp tiếng Anh lớp 4 chuẩn GDPT 2018.",
+         "- *Where are you from?* → *I'm from Viet Nam.*\n- *What time do you get up?* → *I get up at 6 o'clock.*\n- *Can you swim?* → *Yes, I can / No, I can't.*",
+         "Lưu ý động từ sau `can / can't` luôn ở dạng nguyên mẫu không `to`."),
+    ]),
+    (4, "dia-ly", "Chủ đề 1: Thiên nhiên & Con người các vùng Đồng bằng, Trung du Bắc Bộ", [
+        ("Đồng bằng Bắc Bộ, Tây Nguyên & Vùng biển đảo Việt Nam", "Nhận biết đặc điểm địa hình, khí hậu và sản xuất nông nghiệp tiêu biểu.",
+         "Đồng bằng Bắc Bộ do phù sa hệ thống **sông Hồng** và **sông Thái Bình** bồi đắp, là vựa lúa lớn thứ hai cả nước.",
+         "Tây Nguyên có đất đỏ badan màu mỡ thuận lợi trồng cà phê, hồ tiêu, cao su."),
+    ]),
+    (4, "tin-hoc", "Chủ đề 3–5: Tìm kiếm thông tin Internet & Tạo bài trình chiếu", [
+        ("Tìm kiếm thông tin an toàn & Soạn trang trình chiếu PowerPoint", "Sử dụng từ khóa tìm kiếm chính xác và chèn hình ảnh, hiệu ứng vào slide.",
+         "Nguyên tắc làm slide đẹp: chữ ngắn gọn, rõ ý, tương phản màu tốt, không nhồi nhét quá nhiều văn bản.",
+         "Luôn kiểm tra nguồn thông tin đáng tin cậy khi học tập trên Internet."),
+    ]),
+    (5, "khtn", "Chủ đề 1–4: Đất, Năng lượng điện, Vi khuẩn & Môi trường (Khoa học 5)", [
+        ("Sự biến đổi hóa học, Mạch điện đơn giản & Bảo vệ môi trường", "Phân biệt biến đổi vật lí (không tạo chất mới) và biến đổi hóa học (tạo chất mới).",
+         "- Đun nóng đường thành nước đường cháy là **biến đổi hóa học**.\n- Hòa tan muối vào nước là **biến đổi vật lí**.",
+         "Chất dẫn điện: đồng, nhôm, sắt; chất cách điện: nhựa, cao su, gỗ khô."),
+    ]),
+    (5, "lich-su", "Chủ đề 1–3: Nước Văn Lang – Âu Lạc đến Cách mạng Tháng Tám 1945", [
+        ("Các mốc son lịch sử dân tộc & Chiến thắng Điện Biên Phủ 1954", "Hệ thống những sự kiện lịch sử tiêu biểu cuối cấp Tiểu học.",
+         "- **19/8/1945:** Khởi nghĩa giành chính quyền thắng lợi tại Hà Nội.\n- **2/9/1945:** Quốc khánh nước Việt Nam.\n- **7/5/1954:** Chiến thắng lịch sử Điện Biên Phủ.",
+         "Chiến dịch Hồ Chí Minh năm 1975 hoàn thành thống nhất đất nước."),
+    ]),
+    (5, "dia-ly", "Chủ đề 1–3: Vị trí địa lí Việt Nam, Các nước láng giềng & Các châu lục", [
+        ("Đất nước Việt Nam, Biển Đông & 6 Châu lục trên Trái Đất", "Xác định vị trí địa lí Việt Nam trên bản đồ Đông Nam Á và thế giới.",
+         "Việt Nam giáp 3 nước trên đất liền (**Trung Quốc, Lào, Campuchia**) và có vùng biển rộng lớn thuộc **Biển Đông** với 2 quần đảo Hoàng Sa, Trường Sa.",
+         "6 châu lục: Châu Á, Châu Âu, Châu Phi, Châu Mỹ, Châu Đại Dương, Châu Nam Cực."),
+    ]),
+    (6, "tieng-anh", "Unit 1–12: My New School, Present Continuous & Should/Shouldn't", [
+        ("Present Simple vs. Present Continuous & Comparative Adjectives", "Phân biệt hành động lặp lại hằng ngày và hành động đang diễn ra ngay lúc nói.",
+         "- Hiện tại tiếp diễn: `S + am/is/are + V-ing` (*now, at the moment, Look!*).\n- Lời khuyên: `should / shouldn't + V`.",
+         "*Listen! The students **are singing** in the music room.*"),
+    ]),
+    (6, "tin-hoc", "Chủ đề 1–5: Thông tin, Mạng máy tính & Soạn thảo văn bản Word", [
+        ("Đơn vị đo thông tin (Bit, Byte) & Định dạng văn bản, Bảng biểu", "Hiểu cách máy tính biểu diễn thông tin bằng dãy nhị phân 0 và 1.",
+         "$$1\\text{ Byte} = 8\\text{ bit}, \\quad 1\\text{ KB} = 1024\\text{ B}, \\quad 1\\text{ MB} = 1024\\text{ KB}, \\quad 1\\text{ GB} = 1024\\text{ MB}$$",
+         "Dùng `Ctrl+B` (đậm), `Ctrl+I` (nghiêng), `Ctrl+U` (gạch chân) khi soạn thảo văn bản."),
+    ]),
+    (7, "ngu-van", "Chủ đề 1: Thơ bốn chữ – năm chữ, Tản văn & Văn nghị luận đời sống", [
+        ("Biện pháp Nói quá, Nói giảm nói tránh & Viết bài văn biểu cảm", "Nhận diện và vận dụng biện pháp tu từ tinh tế trong viết văn lớp 7.",
+         "- **Nói quá:** Phóng đại quy mô để nhấn mạnh (*Đêm tháng năm chưa nằm đã sáng*).\n- **Nói giảm nói tránh:** Diễn đạt tế nhị, giảm cảm giác đau buồn (*Bác đã đi rồi sao, Bác ơi!*).",
+         "Văn nghị luận lớp 7 tập trung trình bày ý kiến tán thành hoặc phản đối một hiện tượng đời sống."),
+    ]),
+    (7, "lich-su", "Chủ đề 1–4: Tây Âu Trung đại & Đại Việt thời Lý – Trần – Hồ – Lê sơ", [
+        ("Ba lần kháng chiến chống quân Mông – Nguyên & Khởi nghĩa Lam Sơn", "Nắm rõ nghệ thuật quân sự giữ nước và tinh thần đoàn kết thời Trần – Lê sơ.",
+         "- Thời Trần (thế kỷ XIII): **3 lần đánh thắng quân Mông – Nguyên** (Hội nghị Diên Hồng, chiến thắng Bạch Đằng 1288).\n- Lê Lợi lãnh đạo khởi nghĩa Lam Sơn (1418–1427) và Nguyễn Trãi viết *Bình Ngô đại cáo*.",
+         "Quốc triều Hình luật (*Luật Hồng Đức*) là bộ luật tiến bộ tiêu biểu thời Lê sơ."),
+    ]),
+    (7, "dia-ly", "Chủ đề 1–5: Thiên nhiên & Kinh tế Châu Âu, Châu Á, Châu Phi, Châu Mỹ", [
+        ("Đặc điểm tự nhiên & Dân cư Châu Á – Châu Âu", "So sánh địa hình, khí hậu và quy mô dân số các châu lục lớn.",
+         "- **Châu Á** là châu lục rộng nhất và đông dân nhất thế giới, địa hình đa dạng với đỉnh **Everest** ($8848\\text{ m}$).\n- **Châu Âu** chủ yếu nằm trong đới khí hậu ôn hòa, nền kinh tế phát triển cao (Liên minh châu Âu EU).",
+         "Kênh đào Suez nối Địa Trung Hải với Biển Đỏ giúp rút ngắn hải trình Á – Âu."),
+    ]),
+    (8, "tieng-anh", "Unit 1–12: Leisure Time, Complex Sentences & Past Continuous", [
+        ("Verbs of Liking (V-ing / to-V) & Reported Speech Basics", "Thành thạo động từ chỉ sở thích và câu phức với `although, because, however`.",
+         "- `enjoy / adore / detest / fancy + V-ing`\n- `like / love / hate / prefer + V-ing / to-V`.",
+         "*She **adores doing** DIY projects in her free time.*"),
+    ]),
+    (8, "lich-su", "Chủ đề 1–4: Cách mạng Tư sản, Chiến tranh Thế giới I & Việt Nam 1858–1918", [
+        ("Cách mạng Công nghiệp, Thực dân Pháp xâm lược & Phong trào Cần Vương", "Nắm mạch lịch sử cận đại thế giới và cuộc kháng chiến chống Pháp cuối thế kỷ XIX.",
+         "- **1/9/1858:** Liên quân Pháp – Tây Ban Nha nổ súng tấn công Đà Nẵng.\n- **1885–1896:** Phong trào Cần Vương (Hương Khê, Ba Đình, Bãi Sậy).\n- Đầu thế kỷ XX: Phan Bội Châu (Đông Du) & Phan Châu Trinh (Duy Tân).",
+         "Cách mạng công nghiệp lần thứ nhất khởi nguồn từ nước Anh với máy hơi nước của James Watt."),
+    ]),
+    (8, "dia-ly", "Chủ đề 1–4: Vị trí, Địa hình, Khí hậu, Sông ngòi & Biển đảo Việt Nam", [
+        ("Địa hình, Khí hậu & Hệ thống Sông ngòi Việt Nam (Địa lý 8 GDPT 2018)", "Phân tích đặc điểm đồi núi chiếm 3/4 diện tích và mạng lưới sông dày đặc.",
+         "- Địa hình nước ta có **3/4 là đồi núi** (chủ yếu đồi núi thấp), **1/4 là đồng bằng**.\n- Hai hướng núi chính: **Tây Bắc – Đông Nam** (Hoàng Liên Sơn, Trường Sơn) và **vòng cung** (Đông Bắc).",
+         "Sông ngòi Việt Nam nhiều nước, giàu phù sa và có chế độ nước theo mùa."),
+    ]),
+    (8, "tin-hoc", "Chủ đề 4–5: Lọc/Sắp xếp dữ liệu Bảng tính & Lập trình Scratch nâng cao", [
+        ("Biến, Danh sách & Thuật toán tìm kiếm – sắp xếp cơ bản", "Xây dựng chương trình giải toán có sử dụng biến và điều kiện lồng nhau.",
+         "Thuật toán tìm giá trị lớn nhất: khởi tạo `max = a[0]`, duyệt từng phần tử `x`, nếu `x > max` thì cập nhật `max = x`.",
+         "Hàm `COUNTIF` và `SUMIF` trong bảng tính giúp thống kê theo điều kiện nhanh chóng."),
+    ]),
+    (9, "lich-su", "Chủ đề 1–5: Thế giới 1918–1945, Chiến tranh Lạnh & Lịch sử Việt Nam 1918–1991", [
+        ("Đảng Cộng sản Việt Nam ra đời (1930), Cách mạng Tháng Tám & Đổi mới", "Tổng hợp kiến thức Lịch sử 9 chuẩn GDPT 2018.",
+         "- **3/2/1930:** Hội nghị hợp nhất các tổ chức cộng sản thành lập **Đảng Cộng sản Việt Nam** do Nguyễn Ái Quốc chủ trì.\n- **1945–1954:** Kháng chiến chống Pháp; **1954–1975:** Kháng chiến chống Mỹ cứu nước.",
+         "Trật tự thế giới sau 1945 hình thành hai cực Xô – Mỹ và chấm dứt năm 1991."),
+    ]),
+    (9, "dia-ly", "Chủ đề 1–3: Dân cư, Các ngành kinh tế & 7 Vùng kinh tế Việt Nam (Địa lý 9)", [
+        ("Địa lý Dân cư, Công nghiệp – Nông nghiệp & Các vùng kinh tế trọng điểm", "Nắm cơ cấu kinh tế chuyển dịch theo hướng Công nghiệp hóa – Hiện đại hóa.",
+         "Cơ cấu GDP Việt Nam chuyển dịch rõ nét: **giảm tỉ trọng Nông – Lâm – Thủy sản**, **tăng tỉ trọng Công nghiệp – Xây dựng và Dịch vụ**.",
+         "Vùng Đông Nam Bộ là vùng kinh tế năng động nhất, dẫn đầu cả nước về công nghiệp và thu hút FDI."),
+    ]),
+    (9, "tin-hoc", "Chủ đề 4–5: Phần mềm mô phỏng, Hàm bảng tính IF & Định hướng nghề nghiệp", [
+        ("Hàm điều kiện IF, Xác thực dữ liệu & An toàn thông tin số", "Ứng dụng công thức `IF` tự động xếp loại học lực và quản lý tài chính cá nhân.",
+         "Cú pháp: `=IF(điều_kiện, giá_trị_nếu_đúng, giá_trị_nếu_sai)`.\nVí dụ: `=IF(D2>=8, \"Giỏi\", \"Khá\")`.",
+         "Luôn bảo vệ mật khẩu bằng xác thực 2 lớp (2FA) và tránh mở liên kết lừa đảo."),
+    ]),
+    (10, "ngu-van", "Chủ đề 1–4: Thần thoại – Sử thi, Thơ Đường luật, Chèo – Tuồng & Văn nghị luận", [
+        ("Đặc trưng Sử thi (*Đăm Săn*, *Ô-đi-xê*) & Phân tích tác phẩm Văn học 10", "Đọc hiểu văn bản theo thể loại chuẩn chương trình Ngữ văn 10 mới.",
+         "**Sử thi** là tác phẩm tự sự dân gian quy mô lớn, kể về những người anh hùng đại diện cho sức mạnh và khát vọng của cả cộng đồng.",
+         "Khi viết bài nghị luận xã hội lớp 10, luôn đảm bảo 3 phần chặt chẽ và có phản biện đa chiều."),
+    ]),
+    (10, "tieng-anh", "Unit 1–10: Family Life, Passive Voice, Relative Clauses & Conditionals", [
+        ("Tổng hợp Ngữ pháp Tiếng Anh 10 (Thì, Bị động, Mệnh đề quan hệ)", "Củng cố toàn bộ nền tảng ngữ pháp THPT từ năm lớp 10.",
+         "- **Present Perfect:** `S + have/has + V3/ed` (*since, for, already, yet*).\n- **Gerund & Infinitive:** phân biệt động từ theo sau bởi `V-ing` và `to V`.",
+         "*The project **has been completed** ahead of schedule.*"),
+    ]),
+    (10, "lich-su", "Chủ đề 1–6: Các nền Văn minh Thế giới, Đông Nam Á & Văn minh Đại Việt", [
+        ("Văn minh Ai Cập – Hy Lạp – La Mã & Thành tựu Văn minh Đại Việt", "Hiểu rõ vai trò sử học và những thành tựu tiêu biểu của văn minh nhân loại và dân tộc.",
+         "**Văn minh Đại Việt** phát triển rực rỡ từ thế kỷ X đến thế kỷ XIX (Lý, Trần, Lê sơ, Nguyễn) với chữ Nôm, kiến trúc Thăng Long và tư tưởng nhân nghĩa.",
+         "Văn minh Hy Lạp – La Mã đặt nền móng cho khoa học, triết học và nền dân chủ phương Tây."),
+    ]),
+    (10, "dia-ly", "Chủ đề 1–5: Thạch quyển, Khí quyển, Thủy quyển & Địa lí các ngành kinh tế", [
+        ("Kiến tạo mảng, Hoàn lưu khí quyển & Các nguồn lực phát triển kinh tế", "Giải thích các quy luật tự nhiên cơ bản của vỏ Trái Đất và quy luật địa đới.",
+         "- **Quy luật địa đới:** Sự thay đổi có quy luật của các thành phần tự nhiên theo **vĩ độ** (từ Xích đạo về hai cực).\n- **Quy luật đai cao:** Sự thay đổi tự nhiên theo **độ cao địa hình** (lên cao $100\\text{ m}$ nhiệt độ giảm $0{,}6^\\circ\\text{C}$).",
+         "Gió Mậu dịch (Tín phong) thổi thường xuyên từ áp cao cận chí tuyến về áp thấp Xích đạo."),
+    ]),
+    (11, "ngu-van", "Chủ đề 1–4: Truyện thơ Nôm (*Truyện Kiều*), Bi kịch, Ký & Văn nghị luận", [
+        ("Nghệ thuật Truyện thơ Nôm & Giá trị nhân đạo của *Truyện Kiều* (Nguyễn Du)", "Khám phá kiệt tác văn học trung đại và kỹ năng đọc hiểu thơ có yếu tố tượng trưng.",
+         "*Truyện Kiều* gồm **3.254 câu thơ lục bát** bằng chữ Nôm, kết tinh đỉnh cao nghệ thuật miêu tả nội tâm nhân vật và ngôn ngữ dân tộc.",
+         "Cần nắm rõ sự khác biệt giữa kết cấu truyền thống (truyện thơ) và hiện đại (truyện ngắn, bi kịch)."),
+    ]),
+    (11, "tieng-anh", "Unit 1–10: Long & Healthy Life, Modal Verbs, Participle Clauses & Cleft Sentences", [
+        ("Participle Clauses (Mệnh đề phân từ) & Perfect Gerunds", "Chuyên đề ngữ pháp nâng cao lớp 11 xuất hiện thường xuyên trong đề đọc hiểu THPT.",
+         "- **Present Participle (`V-ing`):** Rút gọn mệnh đề mang nghĩa chủ động.\n- **Past Participle (`V3/ed`):** Rút gọn mệnh đề mang nghĩa bị động.\n- **Cleft sentence (Câu chẻ):** `It is/was + thành phần nhấn mạnh + that/who + ...`.",
+         "***Built** in the 11th century, the Temple of Literature attracts millions of visitors.*"),
+    ]),
+    (11, "lich-su", "Chủ đề 1–6: Cách mạng Tư sản, Chủ nghĩa Xã hội & Chiến tranh Bảo vệ Tổ quốc", [
+        ("Lịch sử Chiến tranh Bảo vệ Tổ quốc & Các cuộc Cải cách lớn ở Việt Nam", "Tổng hợp truyền thống chống ngoại xâm từ Ngô Quyền đến Quang Trung và cải cách Hồ Quý Ly, Lê Thánh Tông, Minh Mạng.",
+         "- **1789:** Đại phá quân Thanh (Ngọc Hồi – Đống Đa) dưới sự chỉ huy thiên tài của Hoàng đế **Quang Trung**.\n- Cuộc cải cách hành chính của vua **Lê Thánh Tông** (thế kỷ XV) đưa nhà nước quân chủ tập quyền lên đỉnh cao.",
+         "Bài học xuyên suốt: lấy dân làm gốc, phát huy sức mạnh khối đại đoàn kết toàn dân tộc."),
+    ]),
+    (11, "dia-ly", "Chủ đề 1–3: Toàn cầu hóa, Khu vực hóa & Địa lí các Quốc gia lớn (Mỹ, EU, Trung Quốc, Nhật Bản, ASEAN)", [
+        ("Toàn cầu hóa, Khu vực ASEAN & Kinh tế các cường quốc (Hoa Kỳ, EU, Nhật Bản, Trung Quốc)", "Phân tích thế mạnh, thách thức và biểu đồ kinh tế – xã hội thế giới.",
+         "- **ASEAN** thành lập ngày **8/8/1967** tại Bangkok; Việt Nam gia nhập ngày **28/7/1995**.\n- **Nhật Bản** nghèo tài nguyên, nhiều thiên tai nhưng trở thành cường quốc nhờ đầu tư giáo dục, khoa học công nghệ và con người.",
+         "Liên minh châu Âu (EU) là trung tâm kinh tế hàng đầu thế giới với đồng tiền chung Euro."),
+    ]),
+    (11, "tin-hoc", "Chủ đề 1–6: Hệ điều hành, Cơ sở dữ liệu Quan hệ (SQL) & Thuật toán", [
+        ("Cơ sở dữ liệu Quan hệ, Khóa chính – Khóa ngoại & Truy vấn SQL cơ bản", "Nền tảng thiết kế bảng dữ liệu và truy vấn `SELECT ... FROM ... WHERE ...`.",
+         "- **Khóa chính (Primary Key):** Xác định duy nhất mỗi bản ghi trong bảng.\n- **Khóa ngoại (Foreign Key):** Liên kết dữ liệu giữa hai bảng.\n- Truy vấn chuẩn: `SELECT ho_ten, diem FROM hoc_sinh WHERE lop = 11 ORDER BY diem DESC;`",
+         "Tránh dư thừa dữ liệu bằng cách tách thông tin thành các bảng có quan hệ chuẩn hóa."),
+    ]),
 ]
 
 
