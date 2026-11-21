@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduK12 Open — Hướng dẫn OAuth Google/Facebook & Lộ trình Hoàn thiện Bản Chỉnh chu</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --ink: #0f172a;
+      --muted: #475569;
+      --border: #e2e8f0;
+      --indigo: #4f46e5;
+      --indigo-soft: #eef2ff;
+      --emerald: #059669;
+      --emerald-soft: #ecfdf5;
+      --rose: #e11d48;
+      --rose-soft: #fff1f2;
+      --amber: #d97706;
+      --amber-soft: #fffbeb;
+      --sky: #0284c7;
+      --sky-soft: #f0f9ff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 28px 18px 64px;
+    }
+    /* Hero */
+    .hero {
+      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 55%, #064e3b 100%);
+      color: #fff;
+      border-radius: 24px;
+      padding: 32px;
+      box-shadow: 0 20px 45px rgba(15, 23, 42, 0.16);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .brand-title {
+      margin: 0;
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+    .brand-sub {
+      margin: 4px 0 0;
+      font-size: 13px;
+      color: #cbd5e1;
+    }
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: none;
+      border-radius: 12px;
+      padding: 10px 16px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform 0.12s ease, opacity 0.15s ease, background 0.15s ease;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn-emerald { background: #10b981; color: #022c22; }
+    .btn-emerald:hover { background: #34d399; }
+    .btn-ghost { background: rgba(255,255,255,0.12); color: #fff; border: 1px solid rgba(255,255,255,0.22); }
+    .btn-ghost:hover { background: rgba(255,255,255,0.2); }
+    .btn-indigo { background: var(--indigo); color: #fff; }
+    .btn-indigo:hover { background: #4338ca; }
+    .btn-copy {
+      background: #f1f5f9;
+      color: #0f172a;
+      border: 1px solid #cbd5e1;
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .btn-copy:hover { background: #e2e8f0; }
+    .btn-copy.copied { background: #d1fae5; color: #065f46; border-color: #6ee7b7; }
+
+    /* Nav tabs */
+    .top-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 22px 0;
+    }
+    .tab-pill {
+      padding: 10px 18px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .tab-pill:hover { border-color: var(--indigo); color: var(--indigo); }
+
+    /* Sections & Cards */
+    .section {
+      margin-top: 28px;
+    }
+    .section-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .section-head h2 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 800;
+    }
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+    }
+    .badge-indigo { background: var(--indigo-soft); color: var(--indigo); }
+    .badge-emerald { background: var(--emerald-soft); color: var(--emerald); }
+    .badge-rose { background: var(--rose-soft); color: var(--rose); }
+    .badge-amber { background: var(--amber-soft); color: var(--amber); }
+    .badge-sky { background: var(--sky-soft); color: var(--sky); }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 22px;
+      box-shadow: 0 2px 10px rgba(15, 23, 42, 0.03);
+      margin-bottom: 16px;
+    }
+    .card h3 {
+      margin: 0 0 10px;
+      font-size: 16px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .step-num {
+      width: 28px;
+      height: 28px;
+      border-radius: 10px;
+      background: var(--indigo);
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+    .step-num.fb { background: #1877f2; }
+    .step-num.cf { background: #f38020; }
+    .step-num.ok { background: var(--emerald); }
+
+    .copy-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: #0f172a;
+      color: #e2e8f0;
+      border-radius: 12px;
+      padding: 10px 14px;
+      margin: 8px 0;
+      font-family: Consolas, Monaco, monospace;
+      font-size: 12px;
+      overflow-x: auto;
+    }
+    .copy-box code { word-break: break-all; }
+
+    ol.steps {
+      margin: 10px 0 0;
+      padding-left: 20px;
+      font-size: 13.5px;
+      color: #334155;
+    }
+    ol.steps li { margin-bottom: 10px; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 13px;
+    }
+    th, td {
+      text-align: left;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    th {
+      background: #f8fafc;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #64748b;
+    }
+
+    /* Live check panel */
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+    .status-box {
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      padding: 14px;
+      background: #f8fafc;
+    }
+    .status-box .label { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; }
+    .status-box .val { margin-top: 4px; font-size: 15px; font-weight: 800; }
+
+    /* Roadmap Filter & Cards */
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .filter-btn {
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--muted);
+      border-radius: 10px;
+      padding: 7px 13px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .filter-btn.active {
+      background: #0f172a;
+      color: #fff;
+      border-color: #0f172a;
+    }
+    .roadmap-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 14px;
+    }
+    .feat-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    .feat-card.selected {
+      border-color: var(--indigo);
+      background: #f8faff;
+      box-shadow: 0 6px 20px rgba(79, 70, 229, 0.08);
+    }
+    .feat-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .feat-title {
+      margin: 6px 0 6px;
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--ink);
+    }
+    .feat-desc {
+      margin: 0;
+      font-size: 12.5px;
+      color: var(--muted);
+    }
+    .feat-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding-top: 10px;
+      border-top: 1px solid #f1f5f9;
+      font-size: 11.5px;
+      font-weight: 700;
+    }
+    .pick-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      color: var(--indigo);
+      user-select: none;
+    }
+    .pick-label input { width: 16px; height: 16px; accent-color: var(--indigo); }
+
+    .summary-bar {
+      position: sticky;
+      bottom: 14px;
+      background: #0f172a;
+      color: #fff;
+      border-radius: 16px;
+      padding: 14px 18px;
+      margin-top: 24px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      box-shadow: 0 14px 35px rgba(15, 23, 42, 0.25);
+    }
+    .done-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 10px;
+    }
+    .done-item {
+      background: var(--emerald-soft);
+      border: 1px solid #a7f3d0;
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #065f46;
+    }
+    @media print {
+      .hero-actions, .top-tabs, .filter-bar, .summary-bar, .btn-copy { display: none !important; }
+      body { background: #fff; }
+      .card, .feat-card { break-inside: avoid; box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- HERO -->
+    <header class="hero">
+      <div class="brand">
+        <!-- Logo Cú Bông EduK12 -->
+        <svg width="56" height="56" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Logo Cú Bông EduK12">
+          <rect width="64" height="64" rx="18" fill="url(#g1)"/>
+          <ellipse cx="32" cy="36" rx="18" ry="17" fill="#6366F1"/>
+          <ellipse cx="32" cy="41" rx="12" ry="10" fill="#E0E7FF"/>
+          <polygon points="18,22 24,14 26,23" fill="#4338CA"/>
+          <polygon points="46,22 40,14 38,23" fill="#4338CA"/>
+          <circle cx="25" cy="31" r="6" fill="#FFFFFF"/>
+          <circle cx="39" cy="31" r="6" fill="#FFFFFF"/>
+          <circle cx="25.5" cy="31" r="3" fill="#0F172A"/>
+          <circle cx="38.5" cy="31" r="3" fill="#0F172A"/>
+          <circle cx="26.5" cy="29.8" r="1" fill="#FFFFFF"/>
+          <circle cx="39.5" cy="29.8" r="1" fill="#FFFFFF"/>
+          <polygon points="32,33 28.5,38 35.5,38" fill="#F59E0B"/>
+          <polygon points="32,10 15,17 32,23 49,17" fill="#1E1B4B"/>
+          <rect x="47" y="17" width="2" height="9" rx="1" fill="#FBBF24"/>
+          <defs>
+            <linearGradient id="g1" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#312E81"/>
+              <stop offset="1" stop-color="#4F46E5"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <div>
+          <h1 class="brand-title">EduK12 Open — Cẩm nang OAuth &amp; Lộ trình Bản Chỉnh chu</h1>
+          <p class="brand-sub">Hướng dẫn cài Đăng nhập Google / Facebook chuẩn chỉnh + Danh sách nâng cấp hoàn thiện sản phẩm</p>
+        </div>
+      </div>
+      <div class="hero-actions">
+        <a class="btn btn-emerald" href="https://eduk12-scale.eduk12-scale.workers.dev" target="_blank" rel="noreferrer">Mở Website Live ↗</a>
+        <button class="btn btn-ghost" onclick="window.print()">In / Lưu PDF</button>
+      </div>
+    </header>
+
+    <nav class="top-tabs">
+      <a class="tab-pill" href="#oauth-guide">1. Cài Google &amp; Facebook Login</a>
+      <a class="tab-pill" href="#live-check">2. Kiểm tra Live &amp; Sửa lỗi nhanh</a>
+      <a class="tab-pill" href="#done-now">3. Tính năng Đã hoàn thiện</a>
+      <a class="tab-pill" href="#roadmap">4. Danh sách 14 Chức năng Nâng cấp Chỉnh chu</a>
+    </nav>
+
+    <!-- PHẦN 1: HƯỚNG DẪN GOOGLE & FACEBOOK OAUTH -->
+    <section id="oauth-guide" class="section">
+      <div class="section-head">
+        <h2>Phần 1: Hướng dẫn Kích hoạt Đăng nhập Google &amp; Facebook (Chuẩn Production)</h2>
+        <span class="badge badge-indigo">Mất khoảng 5–10 phút • Bấm Copy tránh gõ sai</span>
+      </div>
+
+      <!-- BƯỚC 1: GOOGLE -->
+      <div class="card">
+        <h3><span class="step-num">1</span> Tạo khóa Google OAuth 2.0 trên Google Cloud Console</h3>
+        <ol class="steps">
+          <li>Truy cập <a href="https://console.cloud.google.com/" target="_blank" rel="noreferrer"><strong>console.cloud.google.com</strong></a> → tạo Project mới tên <strong>EduK12 Open</strong>.</li>
+          <li>Vào <strong>Google Auth Platform → Branding / Audience</strong> (hoặc <em>APIs &amp; Services → OAuth consent screen</em>):
+            <ul>
+              <li>Chọn loại người dùng: <strong>External</strong>.</li>
+              <li>Tên ứng dụng: <strong>EduK12 Open</strong>, nhập Gmail hỗ trợ của bạn.</li>
+              <li>Điền sẵn 2 đường dẫn bắt buộc đã tạo trên website:
+                <div class="copy-box">
+                  <code>https://eduk12-scale.eduk12-scale.workers.dev/chinh-sach-bao-mat/</code>
+                  <button class="btn-copy" onclick="copyText(this, 'https://eduk12-scale.eduk12-scale.workers.dev/chinh-sach-bao-mat/')">Copy Chính sách</button>
+                </div>
+                <div class="copy-box">
+                  <code>https://eduk12-scale.eduk12-scale.workers.dev/dieu-khoan/</code>
+                  <button class="btn-copy" onclick="copyText(this, 'https://eduk12-scale.eduk12-scale.workers.dev/dieu-khoan/')">Copy Điều khoản</button>
+                </div>
+              </li>
+              <li>Ở mục <strong>Audience</strong>, bấm <strong>Publish App</strong> để mọi học sinh &amp; giáo viên đều đăng nhập được (không bị giới hạn 100 email test).</li>
+            </ul>
+          </li>
+          <li>Vào <strong>Clients → Create client</strong> (hoặc <em>Credentials → Create Credentials → OAuth client ID</em>) → chọn <strong>Web application</strong>:
+            <div class="copy-box">
+              <code>Authorized JavaScript origins: https://eduk12-scale.eduk12-scale.workers.dev</code>
+              <button class="btn-copy" onclick="copyText(this, 'https://eduk12-scale.eduk12-scale.workers.dev')">Copy Origin</button>
+            </div>
+            <div class="copy-box">
+              <code>Authorized redirect URI: https://eduk12-scale.eduk12-scale.workers.dev/api/v1/auth/oauth/google/callback</code>
+              <button class="btn-copy" onclick="copyText(this, 'https://eduk12-scale.eduk12-scale.workers.dev/api/v1/auth/oauth/google/callback')">Copy Google Callback</button>
+            </div>
+          </li>
+          <li>Bấm <strong>Create</strong> → lưu lại 2 mã: <code>Client ID</code> và <code>Client Secret</code>.</li>
+        </ol>
+      </div>
+
+      <!-- BƯỚC 2: FACEBOOK -->
+      <div class="card">
+        <h3><span class="step-num fb">2</span> Tạo khóa Facebook Login trên Meta for Developers</h3>
+        <ol class="steps">
+          <li>Truy cập <a href="https://developers.facebook.com/apps/" target="_blank" rel="noreferrer"><strong>developers.facebook.com/apps</strong></a> → bấm <strong>Create App</strong>.</li>
+          <li>Chọn mục tiêu <strong>Authenticate and request data from users with Facebook Login</strong> → đặt tên <strong>EduK12 Open</strong>.</li>
+          <li>Vào <strong>Use cases → Authentication and account creation → Customize</strong>:
+            <ul>
+              <li>Bật quyền <strong><code>email</code></strong> và <strong><code>public_profile</code></strong>.</li>
+              <li>Mở mục <strong>Settings</strong>, dán chính xác dòng sau vào ô <strong>Valid OAuth Redirect URIs</strong> rồi bấm Save:
+                <div class="copy-box">
+                  <code>https://eduk12-scale.eduk12-scale.workers.dev/api/v1/auth/oauth/facebook/callback</code>
+                  <button class="btn-copy" onclick="copyText(this, 'https://eduk12-scale.eduk12-scale.workers.dev/api/v1/auth/oauth/facebook/callback')">Copy Facebook Callback</button>
+                </div>
+              </li>
+            </ul>
+          </li>
+          <li>Vào <strong>App settings → Basic</strong>:
+            <ul>
+              <li><strong>App Domains:</strong>
+                <div class="copy-box">
+                  <code>eduk12-scale.eduk12-scale.workers.dev</code>
+                  <button class="btn-copy" onclick="copyText(this, 'eduk12-scale.eduk12-scale.workers.dev')">Copy Domain</button>
+                </div>
+              </li>
+              <li><strong>Privacy Policy URL</strong> &amp; <strong>User Data Deletion URL:</strong> dán link <code>.../chinh-sach-bao-mat/</code> ở trên.</li>
+              <li>Lưu lại <code>App ID</code> và <code>App Secret</code> (bấm Show để copy).</li>
+            </ul>
+          </li>
+          <li>Gạt công tắc phía trên cùng từ <strong>Development</strong> sang <strong>Live</strong> (Công khai).</li>
+        </ol>
+      </div>
+
+      <!-- BƯỚC 3: CLOUDFLARE SECRETS -->
+      <div class="card">
+        <h3><span class="step-num cf">3</span> Gắn 4 Secret lên Cloudflare Dashboard (An toàn — Không lộ lên GitHub)</h3>
+        <p style="font-size:13.5px; color:#334155; margin-top:0;">
+          Mở <a href="https://dash.cloudflare.com" target="_blank" rel="noreferrer"><strong>dash.cloudflare.com</strong></a> →
+          <strong>Compute (Workers) → Workers &amp; Pages</strong> → chọn Worker <strong><code>eduk12-scale</code></strong> →
+          tab <strong>Settings</strong> → <strong>Variables and Secrets</strong> → bấm <strong>Add</strong> (chọn Type: <strong>Secret</strong>):
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>Tên biến (Variable Name)</th>
+              <th>Copy nhanh</th>
+              <th>Giá trị dán vào (Value)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>GOOGLE_CLIENT_ID</code></td>
+              <td><button class="btn-copy" onclick="copyText(this, 'GOOGLE_CLIENT_ID')">Copy tên</button></td>
+              <td>Client ID lấy từ Google Cloud (Bước 1)</td>
+            </tr>
+            <tr>
+              <td><code>GOOGLE_CLIENT_SECRET</code></td>
+              <td><button class="btn-copy" onclick="copyText(this, 'GOOGLE_CLIENT_SECRET')">Copy tên</button></td>
+              <td>Client Secret lấy từ Google Cloud (Bước 1)</td>
+            </tr>
+            <tr>
+              <td><code>FACEBOOK_APP_ID</code></td>
+              <td><button class="btn-copy" onclick="copyText(this, 'FACEBOOK_APP_ID')">Copy tên</button></td>
+              <td>App ID lấy từ Meta Developers (Bước 2)</td>
+            </tr>
+            <tr>
+              <td><code>FACEBOOK_APP_SECRET</code></td>
+              <td><button class="btn-copy" onclick="copyText(this, 'FACEBOOK_APP_SECRET')">Copy tên</button></td>
+              <td>App Secret lấy từ Meta Developers (Bước 2)</td>
+            </tr>
+          </tbody>
+        </table>
+        <p style="font-size:12.5px; color:#059669; font-weight:700; margin-top:12px;">
+          Sau khi thêm đủ 4 biến, bấm nút <strong>Deploy / Save</strong> trên Cloudflare là hệ thống kích hoạt ngay lập tức!
+        </p>
+      </div>
+
+      <!-- BƯỚC 4: LIVE CHECKER -->
+      <div id="live-check" class="card">
+        <div class="section-head" style="margin-bottom:8px;">
+          <h3 style="margin:0;"><span class="step-num ok">4</span> Kiểm tra Trạng thái OAuth Live trực tiếp</h3>
+          <button class="btn btn-indigo" onclick="checkLiveOAuth()">Kiểm tra kết nối Live ngay</button>
+        </div>
+        <p style="font-size:13px; color:#475569; margin:0;">
+          Bấm nút bên trên để kiểm tra trực tiếp máy chủ <code>eduk12-scale.eduk12-scale.workers.dev</code> xem đã nhận đủ khóa Google &amp; Facebook hay chưa.
+        </p>
+        <div class="status-grid">
+          <div class="status-box">
+            <div class="label">Google OAuth 2.0</div>
+            <div class="val" id="google-status">Chưa kiểm tra — bấm nút trên</div>
+          </div>
+          <div class="status-box">
+            <div class="label">Facebook OAuth 2.0</div>
+            <div class="val" id="facebook-status">Chưa kiểm tra — bấm nút trên</div>
+          </div>
+        </div>
+
+        <h4 style="margin:18px 0 6px; font-size:13.5px;">Bảng xử lý nhanh lỗi thường gặp</h4>
+        <table>
+          <thead>
+            <tr>
+              <th>Thông báo lỗi</th>
+              <th>Nguyên nhân</th>
+              <th>Cách sửa trong 30 giây</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>Error 400: redirect_uri_mismatch</code></td>
+              <td>URL Callback dán trên Google/Facebook bị thiếu chữ hoặc dư dấu <code>/</code> ở cuối.</td>
+              <td>Copy lại đúng link ở Bước 1 / Bước 2 dán đè vào mục Redirect URI và bấm Save.</td>
+            </tr>
+            <tr>
+              <td><code>Access blocked: App has not completed verification</code></td>
+              <td>App Google đang ở chế độ Testing mà chưa thêm email hoặc chưa Publish.</td>
+              <td>Vào Google Auth Platform → Audience → bấm <strong>Publish App</strong>.</td>
+            </tr>
+            <tr>
+              <td><code>App Not Setup / Facebook Login unavailable</code></td>
+              <td>App Facebook đang ở chế độ <em>Development</em>.</td>
+              <td>Điền đủ Privacy Policy URL rồi gạt nút trên cùng sang <strong>Live</strong>.</td>
+            </tr>
+            <tr>
+              <td>Vẫn thấy chữ <code>Setup</code> trên nút Google/FB</td>
+              <td>Chưa bấm <strong>Deploy / Save</strong> sau khi thêm Secret trên Cloudflare.</td>
+              <td>Kiểm tra lại đúng chính tả 4 tên biến ở Bước 3 rồi bấm Deploy.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- PHẦN 2: SNAPSHOT HIỆN TRẠNG -->
+    <section id="done-now" class="section">
+      <div class="section-head">
+        <h2>Phần 2: 10 Trụ cột Đã Hoàn thiện &amp; Chạy Live Hiện tại</h2>
+        <span class="badge badge-emerald">Đang vận hành trên Cloudflare Edge + D1 + WebSocket</span>
+      </div>
+      <div class="done-grid">
+        <div class="done-item">✓ Phân luồng 3 vai trò: Admin • Giáo viên • Học sinh</div>
+        <div class="done-item">✓ Mạng Xã Hội Giáo Viên (Chia sẻ, Thả tim, Lưu, Theo dõi)</div>
+        <div class="done-item">✓ Chat Trực tuyến 1–1 Real-time WebSocket (Typing + Online)</div>
+        <div class="done-item">✓ Cổng Khóa học Trực tuyến + Đánh giá 5 Sao Real-time</div>
+        <div class="done-item">✓ Học sinh đăng Sản phẩm Phần mềm &amp; Thầy Cô chấm điểm</div>
+        <div class="done-item">✓ Admin Mở/Khóa Thi &amp; Tổng hợp Đề theo 3 Cấp học</div>
+        <div class="done-item">✓ BOT Quét Bạo lực / Quấy rối / Mạo danh + Xuất hồ sơ Công an</div>
+        <div class="done-item">✓ Kho 157+ Bài giảng 1–12 &amp; 8 Khóa Lập trình chạy trên Web</div>
+        <div class="done-item">✓ Phòng học Live 0đ + Điểm danh + Bảo mật 2FA &amp; OAuth</div>
+        <div class="done-item">✓ Trang Tải App Mobile + Tự build file Android .APK miễn phí</div>
+      </div>
+    </section>
+
+    <!-- PHẦN 3: LỘ TRÌNH 14 CHỨC NĂNG MỚI ĐỂ LÀM BẢN CHỈNH CHU -->
+    <section id="roadmap" class="section">
+      <div class="section-head">
+        <h2>Phần 3: Danh sách 14 Chức năng Mới để Hoàn thiện Bản Chỉnh chu (Production)</h2>
+        <span class="badge badge-amber">Tích chọn các mục bạn muốn ưu tiên làm tiếp</span>
+      </div>
+
+      <div class="filter-bar">
+        <button class="filter-btn active" onclick="filterRoadmap('all', this)">Tất cả (14)</button>
+        <button class="filter-btn" onclick="filterRoadmap('social', this)">Mạng XH Giáo viên (4)</button>
+        <button class="filter-btn" onclick="filterRoadmap('student', this)">Trải nghiệm Học sinh (4)</button>
+        <button class="filter-btn" onclick="filterRoadmap('safety', this)">An toàn &amp; Quản trị (3)</button>
+        <button class="filter-btn" onclick="filterRoadmap('launch', this)">Chuẩn Ra mắt Công chúng (3)</button>
+      </div>
+
+      <div class="roadmap-grid" id="roadmap-grid"></div>
+
+      <!-- Thanh tổng hợp mục đã chọn -->
+      <div class="summary-bar">
+        <div>
+          <strong id="selected-count">Đã chọn 0 chức năng ưu tiên</strong>
+          <div style="font-size:12px; color:#cbd5e1;">Tích chọn các chức năng bạn ưng ý rồi bấm Copy danh sách gửi lại cho mình để triển khai theo đúng thứ tự!</div>
+        </div>
+        <button class="btn btn-emerald" onclick="copySelectedRoadmap()">Copy Danh sách đã chọn</button>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const ROADMAP_ITEMS = [
+      // Nhóm A: Mạng XH Giáo viên
+      {
+        id: "f1",
+        group: "social",
+        groupLabel: "Mạng XH Giáo viên",
+        priority: "Rất nên làm",
+        badgeClass: "badge-emerald",
+        title: "1. Xác minh Giáo viên Tích xanh (Chặn Mạo danh từ gốc)",
+        desc: "Giáo viên nộp ảnh thẻ ngành hoặc email trường để Admin xét duyệt cấp Huy hiệu Tích xanh chính thức. Ngăn chặn kẻ mạo danh ngay từ khâu đăng ký thay vì chỉ xử phạt sau.",
+        impact: "Tăng độ tin cậy tuyệt đối cho phụ huynh & học sinh"
+      },
+      {
+        id: "f2",
+        group: "social",
+        groupLabel: "Mạng XH Giáo viên",
+        priority: "Rất nên làm",
+        badgeClass: "badge-emerald",
+        title: "2. Trang Hồ sơ Cá nhân Giáo viên (Teacher Profile Wall)",
+        desc: "Mỗi thầy cô có 1 trang tường cá nhân riêng (/giao-vien?id=...) hiển thị tiểu sử, trường giảng dạy, tích xanh, điểm sao trung bình từ khóa học, danh sách giáo án và nút Theo dõi / Nhắn tin.",
+        impact: "Đúng chất mạng xã hội chuyên nghiệp cho giáo viên"
+      },
+      {
+        id: "f3",
+        group: "social",
+        groupLabel: "Mạng XH Giáo viên",
+        priority: "Nên làm",
+        badgeClass: "badge-indigo",
+        title: "3. Upload Tệp Học liệu thật (PDF, Word, Slide, Ảnh bài làm)",
+        desc: "Tích hợp lưu trữ đám mây (Cloudflare R2) để giáo viên tải thẳng file PDF đề thi, slide giảng dạy và học sinh chụp ảnh bài tập tự luận gửi vào Chat hoặc nộp sản phẩm.",
+        impact: "Không cần dán link ngoài, dùng cực tiện như Zalo/Facebook"
+      },
+      {
+        id: "f4",
+        group: "social",
+        groupLabel: "Mạng XH Giáo viên",
+        priority: "Nên làm",
+        badgeClass: "badge-indigo",
+        title: "4. Nút \"Nhân bản Đề thi / Giáo án về Lớp của tôi\"",
+        desc: "Khi thầy cô thấy một bộ đề hay hoặc giáo án chuẩn của đồng nghiệp trên Mạng xã hội, bấm 1 nút là sao chép thẳng về lớp mình đang giảng dạy để giao cho học sinh.",
+        impact: "Biến cộng đồng giáo viên thành kho học liệu sống"
+      },
+
+      // Nhóm B: Trải nghiệm Học sinh
+      {
+        id: "f5",
+        group: "student",
+        groupLabel: "Trải nghiệm Học sinh",
+        priority: "Rất nên làm",
+        badgeClass: "badge-amber",
+        title: "5. Cấp Chứng chỉ Hoàn thành Khóa học (In PDF + Mã QR xác thực)",
+        desc: "Học sinh hoàn thành 100% bài học trong khóa trên /khoa-hoc và vượt bài kiểm tra sẽ nhận ngay Giấy chứng nhận đẹp mắt có tên học sinh, logo Cú Bông và mã QR kiểm tra thật/giả.",
+        impact: "Tạo động lực học hết khóa và chia sẻ lan tỏa mạnh"
+      },
+      {
+        id: "f6",
+        group: "student",
+        groupLabel: "Trải nghiệm Học sinh",
+        priority: "Rất nên làm",
+        badgeClass: "badge-amber",
+        title: "6. Học bạ Số & Hồ sơ Năng lực Học sinh (Student Portfolio)",
+        desc: "Trang tổng hợp biểu đồ tiến bộ điểm thi thử, chuỗi ngày học liên tục (Streak), chứng chỉ khóa học, 8 kỹ năng lập trình và các sản phẩm phần mềm đã được thầy cô đánh giá cao.",
+        impact: "Học sinh thấy rõ sự tiến bộ của mình từng tuần"
+      },
+      {
+        id: "f7",
+        group: "student",
+        groupLabel: "Trải nghiệm Học sinh",
+        priority: "Nên làm",
+        badgeClass: "badge-sky",
+        title: "7. Phân tích Điểm yếu sau Thi & Gợi ý Bài cần ôn lại",
+        desc: "Sau mỗi lần nộp bài thi tổng hợp theo cấp, hệ thống tự thống kê em hay sai dạng câu nào/chương nào và đưa thẳng nút bấm tới đúng bài giảng + bài tập củng cố.",
+        impact: "Nâng điểm thi thực tế thay vì chỉ xem điểm xong tắt"
+      },
+      {
+        id: "f8",
+        group: "student",
+        groupLabel: "Trải nghiệm Học sinh",
+        priority: "Nên làm",
+        badgeClass: "badge-sky",
+        title: "8. Chế độ Phụ huynh Đồng hành (Theo dõi Con miễn phí)",
+        desc: "Phụ huynh nhập mã liên kết tài khoản con để xem lịch sử điểm danh Lớp Live, bảng điểm thi thử, thời gian tự học và nhận thông báo an toàn nếu con gặp tình huống bất thường.",
+        impact: "Phụ huynh yên tâm tuyệt đối khi cho con học online"
+      },
+
+      // Nhóm C: An toàn & Quản trị
+      {
+        id: "f9",
+        group: "safety",
+        groupLabel: "An toàn & Quản trị",
+        priority: "Rất nên làm",
+        badgeClass: "badge-rose",
+        title: "9. Nâng cấp BOT Quét AI Hiểu Ngữ cảnh (Chống viết lái / Teencode)",
+        desc: "Kết hợp BOT từ khóa hiện tại với Workers AI để nhận diện cả tin nhắn viết tắt, viết không dấu hoặc gạ gẫm tinh vi trong Chat và Bình luận, giảm tối đa lọt vi phạm.",
+        impact: "Bảo vệ học sinh chặt chẽ hơn gấp nhiều lần"
+      },
+      {
+        id: "f10",
+        group: "safety",
+        groupLabel: "An toàn & Quản trị",
+        priority: "Nên làm",
+        badgeClass: "badge-rose",
+        title: "10. Điểm Uy tín Giáo viên & Tự động Xếp hạng Giáo án Chuẩn",
+        desc: "Tính điểm uy tín tự động dựa trên đánh giá 5 sao khóa học, lượt lưu từ đồng nghiệp và lịch sử không vi phạm. Tự động đẩy bài hay lên đầu và hạ hiển thị giáo án kém chất lượng.",
+        impact: "Giữ chất lượng nội dung toàn hệ thống luôn cao"
+      },
+      {
+        id: "f11",
+        group: "safety",
+        groupLabel: "An toàn & Quản trị",
+        priority: "Nên làm",
+        badgeClass: "badge-rose",
+        title: "11. Nhật ký Quản trị (Audit Log) & Sao lưu Dữ liệu Tự động",
+        desc: "Ghi lại toàn bộ lịch sử thao tác của Admin (mở/khóa thi cấp, duyệt giáo viên, khóa acc, xuất hồ sơ Công an) kèm tính năng xuất bản sao lưu dữ liệu phòng sự cố.",
+        impact: "Vận hành minh bạch, chuẩn kiểm tra pháp lý"
+      },
+
+      // Nhóm D: Chuẩn Ra mắt Công chúng
+      {
+        id: "f12",
+        group: "launch",
+        groupLabel: "Ra mắt Công chúng",
+        priority: "Rất nên làm",
+        badgeClass: "badge-indigo",
+        title: "12. Gắn Tên miền Riêng (VD: eduk12.vn) & Email Quên mật khẩu",
+        desc: "Chuyển từ tên miền mặc định sang tên miền thương hiệu riêng kèm luồng gửi email xác nhận tài khoản, khôi phục mật khẩu và gửi thông báo khóa tài khoản qua Email.",
+        impact: "Tạo diện mạo thương hiệu chuyên nghiệp, đáng tin cậy"
+      },
+      {
+        id: "f13",
+        group: "launch",
+        groupLabel: "Ra mắt Công chúng",
+        priority: "Nên làm",
+        badgeClass: "badge-indigo",
+        title: "13. Thông báo Đẩy trên Điện thoại (Push Notification) & Lên Store",
+        desc: "Báo thẳng ra màn hình khóa điện thoại khi Admin mở khóa kỳ thi cấp, khi sắp tới giờ Lớp Live, khi thầy cô trả lời tin nhắn hoặc chấm điểm sản phẩm — sẵn sàng lên CH Play & App Store.",
+        impact: "Trải nghiệm trọn vẹn như ứng dụng giáo dục hàng đầu"
+      },
+      {
+        id: "f14",
+        group: "launch",
+        groupLabel: "Ra mắt Công chúng",
+        priority: "Nên làm",
+        badgeClass: "badge-indigo",
+        title: "14. Tối ưu SEO & Thẻ Chia sẻ Facebook/Zalo đẹp mắt (OpenGraph)",
+        desc: "Khi thầy cô chia sẻ link khóa học hay bài giảng lên nhóm Facebook/Zalo sẽ tự động hiện ảnh bìa đẹp, tên khóa học, số sao đánh giá và mô tả ngắn chuyên nghiệp.",
+        impact: "Thu hút học sinh & giáo viên mới tự nhiên 0đ quảng cáo"
+      }
+    ];
+
+    const STORAGE_KEY = "eduk12_selected_roadmap_v1";
+    let selectedIds = new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"));
+    let currentFilter = "all";
+
+    function renderRoadmap() {
+      const grid = document.getElementById("roadmap-grid");
+      const items = currentFilter === "all"
+        ? ROADMAP_ITEMS
+        : ROADMAP_ITEMS.filter((x) => x.group === currentFilter);
+
+      grid.innerHTML = items.map((item) => {
+        const checked = selectedIds.has(item.id);
+        return `
+          <div class="feat-card ${checked ? "selected" : ""}">
+            <div>
+              <div class="feat-head">
+                <span class="badge ${item.badgeClass}">${item.groupLabel}</span>
+                <span style="font-size:11px; font-weight:800; color:#64748b;">${item.priority}</span>
+              </div>
+              <h3 class="feat-title">${item.title}</h3>
+              <p class="feat-desc">${item.desc}</p>
+            </div>
+            <div class="feat-meta">
+              <span style="color:#059669;">✦ ${item.impact}</span>
+              <label class="pick-label">
+                <input type="checkbox" ${checked ? "checked" : ""} onchange="toggleFeature('${item.id}')" />
+                Chọn làm
+              </label>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      document.getElementById("selected-count").textContent =
+        `Đã chọn ${selectedIds.size} / ${ROADMAP_ITEMS.length} chức năng ưu tiên`;
+    }
+
+    function toggleFeature(id) {
+      if (selectedIds.has(id)) selectedIds.delete(id);
+      else selectedIds.add(id);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify([...selectedIds]));
+      renderRoadmap();
+    }
+
+    function filterRoadmap(group, btn) {
+      currentFilter = group;
+      document.querySelectorAll(".filter-btn").forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      renderRoadmap();
+    }
+
+    function copyText(btn, text) {
+      navigator.clipboard.writeText(text).then(() => {
+        const old = btn.textContent;
+        btn.textContent = "Đã Copy ✓";
+        btn.classList.add("copied");
+        setTimeout(() => {
+          btn.textContent = old;
+          btn.classList.remove("copied");
+        }, 1800);
+      });
+    }
+
+    function copySelectedRoadmap() {
+      const picked = ROADMAP_ITEMS.filter((i) => selectedIds.has(i.id));
+      if (picked.length === 0) {
+        alert("Hãy tích chọn ít nhất 1 chức năng bạn muốn làm trước khi copy nhé!");
+        return;
+      }
+      const text = "Danh sách chức năng ưu tiên triển khai cho EduK12 Open:\n" +
+        picked.map((p) => `- ${p.title}`).join("\n");
+      navigator.clipboard.writeText(text).then(() => {
+        alert("Đã copy danh sách " + picked.length + " chức năng ưu tiên! Bạn chỉ cần dán vào khung chat để mình làm ngay.");
+      });
+    }
+
+    async function checkLiveOAuth() {
+      const gEl = document.getElementById("google-status");
+      const fEl = document.getElementById("facebook-status");
+      gEl.textContent = "Đang kiểm tra...";
+      fEl.textContent = "Đang kiểm tra...";
+      try {
+        const res = await fetch("https://eduk12-scale.eduk12-scale.workers.dev/api/v1/auth/oauth/providers");
+        const data = await res.json();
+        gEl.innerHTML = data.google_configured
+          ? '<span style="color:#059669;">✅ ĐÃ KÍCH HOẠT SẴN SÀNG</span>'
+          : '<span style="color:#d97706;">⏳ Chưa gắn GOOGLE_CLIENT_ID / SECRET</span>';
+        fEl.innerHTML = data.facebook_configured
+          ? '<span style="color:#059669;">✅ ĐÃ KÍCH HOẠT SẴN SÀNG</span>'
+          : '<span style="color:#d97706;">⏳ Chưa gắn FACEBOOK_APP_ID / SECRET</span>';
+      } catch (e) {
+        gEl.innerHTML = '<span style="color:#e11d48;">Không kết nối được máy chủ</span>';
+        fEl.innerHTML = '<span style="color:#e11d48;">Không kết nối được máy chủ</span>';
+      }
+    }
+
+    renderRoadmap();
+  </script>
+</body>
+</html>
