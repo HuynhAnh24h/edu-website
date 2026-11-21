@@ -31,11 +31,12 @@ import {
   X,
 } from "lucide-react";
 import { AI_API_URL, CORE_API_URL } from "@/lib/api";
-import { AuthUser, useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/context/AuthContext";
 import { MathContent } from "@/components/MathContent";
 import { BulkImportPanel } from "@/components/cms/BulkImportPanel";
 import { ClassroomManager } from "@/components/cms/ClassroomManager";
 import { RichWordEditor } from "@/components/cms/RichWordEditor";
+import { UserManagementPanel } from "@/components/cms/UserManagementPanel";
 import {
   createEmptyDraftQuestion,
   DraftQuestion,
@@ -165,7 +166,6 @@ export default function CMSAdminPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [questions, setQuestions] = useState<CMSQuestion[]>([]);
-  const [usersList, setUsersList] = useState<AuthUser[]>([]);
   const [toast, setToast] = useState<{ type: "ok" | "err"; msg: string } | null>(null);
   const [savingLesson, setSavingLesson] = useState(false);
   const [savingQuestions, setSavingQuestions] = useState(false);
@@ -225,17 +225,6 @@ export default function CMSAdminPage() {
     }
   }, [accessToken]);
 
-  const loadUsers = useCallback(async () => {
-    if (!accessToken || !isAdmin) return;
-    const res = await fetch(`${CORE_API_URL}/api/v1/admin/users`, {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    });
-    if (res.ok) {
-      const data = await res.json();
-      setUsersList(data.users || []);
-    }
-  }, [accessToken, isAdmin]);
-
   const loadDashboardOverview = useCallback(async () => {
     if (!accessToken) return;
     try {
@@ -280,8 +269,7 @@ export default function CMSAdminPage() {
       void loadQuestions();
       void loadDashboardOverview();
     }
-    if (isAdmin) void loadUsers();
-  }, [isStaff, isAdmin, loadQuestions, loadUsers, loadDashboardOverview]);
+  }, [isStaff, loadQuestions, loadDashboardOverview]);
 
   if (loading) {
     return (
@@ -503,21 +491,6 @@ export default function CMSAdminPage() {
     setSelectedQIds([]);
     void loadDashboardOverview();
     showToast("ok", "Đã xuất bản đề thi & mã hóa gói AES-256-GCM sẵn sàng trên /thi!");
-  };
-
-  const handleRoleChange = async (userId: string, newRole: string) => {
-    const res = await fetch(`${CORE_API_URL}/api/v1/admin/users/${userId}/role`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
-      },
-      body: JSON.stringify({ role: newRole }),
-    });
-    if (res.ok) {
-      showToast("ok", "Đã cập nhật phân quyền người dùng!");
-      void loadUsers();
-    }
   };
 
   const totalStudentsInClasses = myClassrooms.reduce(
@@ -1522,49 +1495,13 @@ export default function CMSAdminPage() {
             />
           )}
 
-          {/* === TAB 6: QUẢN LÝ NGƯỜI DÙNG & PHÂN QUYỀN (SUPER ADMIN) === */}
+          {/* === TAB 6: QUẢN LÝ NGƯỜI DÙNG, 2FA & OAUTH GOOGLE/FACEBOOK (SUPER ADMIN) === */}
           {activeTab === "users" && isAdmin && (
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs">
-              <h2 className="mb-4 text-base font-bold text-slate-900">
-                Quản lý Tài khoản &amp; Phân quyền RBAC ({usersList.length} tài khoản)
-              </h2>
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm">
-                  <thead className="border-b border-slate-200 text-xs uppercase text-slate-500">
-                    <tr>
-                      <th className="py-2.5 pr-4">Họ tên</th>
-                      <th className="py-2.5 pr-4">Email</th>
-                      <th className="py-2.5 pr-4">Lớp / Trường</th>
-                      <th className="py-2.5">Phân quyền</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {usersList.map((u) => (
-                      <tr key={u.id}>
-                        <td className="py-3 pr-4 font-semibold text-slate-900">{u.full_name}</td>
-                        <td className="py-3 pr-4 font-mono text-xs text-slate-600">{u.email}</td>
-                        <td className="py-3 pr-4 text-xs text-slate-500">
-                          {u.current_grade ? `Lớp ${u.current_grade}` : "—"}{" "}
-                          {u.school_name ? `• ${u.school_name}` : ""}
-                        </td>
-                        <td className="py-3">
-                          <select
-                            value={u.role}
-                            onChange={(e) => void handleRoleChange(u.id, e.target.value)}
-                            className="rounded-lg border border-slate-300 bg-white px-2.5 py-1 text-xs font-semibold"
-                          >
-                            <option value="student">Học sinh</option>
-                            <option value="teacher">Giáo viên (CMS)</option>
-                            <option value="content_admin">Biên tập viên (CMS)</option>
-                            <option value="super_admin">Super Admin</option>
-                          </select>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
+            <UserManagementPanel
+              accessToken={accessToken}
+              currentUserId={user.id}
+              onNotify={showToast}
+            />
           )}
         </main>
       </div>

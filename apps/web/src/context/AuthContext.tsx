@@ -13,13 +13,22 @@ export interface AuthUser {
   school_name?: string;
 }
 
+export interface LoginResult {
+  ok: boolean;
+  error?: string;
+  requires_2fa?: boolean;
+  temp_token?: string;
+}
+
 interface AuthContextValue {
   user: AuthUser | null;
   accessToken: string | null;
   loading: boolean;
   isStaff: boolean;
   isAdmin: boolean;
-  login: (email: string, password: string) => Promise<{ ok: boolean; error?: string }>;
+  login: (email: string, password: string) => Promise<LoginResult>;
+  verify2faLogin: (tempToken: string, code: string) => Promise<{ ok: boolean; error?: string; user?: AuthUser }>;
+  completeOAuthExchange: (code: string) => Promise<{ ok: boolean; error?: string; user?: AuthUser }>;
   register: (payload: {
     email: string;
     password: string;
@@ -40,6 +49,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const persistSession = useCallback((data: { access_token: string; refresh_token?: string; user: AuthUser }) => {
+    localStorage.setItem(TOKEN_KEY, data.access_token);
+    if (data.refresh_token) localStorage.setItem(REFRESH_KEY, data.refresh_token);
+    setAccessToken(data.access_token);
+    setUser(data.user);
+  }, []);
 
   useEffect(() => {
     const saved = typeof window !== "undefined" ? localStorage.getItem(TOKEN_KEY) : null;
@@ -65,26 +81,71 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .finally(() => setLoading(false));
   }, []);
 
-  const login = useCallback(async (email: string, password: string) => {
-    try {
-      const res = await fetch(`${CORE_API_URL}/api/v1/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        return { ok: false, error: data.error || "Đăng nhập thất bại" };
+  const login = useCallback(
+    async (email: string, password: string): Promise<LoginResult> => {
+      try {
+        const res = await fetch(`${CORE_API_URL}/api/v1/auth/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          return { ok: false, error: data.error || "Đăng nhập thất bại" };
+        }
+        if (data.requires_2fa && data.temp_token) {
+          return { ok: false, requires_2fa: true, temp_token: data.temp_token };
+        }
+        persistSession(data);
+        return { ok: true };
+      } catch {
+        return { ok: false, error: "Không thể kết nối máy chủ xác thực" };
       }
-      localStorage.setItem(TOKEN_KEY, data.access_token);
-      if (data.refresh_token) localStorage.setItem(REFRESH_KEY, data.refresh_token);
-      setAccessToken(data.access_token);
-      setUser(data.user as AuthUser);
-      return { ok: true };
-    } catch {
-      return { ok: false, error: "Không thể kết nối máy chủ xác thực (:8080)" };
-    }
-  }, []);
+    },
+    [persistSession]
+  );
+
+  const verify2faLogin = useCallback(
+    async (tempToken: string, code: string) => {
+      try {
+        const res = await fetch(`${CORE_API_URL}/api/v1/auth/2fa/verify-login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ temp_token: tempToken, code }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          return { ok: false, error: data.error || "Mã 2FA không hợp lệ" };
+        }
+        persistSession(data);
+        return { ok: true, user: data.user as AuthUser };
+      } catch {
+        return { ok: false, error: "Không thể xác thực mã 2FA" };
+      }
+    },
+    [persistSession]
+  );
+
+  const completeOAuthExchange = useCallback(
+    async (code: string) => {
+      try {
+        const res = await fetch(`${CORE_API_URL}/api/v1/auth/oauth/exchange`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ code }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          return { ok: false, error: data.error || "Đăng nhập mạng xã hội thất bại" };
+        }
+        persistSession(data);
+        return { ok: true, user: data.user as AuthUser };
+      } catch {
+        return { ok: false, error: "Không thể hoàn tất đăng nhập OAuth" };
+      }
+    },
+    [persistSession]
+  );
 
   const register = useCallback(
     async (payload: {
@@ -105,16 +166,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (!res.ok) {
           return { ok: false, error: data.error || "Đăng ký thất bại" };
         }
-        localStorage.setItem(TOKEN_KEY, data.access_token);
-        if (data.refresh_token) localStorage.setItem(REFRESH_KEY, data.refresh_token);
-        setAccessToken(data.access_token);
-        setUser(data.user as AuthUser);
+        persistSession(data);
         return { ok: true };
       } catch {
-        return { ok: false, error: "Không thể kết nối máy chủ xác thực (:8080)" };
+        return { ok: false, error: "Không thể kết nối máy chủ xác thực" };
       }
     },
-    []
+    [persistSession]
   );
 
   const logout = useCallback(async () => {
@@ -140,7 +198,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, accessToken, loading, isStaff, isAdmin, login, register, logout }}
+      value={{
+        user,
+        accessToken,
+        loading,
+        isStaff,
+        isAdmin,
+        login,
+        verify2faLogin,
+        completeOAuthExchange,
+        register,
+        logout,
+      }}
     >
       {children}
     </AuthContext.Provider>

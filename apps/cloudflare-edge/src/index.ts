@@ -9,6 +9,8 @@ import {
 import { parseRawExamText } from "./parser";
 import { ensureSeeded, slugify, SUBJECT_NAMES } from "./seed";
 import { handleClassroomRoutes } from "./classrooms";
+import { handleAuthSecurityRoutes, issueSessionTokens } from "./auth-security";
+import { handleCodingRoutes } from "./coding";
 
 export interface Env {
   DB: D1Database;
@@ -16,6 +18,10 @@ export interface Env {
   AI: Ai;
   ASSETS: Fetcher;
   JWT_SECRET?: string;
+  GOOGLE_CLIENT_ID?: string;
+  GOOGLE_CLIENT_SECRET?: string;
+  FACEBOOK_APP_ID?: string;
+  FACEBOOK_APP_SECRET?: string;
 }
 
 interface QuestionRow {
@@ -222,6 +228,31 @@ export default {
         if (clsResp) return clsResp;
       }
 
+      if (
+        path.startsWith("/api/v1/auth/oauth") ||
+        path.startsWith("/api/v1/auth/2fa") ||
+        path.startsWith("/api/v1/admin/users")
+      ) {
+        const claims = await getClaims(request, env);
+        const secResp = await handleAuthSecurityRoutes(
+          request,
+          env,
+          path,
+          method,
+          url,
+          claims,
+          getSecret(env),
+          jsonRes
+        );
+        if (secResp) return secResp;
+      }
+
+      if (path.startsWith("/api/v1/coding")) {
+        const claims = await getClaims(request, env);
+        const codingResp = await handleCodingRoutes(request, env.DB, path, method, claims, jsonRes);
+        if (codingResp) return codingResp;
+      }
+
       // === HEALTH & TELEMETRY ===
       if (path === "/health") {
         return jsonRes({
@@ -253,7 +284,7 @@ export default {
         });
       }
 
-      // === 1. AUTH & RBAC ===
+      // === 1. AUTH & RBAC (KÈM KIỂM TRA KHÓA TÀI KHOẢN & 2FA TOTP) ===
       if (path === "/api/v1/auth/login" && method === "POST") {
         const body = (await request.json()) as { email?: string; password?: string };
         const user = await env.DB.prepare("SELECT * FROM users WHERE LOWER(email) = LOWER(?)")
@@ -262,22 +293,23 @@ export default {
         if (!user || !(await verifyPassword(String(user.password_hash), body.password || ""))) {
           return jsonRes({ error: "Email hoặc mật khẩu không đúng" }, 401);
         }
-        const safeUser = {
-          id: String(user.id),
-          email: String(user.email),
-          full_name: String(user.full_name),
-          role: String(user.role),
-          tier: String(user.tier),
-          current_grade: user.current_grade ? Number(user.current_grade) : undefined,
-          school_name: String(user.school_name || ""),
-        };
-        const accessToken = await signJwt(
-          { uid: safeUser.id, email: safeUser.email, name: safeUser.full_name, role: safeUser.role, grade: safeUser.current_grade },
-          getSecret(env)
-        );
-        const refreshToken = crypto.randomUUID();
-        await env.EDU_KV.put(`auth:refresh:${refreshToken}`, safeUser.id, { expirationTtl: 30 * 86400 });
-        return jsonRes({ access_token: accessToken, refresh_token: refreshToken, user: safeUser });
+        if (Number(user.is_active ?? 1) === 0) {
+          return jsonRes({ error: "Tài khoản này đã bị tạm khóa bởi Quản trị viên" }, 403);
+        }
+        const sec = await env.DB.prepare("SELECT totp_enabled FROM user_security WHERE user_id = ?")
+          .bind(String(user.id))
+          .first<{ totp_enabled: number }>();
+        if (sec?.totp_enabled === 1) {
+          const tempToken = crypto.randomUUID();
+          await env.EDU_KV.put(`auth:2fa:${tempToken}`, String(user.id), { expirationTtl: 300 });
+          return jsonRes({
+            requires_2fa: true,
+            temp_token: tempToken,
+            user: { email: String(user.email), full_name: String(user.full_name) },
+          });
+        }
+        const tokens = await issueSessionTokens(env, getSecret(env), user);
+        return jsonRes(tokens);
       }
 
       if (path === "/api/v1/auth/register" && method === "POST") {
