@@ -46,7 +46,7 @@ export default function ExamsLobbyPage() {
 
       <div className="grid gap-6 lg:grid-cols-12">
         {/* Danh sách kỳ thi */}
-        <div className="space-y-4 lg:col-span-8">
+        <div data-tour="exam-list" className="space-y-4 lg:col-span-8">
           {exams.map((ex) => (
             <div
               key={ex.id}
@@ -93,7 +93,7 @@ export default function ExamsLobbyPage() {
         </div>
 
         {/* Bảng xếp hạng trực tiếp */}
-        <aside className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs lg:col-span-4">
+        <aside data-tour="exam-leaderboard" className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs lg:col-span-4">
           <div className="mb-4 flex items-center gap-2">
             <Trophy className="h-5 w-5 text-amber-500" />
             <h2 className="text-base font-bold text-slate-900">

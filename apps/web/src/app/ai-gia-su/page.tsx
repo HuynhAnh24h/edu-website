@@ -180,7 +180,7 @@ function AITutorContent() {
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-2">
+          <div data-tour="ai-controls" className="flex flex-wrap gap-2">
             <select
               value={gradeId}
               onChange={(e) => setGradeId(Number(e.target.value))}
@@ -294,6 +294,7 @@ function AITutorContent() {
 
         {/* Form nhập câu hỏi */}
         <form
+          data-tour="ai-input"
           onSubmit={(e) => {
             e.preventDefault();
             void sendMessage();

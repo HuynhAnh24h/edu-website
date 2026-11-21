@@ -311,7 +311,7 @@ function AuthPageInner() {
         )}
 
         {/* Khối Cài đặt 2FA (Google Authenticator / Authy) */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs space-y-5">
+        <div data-tour="auth-2fa" className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs space-y-5">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <div
@@ -555,7 +555,7 @@ function AuthPageInner() {
         </div>
 
         {/* Nút Đăng nhập nhanh bằng Google & Facebook OAuth 2.0 */}
-        <div className="grid grid-cols-2 gap-2.5">
+        <div data-tour="auth-social" className="grid grid-cols-2 gap-2.5">
           <a
             href={`${CORE_API_URL}/api/v1/auth/oauth/google`}
             className="flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition"

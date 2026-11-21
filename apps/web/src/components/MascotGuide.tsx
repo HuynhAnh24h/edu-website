@@ -24,6 +24,16 @@ const ROUTE_FLIGHTS: Record<string, FlightWaypoint[]> = {
       text: "Bấm Chạy & Kiểm tra — đạt 100% test mới mở khóa bài tiếp theo!",
     },
   ],
+  "/tai-lieu": [
+    {
+      selector: '[data-tour="docs-grades"]',
+      text: "Chọn Khối Lớp 1 đến 12 theo đúng chương trình GDPT 2018 ở thanh này nhé!",
+    },
+    {
+      selector: '[data-tour="docs-subjects"]',
+      text: "Bấm chọn Môn học (Toán, Lý, Hóa, Sinh, Sử, Địa...) để mở cây Chương & Bài giảng!",
+    },
+  ],
   "/lop-hoc": [
     {
       selector: '[data-tour="join-code-input"]',
@@ -36,6 +46,42 @@ const ROUTE_FLIGHTS: Record<string, FlightWaypoint[]> = {
     {
       selector: '[data-tour="classroom-grid"]',
       text: "Thấy badge LIVE đỏ là bấm Vào Phòng Live học trực tuyến & điểm danh ngay!",
+    },
+  ],
+  "/bai-tap": [
+    {
+      selector: '[data-tour="ex-sets"]',
+      text: "Chọn bộ bài tập theo Lớp & Môn để luyện cả 4 định dạng câu hỏi mới 2025+!",
+    },
+    {
+      selector: '[data-tour="ex-questions"]',
+      text: "Chọn đáp án rồi bấm Kiểm tra để xem điểm & lời giải chi tiết ngay lập tức!",
+    },
+  ],
+  "/thi": [
+    {
+      selector: '[data-tour="exam-list"]',
+      text: "Chọn đề thi mã hóa AES-256-GCM rồi bấm Vào phòng thi — tự lưu nháp chống rớt mạng!",
+    },
+    {
+      selector: '[data-tour="exam-leaderboard"]',
+      text: "Nộp bài xong điểm của bạn sẽ cập nhật tức thì trên Bảng xếp hạng trực tiếp này!",
+    },
+  ],
+  "/ai-gia-su": [
+    {
+      selector: '[data-tour="ai-controls"]',
+      text: "Chọn đúng Khối lớp & chế độ Gợi mở Socratic để AI dẫn dắt đúng trình độ của bạn!",
+    },
+    {
+      selector: '[data-tour="ai-input"]',
+      text: "Gõ bài khó hoặc câu hỏi bất kỳ vào đây — AI Gia sư hỗ trợ bạn 24/7!",
+    },
+  ],
+  "/dang-nhap": [
+    {
+      selector: '[data-tour="auth-2fa"], [data-tour="auth-social"]',
+      text: "Đăng nhập nhanh bằng Google, Facebook hoặc Email — và nhớ bật bảo mật 2FA bằng mã QR nhé!",
     },
   ],
   "/quan-tri": [
@@ -286,27 +332,41 @@ export function MascotGuide() {
     }
 
     const waypoints = ROUTE_FLIGHTS[matchedPrefix];
-    const stepDuration = 3800;
+    const stepDuration = 3600;
+
+    const flyToWaypoint = (wp: FlightWaypoint, retries = 5) => {
+      const el = document.querySelector(wp.selector);
+      if (!el) {
+        if (retries > 0) {
+          const retryT = setTimeout(() => flyToWaypoint(wp, retries - 1), 250);
+          timersRef.current.push(retryT);
+        }
+        return;
+      }
+      const rect = el.getBoundingClientRect();
+      if (rect.width === 0 && rect.height === 0) return;
+      if (rect.top < 64 || rect.bottom > window.innerHeight - 20) {
+        el.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        const settleT = setTimeout(() => {
+          const r2 = el.getBoundingClientRect();
+          flyToRect(r2, wp.text, true, stepDuration - 350);
+        }, 320);
+        timersRef.current.push(settleT);
+      } else {
+        flyToRect(rect, wp.text, true, stepDuration - 300);
+      }
+    };
 
     waypoints.forEach((wp, idx) => {
-      const t = setTimeout(() => {
-        const el = document.querySelector(wp.selector);
-        if (!el) return;
-        const rect = el.getBoundingClientRect();
-        if (rect.width === 0 && rect.height === 0) return;
-        // Nếu phần tử nằm trong viewport thì bay thẳng tới chỉ mượt mà (không giật scroll đột ngột)
-        if (rect.top >= 0 && rect.top < window.innerHeight - 40) {
-          flyToRect(rect, wp.text, true, stepDuration - 300);
-        }
-      }, 450 + idx * stepDuration);
+      const t = setTimeout(() => flyToWaypoint(wp), 420 + idx * stepDuration);
       timersRef.current.push(t);
     });
 
-    // Dọn ring sau khi bay xong 3 điểm
+    // Dọn ring sau khi bay dẫn đường xong
     const endTimer = setTimeout(() => {
       setSpotlight(null);
       setSpeech("");
-    }, 450 + waypoints.length * stepDuration + 300);
+    }, 420 + waypoints.length * stepDuration + 400);
     timersRef.current.push(endTimer);
 
     return () => clearFlightTimers();
@@ -325,6 +385,14 @@ export function MascotGuide() {
       ) as HTMLElement | null;
       if (!interactive) return;
 
+      // Nếu đang bấm link chuyển sang trang chức năng khác -> để đường bay tự động của trang đích chạy mượt ngay lập tức!
+      if (interactive.tagName === "A") {
+        const href = interactive.getAttribute("href") || "";
+        if (href.startsWith("/") && !href.startsWith(pathname === "/" ? "/#" : pathname)) {
+          return;
+        }
+      }
+
       const rect = interactive.getBoundingClientRect();
       if (rect.width === 0 && rect.height === 0) return;
 
@@ -334,7 +402,7 @@ export function MascotGuide() {
 
     document.addEventListener("click", handleGlobalClick, true);
     return () => document.removeEventListener("click", handleGlobalClick, true);
-  }, [hidden, sleeping, clearFlightTimers, flyToRect]);
+  }, [hidden, sleeping, pathname, clearFlightTimers, flyToRect]);
 
   // Lắng nghe sự kiện chúc mừng khi học sinh vừa đăng ký vào lớp thành công
   useEffect(() => {

@@ -194,7 +194,7 @@ function MaterialsTreeContent() {
 
       {/* Thanh chọn Khối Lớp 1 -> 12 */}
       <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-xs space-y-3">
-        <div className="flex gap-1.5 overflow-x-auto pb-1">
+        <div data-tour="docs-grades" className="flex gap-1.5 overflow-x-auto pb-1">
           {Array.from({ length: 12 }, (_, i) => i + 1).map((g) => {
             const active = selectedGrade === g;
             return (
@@ -217,7 +217,7 @@ function MaterialsTreeContent() {
         </div>
 
         {/* Lưới Thẻ Các Môn Học Trực Quan thuộc khối lớp đang chọn */}
-        <div className="space-y-2.5 border-t border-slate-100 pt-3">
+        <div data-tour="docs-subjects" className="space-y-2.5 border-t border-slate-100 pt-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <span className={`rounded-lg border px-2.5 py-1 text-[11px] font-bold ${gradeLevelColor(selectedGrade)}`}>
               {selectedGrade <= 5 ? "Tiểu học" : selectedGrade <= 9 ? "THCS" : "THPT"} • Lớp {selectedGrade} ({subjectsForGrade.length} môn)

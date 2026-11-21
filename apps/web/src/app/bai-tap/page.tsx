@@ -54,7 +54,7 @@ export default function ExercisesPage() {
       </div>
 
       {/* Chọn bộ bài tập */}
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div data-tour="ex-sets" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {sets.map((s) => {
           const selected = activeSet?.id === s.id;
           return (
@@ -85,7 +85,7 @@ export default function ExercisesPage() {
 
       {/* Danh sách câu hỏi trong bộ */}
       {activeSet && (
-        <div className="space-y-5">
+        <div data-tour="ex-questions" className="space-y-5">
           {activeSet.questions.map((q, idx) => {
             const detail = results[q.id];
             return (
