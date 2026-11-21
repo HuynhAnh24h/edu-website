@@ -13,6 +13,7 @@ import {
   LogIn,
   Play,
   School,
+  Sparkles,
   Users,
 } from "lucide-react";
 import { CORE_API_URL, Lesson } from "@/lib/api";
@@ -137,6 +138,12 @@ export default function ClassroomsPage() {
     }
     setJoinCode("");
     notify("ok", `Đăng ký thành công vào lớp "${data.classroom.name}"! Bạn có thể học theo giáo án ngay.`);
+    // Tự động gọi Linh vật Cú Bông Edu hiện hướng dẫn 4 bước học lớp cho học sinh!
+    window.dispatchEvent(
+      new CustomEvent("eduk12:mascot-tour", {
+        detail: { className: data.classroom.name },
+      })
+    );
     await loadList();
     void openClassroom(data.classroom.id);
   };
@@ -397,6 +404,15 @@ export default function ClassroomsPage() {
             }`}
           >
             Lớp học của tôi
+          </button>
+          <button
+            type="button"
+            onClick={() =>
+              window.dispatchEvent(new CustomEvent("eduk12:mascot-tour", { detail: {} }))
+            }
+            className="inline-flex items-center gap-1.5 rounded-xl border border-indigo-200 bg-indigo-50 px-3.5 py-2 text-xs font-bold text-indigo-700 hover:bg-indigo-100 transition"
+          >
+            <Sparkles className="h-3.5 w-3.5" /> Cú Bông hướng dẫn
           </button>
         </div>
 
