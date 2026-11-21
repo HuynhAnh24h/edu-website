@@ -3,8 +3,8 @@ $ErrorActionPreference = "Stop"
 Write-Host "=== 1. Build Next.js Static Export (apps/web/out) cho Cloudflare Edge CDN ===" -ForegroundColor Cyan
 Push-Location "$PSScriptRoot\apps\web"
 $env:NEXT_STATIC_EXPORT = "1"
-$env:NEXT_PUBLIC_CORE_API_URL = ""
-$env:NEXT_PUBLIC_AI_API_URL = ""
+$env:NEXT_PUBLIC_CORE_API_URL = "SAME_ORIGIN"
+$env:NEXT_PUBLIC_AI_API_URL = "SAME_ORIGIN"
 npm run build
 Pop-Location
 

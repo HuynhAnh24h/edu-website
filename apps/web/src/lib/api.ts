@@ -1,7 +1,23 @@
-export const CORE_API_URL =
-  process.env.NEXT_PUBLIC_CORE_API_URL ?? "http://localhost:8080";
-export const AI_API_URL =
-  process.env.NEXT_PUBLIC_AI_API_URL ?? "http://localhost:8001";
+function resolveApiBase(envVal: string | undefined, devDefault: string): string {
+  if (envVal === "SAME_ORIGIN") return "";
+  if (envVal) return envVal;
+  if (typeof window !== "undefined") {
+    const h = window.location.hostname;
+    if (h !== "localhost" && h !== "127.0.0.1") {
+      return "";
+    }
+  }
+  return devDefault;
+}
+
+export const CORE_API_URL = resolveApiBase(
+  process.env.NEXT_PUBLIC_CORE_API_URL,
+  "http://localhost:8080"
+);
+export const AI_API_URL = resolveApiBase(
+  process.env.NEXT_PUBLIC_AI_API_URL,
+  "http://localhost:8001"
+);
 
 export interface Grade {
   id: number;

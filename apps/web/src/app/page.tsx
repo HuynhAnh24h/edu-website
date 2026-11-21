@@ -15,6 +15,7 @@ import {
 import { AI_API_URL, CORE_API_URL } from "@/lib/api";
 
 interface CoreMetrics {
+  engine?: string;
   postgres_ok: boolean;
   redis_ok: boolean;
   kafka_ok: boolean;
@@ -215,7 +216,9 @@ export default function HomePage() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 font-semibold text-slate-800">
                 <Cpu className="h-4 w-4 text-indigo-600" />
-                Go Core &amp; Exam Engine (:8080)
+                {coreMetrics?.engine?.includes("Cloudflare")
+                  ? "Cloudflare Edge Worker (D1 + KV)"
+                  : "Go Core & Exam Engine (:8080)"}
               </div>
               <span
                 className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${
@@ -261,7 +264,9 @@ export default function HomePage() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 font-semibold text-slate-800">
                 <Bot className="h-4 w-4 text-purple-600" />
-                Python FastAPI AI Tutor (:8001)
+                {aiStats?.active_provider?.includes("cloudflare")
+                  ? "Cloudflare Workers AI Tutor (Edge)"
+                  : "Python FastAPI AI Tutor (:8001)"}
               </div>
               <span
                 className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${
