@@ -144,12 +144,6 @@ export default function ClassroomsPage() {
     }
     setJoinCode("");
     notify("ok", `Đăng ký thành công vào lớp "${data.classroom.name}"! Bạn có thể học theo giáo án ngay.`);
-    // Tự động gọi Linh vật Cú Bông Edu hiện hướng dẫn 4 bước học lớp cho học sinh!
-    window.dispatchEvent(
-      new CustomEvent("eduk12:mascot-tour", {
-        detail: { className: data.classroom.name },
-      })
-    );
     await loadList();
     void openClassroom(data.classroom.id);
   };
