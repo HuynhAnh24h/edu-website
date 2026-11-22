@@ -4,24 +4,29 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import {
   ArrowRight,
+  Award,
+  BarChart3,
   BookOpen,
   Bot,
   CheckCircle2,
   Code2,
+  FileSpreadsheet,
   GraduationCap,
   HeartHandshake,
-  Lock,
   Radio,
+  School,
   ShieldCheck,
   Smartphone,
   Sparkles,
-  Terminal,
+  Star,
   Users,
 } from "lucide-react";
 import { CORE_API_URL } from "@/lib/api";
 import { getSubjectMeta, SUBJECT_ORDER } from "@/lib/subjects";
 import { CODING_TRACKS } from "@/lib/codingCurriculum";
 import { useAuth } from "@/context/AuthContext";
+import { CuBongLogoMark } from "@/components/BrandLogo";
+import { VerifiedBadge } from "@/components/VerifiedBadge";
 
 interface SummaryRow {
   grade_id: number;
@@ -30,74 +35,173 @@ interface SummaryRow {
   lesson_count: number;
 }
 
-const PLATFORM_FEATURES = [
+interface HomeCourse {
+  id: string;
+  teacher_id: string;
+  teacher_name: string;
+  teacher_verified?: boolean;
+  title: string;
+  subject_name: string;
+  grade_label: string;
+  cover_theme: string;
+  summary: string;
+  student_count: number;
+  avg_rating: number;
+  review_count: number;
+  modules: { id: string }[];
+}
+
+interface HomeTeacher {
+  id: string;
+  full_name: string;
+  school_name: string;
+  specialty?: string;
+  is_verified?: boolean;
+  post_count: number;
+  follower_count: number;
+  reputation_score?: number;
+  reputation_label?: string;
+}
+
+const COVER_THEMES: Record<string, string> = {
+  indigo: "from-indigo-600 via-blue-600 to-sky-600",
+  emerald: "from-emerald-600 via-teal-600 to-cyan-600",
+  rose: "from-rose-500 via-pink-600 to-indigo-600",
+  amber: "from-amber-500 via-orange-500 to-rose-500",
+  sky: "from-sky-500 via-blue-600 to-indigo-600",
+};
+
+const LEVEL_TABS = [
+  { id: "primary", label: "Tiểu học (Lớp 1–5)", grades: [1, 2, 3, 4, 5], badge: "Nền tảng vững chắc" },
+  { id: "middle", label: "THCS (Lớp 6–9)", grades: [6, 7, 8, 9], badge: "Bứt phá & Vào lớp 10" },
+  { id: "high", label: "THPT (Lớp 10–12)", grades: [10, 11, 12], badge: "Chinh phục THPT 2025+" },
+] as const;
+
+const ROLE_CARDS = [
   {
-    href: "/lap-trinh",
-    icon: Code2,
-    badge: "Mới • Cộng đồng Dev",
-    color: "bg-indigo-50 text-indigo-600",
-    title: "Code trực tiếp trên Trình duyệt",
-    desc: "8 lộ trình thực chiến: HTML, CSS, JS, TS, Python, Golang, MongoDB, PostgreSQL. Chấm test tự động — chạy ĐÚNG mới qua bài tiếp theo.",
+    role: "Dành cho Học sinh (Lớp 1–12)",
+    title: "Tự học chủ động, nắm chắc kiến thức & tích lũy Học bạ Số",
+    desc: "Học 157+ bài giảng theo chương trình GDPT 2018, luyện đề phân tích điểm yếu tự động, hỏi AI Gia sư 24/7 và nhận Chứng chỉ PDF kèm mã QR.",
+    icon: GraduationCap,
+    accent: "border-indigo-200 bg-gradient-to-br from-indigo-50/80 via-white to-sky-50/60",
+    iconCls: "bg-indigo-600 text-white",
+    ctaPrimary: { href: "/tai-lieu", label: "Vào học Lớp 1–12" },
+    ctaSecondary: { href: "/hoc-ba", label: "Xem Học bạ Số" },
   },
+  {
+    role: "Dành cho Giáo viên & Cố vấn",
+    title: "Chia sẻ giáo án chuẩn, dạy Lớp Live & nhận Tích xanh Uy tín",
+    desc: "Tham gia Mạng Xã Hội Giáo Viên, nhân bản đề thi đồng nghiệp về lớp trong 1 chạm, mở phòng Live điểm danh tự động và xây dựng Tường Hồ sơ chuyên môn.",
+    icon: School,
+    accent: "border-emerald-200 bg-gradient-to-br from-emerald-50/80 via-white to-teal-50/60",
+    iconCls: "bg-emerald-600 text-white",
+    ctaPrimary: { href: "/cong-dong", label: "Cộng đồng Giáo viên" },
+    ctaSecondary: { href: "/quan-tri", label: "Studio Giảng dạy" },
+  },
+  {
+    role: "Dành cho Phụ huynh Đồng hành",
+    title: "Theo dõi sát sao điểm số, chuyên cần & an toàn của con — 0đ",
+    desc: "Chỉ cần nhập mã liên kết từ Học bạ Số của con để xem bảng điểm thi thử, lịch sử điểm danh Lớp Live, chứng chỉ đạt được và nhắn tin trực tiếp với thầy cô.",
+    icon: HeartHandshake,
+    accent: "border-amber-200 bg-gradient-to-br from-amber-50/80 via-white to-orange-50/50",
+    iconCls: "bg-amber-500 text-slate-950",
+    ctaPrimary: { href: "/phu-huynh", label: "Mở Góc Phụ huynh" },
+    ctaSecondary: { href: "/chung-chi", label: "Tra cứu Chứng chỉ QR" },
+  },
+];
+
+const EDU_PILLARS = [
   {
     href: "/tai-lieu",
     icon: BookOpen,
-    badge: "Lớp 1 → 12",
+    badge: "GDPT 2018",
     color: "bg-blue-50 text-blue-600",
-    title: "Kho Tài liệu GDPT 2018",
-    desc: "Đầy đủ môn Toán, Ngữ văn, Tiếng Anh, Vật lý, Hóa học, Sinh học, Lịch sử, Địa lý, Tin học chia rõ theo từng Chương & Bài giảng.",
+    title: "Kho Bài giảng Chuẩn Lớp 1–12",
+    desc: "Đầy đủ Toán, Ngữ văn, Tiếng Anh, Lý, Hóa, Sinh, Sử, Địa, Tin học trình bày mạch lạc theo từng Khối, Chương và Bài học.",
+  },
+  {
+    href: "/thi",
+    icon: BarChart3,
+    badge: "Định dạng 2025+",
+    color: "bg-emerald-50 text-emerald-600",
+    title: "Thi Trắc nghiệm & Phân tích Điểm yếu",
+    desc: "Đủ 4 dạng câu hỏi mới, tự động chấm điểm tức thì, chỉ rõ chuyên đề còn yếu (<70%) và gợi ý đúng bài giảng cần ôn lại.",
+  },
+  {
+    href: "/khoa-hoc",
+    icon: Award,
+    badge: "Chứng chỉ QR",
+    color: "bg-amber-50 text-amber-700",
+    title: "Khóa học 5 Sao & Chứng chỉ PDF",
+    desc: "Theo dõi tiến độ từng bài giảng của thầy cô, đánh giá sao trực tiếp và nhận Chứng chỉ Hoàn thành có mã QR xác thực.",
   },
   {
     href: "/lop-hoc",
     icon: Radio,
-    badge: "Trực tuyến 0đ",
+    badge: "Tương tác trực tiếp",
     color: "bg-rose-50 text-rose-600",
-    title: "Phòng học Trực tuyến & Livestream",
-    desc: "Dạy học Video tương tác 2 chiều hoặc phát Livestream ngay trong lớp kèm Live Chat, Điểm danh tự động và giao giáo án.",
-  },
-  {
-    href: "/thi",
-    icon: ShieldCheck,
-    badge: "Chuẩn 2025+",
-    color: "bg-emerald-50 text-emerald-600",
-    title: "Thi trắc nghiệm Online",
-    desc: "Hỗ trợ đủ 4 dạng câu hỏi mới của Bộ GD&ĐT, tự động lưu bài làm ngay trên máy giúp không lo mất bài khi rớt mạng.",
+    title: "Lớp học Trực tuyến & Livestream 0đ",
+    desc: "Phòng học Video 2 chiều hoặc phát trực tiếp kèm bảng tin lớp, giao bài tập về nhà và tự động ghi nhận điểm danh.",
   },
   {
     href: "/ai-gia-su",
     icon: Bot,
-    badge: "Gia sư 24/7",
-    color: "bg-purple-50 text-purple-600",
-    title: "AI Gia sư theo Khối lớp",
-    desc: "Bám sát đúng kiến thức từng lớp học, gợi mở phương pháp tư duy từng bước thay vì chỉ đưa đáp án chép sẵn.",
+    badge: "Phương pháp Socratic",
+    color: "bg-violet-50 text-violet-600",
+    title: "AI Gia sư Bám sát Khối lớp 24/7",
+    desc: "Gợi mở từng bước tư duy đúng theo kiến thức SGK từng lớp thay vì chỉ đưa đáp án chép sẵn — giúp học sinh hiểu sâu gốc rễ.",
   },
   {
-    href: "/cong-dong",
-    icon: Users,
-    badge: "Mới • MXH Giáo viên",
-    color: "bg-amber-50 text-amber-700",
-    title: "Mạng Xã Hội Giáo Viên",
-    desc: "Nơi thầy cô chia sẻ giáo án hay, đề thi chuẩn mới, kinh nghiệm đứng lớp, theo dõi đồng nghiệp và lưu nhanh về tủ bài giảng.",
+    href: "/hoc-ba",
+    icon: FileSpreadsheet,
+    badge: "Minh bạch & An toàn",
+    color: "bg-sky-50 text-sky-600",
+    title: "Học bạ Số & Bảo vệ An toàn Học đường",
+    desc: "Lưu giữ trọn vẹn bảng điểm, chứng chỉ, dự án phần mềm cùng BOT AI 2 tầng bảo vệ học sinh khỏi quấy rối và bắt nạt mạng.",
   },
 ];
 
 export default function LandingPage() {
   const { user, isTeacher, isAdmin } = useAuth();
+  const isParent = user?.role === "parent";
+
   const [summaryRows, setSummaryRows] = useState<SummaryRow[]>([]);
   const [totalLessons, setTotalLessons] = useState<number>(157);
+  const [selectedLevel, setSelectedLevel] = useState<"primary" | "middle" | "high">("high");
   const [selectedGrade, setSelectedGrade] = useState<number>(12);
+  const [featuredCourses, setFeaturedCourses] = useState<HomeCourse[]>([]);
+  const [topTeachers, setTopTeachers] = useState<HomeTeacher[]>([]);
 
   useEffect(() => {
-    fetch(`${CORE_API_URL}/api/v1/curriculum/summary`)
-      .then((r) => (r.ok ? r.json() : null))
-      .then((data) => {
-        if (data) {
-          setSummaryRows(data.summary || []);
-          if (data.total_lessons) setTotalLessons(data.total_lessons);
+    Promise.all([
+      fetch(`${CORE_API_URL}/api/v1/curriculum/summary`).then((r) => (r.ok ? r.json() : null)),
+      fetch(`${CORE_API_URL}/api/v1/courses`).then((r) => (r.ok ? r.json() : null)),
+      fetch(`${CORE_API_URL}/api/v1/social/teachers`).then((r) => (r.ok ? r.json() : null)),
+    ])
+      .then(([curr, crs, tchs]) => {
+        if (curr) {
+          setSummaryRows(curr.summary || []);
+          if (curr.total_lessons) setTotalLessons(curr.total_lessons);
+        }
+        if (crs?.courses) {
+          setFeaturedCourses((crs.courses as HomeCourse[]).slice(0, 3));
+        }
+        if (tchs?.teachers) {
+          setTopTeachers((tchs.teachers as HomeTeacher[]).slice(0, 4));
         }
       })
       .catch(() => {});
   }, []);
+
+  const currentLevelTab = LEVEL_TABS.find((t) => t.id === selectedLevel) || LEVEL_TABS[2];
+
+  const handleSelectLevel = (lvlId: "primary" | "middle" | "high") => {
+    setSelectedLevel(lvlId);
+    const tab = LEVEL_TABS.find((t) => t.id === lvlId);
+    if (tab && !tab.grades.includes(selectedGrade as never)) {
+      setSelectedGrade(tab.grades[tab.grades.length - 1]);
+    }
+  };
 
   const subjectsInGrade = useMemo(() => {
     return summaryRows
@@ -111,15 +215,17 @@ export default function LandingPage() {
 
   return (
     <div className="space-y-12 pb-12">
-      {/* === THANH ĐIỀU HƯỚNG THÔNG MINH THEO VAI TRÒ KHI ĐÃ ĐĂNG NHẬP === */}
+      {/* === 0. THANH CHÀO NHANH THEO VAI TRÒ KHI ĐÃ ĐĂNG NHẬP === */}
       {user && (
         <section
-          className={`rounded-3xl border p-5 shadow-xs sm:p-6 ${
+          className={`rounded-3xl border p-5 shadow-xs ${
             isAdmin
               ? "border-rose-200 bg-gradient-to-r from-rose-50 via-white to-slate-50"
               : isTeacher
-                ? "border-emerald-200 bg-gradient-to-r from-emerald-50 via-white to-indigo-50/40"
-                : "border-indigo-200 bg-gradient-to-r from-indigo-50 via-white to-sky-50/50"
+                ? "border-emerald-200 bg-gradient-to-r from-emerald-50 via-white to-sky-50/40"
+                : isParent
+                  ? "border-amber-200 bg-gradient-to-r from-amber-50 via-white to-orange-50/40"
+                  : "border-indigo-200 bg-gradient-to-r from-indigo-50 via-white to-sky-50/50"
           }`}
         >
           <div className="flex flex-wrap items-center justify-between gap-4">
@@ -130,25 +236,22 @@ export default function LandingPage() {
                     ? "bg-rose-100 text-rose-700"
                     : isTeacher
                       ? "bg-emerald-100 text-emerald-700"
-                      : "bg-indigo-100 text-indigo-700"
+                      : isParent
+                        ? "bg-amber-100 text-amber-800"
+                        : "bg-indigo-100 text-indigo-700"
                 }`}
               >
                 {isAdmin
                   ? "Không gian Quản trị viên"
                   : isTeacher
                     ? "Không gian Giáo viên"
-                    : `Không gian Học sinh${user.current_grade ? ` • Lớp ${user.current_grade}` : ""}`}
+                    : isParent
+                      ? "Chế độ Phụ huynh Đồng hành"
+                      : `Góc Học tập${user.current_grade ? ` • Lớp ${user.current_grade}` : ""}`}
               </span>
               <h2 className="text-lg font-extrabold text-slate-900 sm:text-xl">
-                Xin chào, {user.full_name}!
+                Chào mừng trở lại, {user.full_name}!
               </h2>
-              <p className="text-xs text-slate-600">
-                {isAdmin
-                  ? "Chọn nhanh chức năng quản trị người dùng, kiểm duyệt cộng đồng giáo viên hoặc cập nhật kho học liệu."
-                  : isTeacher
-                    ? "Vào ngay Mạng Xã Hội Giáo Viên để chia sẻ giáo án cùng đồng nghiệp hoặc mở Studio để dạy Live & soạn đề."
-                    : "Bắt đầu ngay vào lớp học, bài giảng, thi thử hoặc xem chia sẻ mới từ thầy cô."}
-              </p>
             </div>
 
             <div className="flex flex-wrap gap-2">
@@ -156,75 +259,78 @@ export default function LandingPage() {
                 <>
                   <Link
                     href="/quan-tri"
-                    className="inline-flex items-center gap-1.5 rounded-xl bg-rose-600 px-4 py-2.5 text-xs font-extrabold text-white shadow hover:bg-rose-500 transition"
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-rose-600 px-4 py-2 text-xs font-extrabold text-white shadow hover:bg-rose-500 transition"
                   >
                     <ShieldCheck className="h-4 w-4" /> Trung tâm Quản trị
                   </Link>
                   <Link
                     href="/cong-dong"
-                    className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold text-slate-800 hover:bg-slate-50 transition"
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-800 hover:bg-slate-50"
                   >
-                    <Users className="h-4 w-4 text-indigo-600" /> Mạng XH Giáo viên
+                    <Users className="h-4 w-4 text-indigo-600" /> Cộng đồng Giáo viên
                   </Link>
                 </>
               ) : isTeacher ? (
                 <>
                   <Link
                     href="/cong-dong"
-                    className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2.5 text-xs font-extrabold text-white shadow hover:bg-emerald-500 transition"
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-extrabold text-white shadow hover:bg-emerald-500 transition"
                   >
-                    <Users className="h-4 w-4" /> Mạng Xã Hội Giáo Viên
+                    <Users className="h-4 w-4" /> Cộng đồng Giáo viên
                   </Link>
                   <Link
                     href="/quan-tri"
-                    className="inline-flex items-center gap-1.5 rounded-xl bg-slate-900 px-4 py-2.5 text-xs font-bold text-white hover:bg-slate-800 transition"
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-slate-900 px-4 py-2 text-xs font-bold text-white hover:bg-slate-800 transition"
                   >
-                    <GraduationCap className="h-4 w-4" /> Mở Studio Giảng dạy
+                    <GraduationCap className="h-4 w-4" /> Studio Giảng dạy
                   </Link>
                   <Link
                     href="/lop-hoc"
-                    className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold text-slate-800 hover:bg-slate-50 transition"
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-800 hover:bg-slate-50"
                   >
                     <Radio className="h-4 w-4 text-rose-500" /> Lớp đang dạy
+                  </Link>
+                </>
+              ) : isParent ? (
+                <>
+                  <Link
+                    href="/phu-huynh"
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-amber-500 px-4 py-2 text-xs font-extrabold text-slate-950 shadow hover:bg-amber-400 transition"
+                  >
+                    <HeartHandshake className="h-4 w-4" /> Theo dõi tiến độ của Con
+                  </Link>
+                  <Link
+                    href="/chung-chi"
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-800 hover:bg-slate-50"
+                  >
+                    <Award className="h-4 w-4 text-amber-600" /> Tra cứu Chứng chỉ QR
                   </Link>
                 </>
               ) : (
                 <>
                   <Link
+                    href="/hoc-ba"
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-extrabold text-white shadow hover:bg-indigo-500 transition"
+                  >
+                    <FileSpreadsheet className="h-4 w-4" /> Học bạ Số của em
+                  </Link>
+                  <Link
                     href="/khoa-hoc"
-                    className="inline-flex items-center gap-1.5 rounded-xl bg-amber-500 px-4 py-2.5 text-xs font-extrabold text-slate-950 shadow hover:bg-amber-400 transition"
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-amber-400 px-4 py-2 text-xs font-extrabold text-slate-950 shadow-2xs hover:bg-amber-300 transition"
                   >
                     <GraduationCap className="h-4 w-4" /> Khóa học 5★
                   </Link>
                   <Link
-                    href="/lop-hoc"
-                    className="inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2.5 text-xs font-extrabold text-white shadow hover:bg-indigo-500 transition"
-                  >
-                    <Radio className="h-4 w-4" /> Lớp của em
-                  </Link>
-                  <Link
-                    href="/tai-lieu"
-                    className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold text-slate-800 hover:bg-slate-50 transition"
+                    href={`/tai-lieu?grade=${user.current_grade || 12}`}
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-800 hover:bg-slate-50"
                   >
                     <BookOpen className="h-4 w-4 text-blue-600" /> Bài giảng Lớp {user.current_grade || 12}
                   </Link>
                   <Link
                     href="/thi"
-                    className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold text-slate-800 hover:bg-slate-50 transition"
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-800 hover:bg-slate-50"
                   >
-                    <ShieldCheck className="h-4 w-4 text-emerald-600" /> Thi trắc nghiệm
-                  </Link>
-                  <Link
-                    href="/cong-dong"
-                    className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold text-slate-800 hover:bg-slate-50 transition"
-                  >
-                    <Users className="h-4 w-4 text-amber-600" /> Góc Thầy Cô &amp; Sản phẩm
-                  </Link>
-                  <Link
-                    href="/tin-nhan"
-                    className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-xs font-bold text-emerald-800 hover:bg-emerald-100 transition"
-                  >
-                    <HeartHandshake className="h-4 w-4 text-emerald-600" /> Chat hỏi Thầy Cô
+                    <ShieldCheck className="h-4 w-4 text-emerald-600" /> Phòng thi
                   </Link>
                 </>
               )}
@@ -233,123 +339,419 @@ export default function LandingPage() {
         </section>
       )}
 
-      {/* ================= 1. HERO LANDING SECTION ================= */}
-      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 px-6 py-12 text-white shadow-xl sm:px-12 sm:py-16">
-        <div className="pointer-events-none absolute -top-24 -right-24 h-80 w-80 rounded-full bg-indigo-500/20 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-24 -left-24 h-80 w-80 rounded-full bg-emerald-500/15 blur-3xl" />
+      {/* ================= 1. HERO GIÁO DỤC SÁNG, ẤM ÁP & CHUẨN HỌC THUẬT ================= */}
+      <section className="relative overflow-hidden rounded-[32px] border border-indigo-100 bg-gradient-to-br from-sky-50 via-white to-indigo-50/70 px-6 py-10 shadow-sm sm:px-10 sm:py-14">
+        <div className="pointer-events-none absolute -top-24 -right-24 h-80 w-80 rounded-full bg-indigo-200/35 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-24 -left-24 h-80 w-80 rounded-full bg-emerald-200/30 blur-3xl" />
 
         <div className="relative z-10 grid items-center gap-10 lg:grid-cols-12">
-          <div className="space-y-6 lg:col-span-7">
-            <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3.5 py-1.5 text-xs font-bold text-emerald-300 ring-1 ring-white/15">
-              <HeartHandshake className="h-4 w-4" />
-              <span>Nền tảng Học tập Mở • 100% Miễn phí cho Cộng đồng Việt Nam</span>
+          {/* Cột trái: Thông điệp giáo dục & Hành động nhanh */}
+          <div className="space-y-6 lg:col-span-6">
+            <div className="inline-flex items-center gap-2 rounded-full border border-indigo-200/80 bg-white/90 px-3.5 py-1.5 text-xs font-bold text-indigo-700 shadow-2xs">
+              <Sparkles className="h-3.5 w-3.5 text-amber-500" />
+              <span>Nền tảng Giáo dục Mở Chuẩn GDPT 2018 • Miễn phí 100%</span>
             </div>
 
-            <h1 className="text-3xl font-extrabold tracking-tight leading-tight sm:text-5xl">
-              Học Phổ thông Lớp 1–12 &amp;{" "}
-              <span className="bg-gradient-to-r from-indigo-300 via-sky-300 to-emerald-300 bg-clip-text text-transparent">
-                Thực hành Lập trình
+            <h1 className="text-3xl font-black tracking-tight text-slate-900 leading-[1.18] sm:text-5xl">
+              Học tập Thông minh từ{" "}
+              <span className="bg-gradient-to-r from-indigo-600 via-blue-600 to-emerald-600 bg-clip-text text-transparent">
+                Lớp 1 đến Lớp 12
               </span>{" "}
-              ngay trên trình duyệt
+              cùng Owlie Edu
             </h1>
 
-            <p className="max-w-2xl text-sm leading-relaxed text-slate-300 sm:text-base">
-              Từ kiến thức chuẩn Bộ GD&amp;ĐT Lớp 1–12, lớp học Livestream trực tuyến, AI Gia sư cho đến 8 khóa Lập trình thực chiến (HTML, CSS, JS, TS, Python, Golang, MongoDB, PostgreSQL) chấm test tự động — tất cả trong một hệ thống duy nhất.
+            <p className="max-w-xl text-sm leading-relaxed text-slate-600 sm:text-base">
+              Đồng hành cùng học sinh, giáo viên và phụ huynh Việt Nam: kho <strong>{totalLessons}+ bài giảng chuẩn SGK</strong>, khóa học 5 sao cấp <strong>Chứng chỉ QR</strong>, phòng thi thử <strong>phân tích điểm yếu</strong>, Học bạ Số và học viện <strong>STEM Lập trình</strong> hoàn toàn miễn phí.
             </p>
 
-            <div className="flex flex-wrap gap-3 pt-1">
+            {/* Nút hành động chính */}
+            <div className="flex flex-wrap items-center gap-3 pt-1">
               <Link
-                href="/lap-trinh"
-                className="inline-flex items-center gap-2 rounded-2xl bg-indigo-500 px-6 py-3.5 text-sm font-extrabold text-white shadow-lg shadow-indigo-900/40 hover:bg-indigo-400 transition"
+                href="/tai-lieu"
+                className="inline-flex items-center gap-2 rounded-2xl bg-indigo-600 px-6 py-3.5 text-sm font-extrabold text-white shadow-lg shadow-indigo-600/20 hover:bg-indigo-500 transition"
               >
-                <Terminal className="h-4 w-4" />
-                Học Lập trình &amp; Code ngay
+                <BookOpen className="h-4 w-4" />
+                Bắt đầu học Lớp 1–12
                 <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
-                href="/tai-lieu"
-                className="inline-flex items-center gap-2 rounded-2xl bg-white/10 px-6 py-3.5 text-sm font-bold text-white ring-1 ring-white/20 hover:bg-white/20 transition"
+                href="/khoa-hoc"
+                className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-3.5 text-sm font-extrabold text-slate-800 shadow-xs hover:border-indigo-300 hover:text-indigo-700 transition"
               >
-                <BookOpen className="h-4 w-4" />
-                Khám phá Lớp 1–12
+                <GraduationCap className="h-4 w-4 text-amber-500" />
+                Khám phá Khóa học 5★
               </Link>
               <Link
-                href="/lop-hoc"
-                className="inline-flex items-center gap-2 rounded-2xl bg-rose-500/20 px-5 py-3.5 text-sm font-bold text-rose-200 ring-1 ring-rose-400/30 hover:bg-rose-500/30 transition"
+                href="/thi"
+                className="inline-flex items-center gap-2 rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-3.5 text-sm font-bold text-emerald-800 hover:bg-emerald-100 transition"
               >
-                <Radio className="h-4 w-4" />
-                Vào Lớp Live
+                <ShieldCheck className="h-4 w-4 text-emerald-600" />
+                Thi thử Online
               </Link>
+            </div>
+
+            {/* Thanh cam kết học đường minh bạch */}
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 pt-1 text-xs font-semibold text-slate-600">
+              <span className="inline-flex items-center gap-1.5">
+                <CheckCircle2 className="h-4 w-4 text-emerald-600" /> Không quảng cáo
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <CheckCircle2 className="h-4 w-4 text-emerald-600" /> Giáo viên Tích xanh xác thực
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <CheckCircle2 className="h-4 w-4 text-emerald-600" /> Phụ huynh theo dõi miễn phí
+              </span>
             </div>
           </div>
 
-          {/* Minh họa Code IDE trực quan trên Hero */}
-          <div className="lg:col-span-5">
-            <div className="overflow-hidden rounded-2xl border border-slate-700/80 bg-slate-950/90 shadow-2xl">
-              <div className="flex items-center justify-between border-b border-slate-800 bg-slate-900 px-4 py-2.5 text-[11px]">
-                <div className="flex items-center gap-1.5">
-                  <span className="h-2.5 w-2.5 rounded-full bg-rose-500" />
-                  <span className="h-2.5 w-2.5 rounded-full bg-amber-400" />
-                  <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
-                  <span className="ml-2 font-mono text-slate-400">main.go • EduK12 Browser IDE</span>
-                </div>
-                <span className="rounded bg-emerald-500/20 px-2 py-0.5 font-mono text-[10px] font-bold text-emerald-300">
-                  PASS 3/3
-                </span>
-              </div>
-              <pre className="p-4 font-mono text-xs leading-6 text-slate-200 overflow-x-auto">
-                <code>{`func SumSlice(nums []int) int {
-  total := 0
-  for _, v := range nums {
-    total += v
-  }
-  return total
-}`}</code>
-              </pre>
-              <div className="flex items-center justify-between border-t border-slate-800 bg-slate-900/70 px-4 py-2.5 text-[11px]">
-                <span className="inline-flex items-center gap-1.5 font-semibold text-emerald-400">
-                  <CheckCircle2 className="h-3.5 w-3.5" /> Đạt 100% test — Mở khóa bài tiếp theo!
-                </span>
-                <Link href="/lap-trinh?track=golang" className="font-bold text-indigo-400 hover:underline">
-                  Thử ngay →
+          {/* Cột phải: Tranh minh họa Giáo dục Hiện đại + Thẻ nổi chuẩn EdTech */}
+          <div className="relative lg:col-span-6">
+            <div className="relative overflow-hidden rounded-3xl border border-white bg-white p-2.5 shadow-xl shadow-indigo-900/10">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/hero-owlie-edu.jpg"
+                alt="Học sinh học tập cùng chú cú Owlie trên nền tảng giáo dục Owlie Edu"
+                className="aspect-[16/10] w-full rounded-2xl object-cover"
+              />
+
+              {/* Thẻ nổi góc dưới trái: Chứng chỉ QR */}
+              <div className="mt-3 grid grid-cols-2 gap-2.5 sm:mt-0 sm:grid-cols-2 sm:gap-3 sm:pt-3">
+                <Link
+                  href="/chung-chi?code=OWLIE-CERT-2026-WEB01"
+                  className="flex items-center gap-2.5 rounded-2xl border border-amber-200/80 bg-amber-50/70 px-3.5 py-2.5 hover:bg-amber-50 transition"
+                >
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-400 text-slate-950">
+                    <Award className="h-5 w-5" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="truncate text-xs font-extrabold text-slate-900">Chứng chỉ PDF + QR</p>
+                    <p className="truncate text-[10px] font-medium text-amber-800">Xác thực điện tử công khai</p>
+                  </div>
+                </Link>
+
+                <Link
+                  href="/phu-huynh"
+                  className="flex items-center gap-2.5 rounded-2xl border border-emerald-200/80 bg-emerald-50/70 px-3.5 py-2.5 hover:bg-emerald-50 transition"
+                >
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-600 text-white">
+                    <ShieldCheck className="h-5 w-5" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="truncate text-xs font-extrabold text-slate-900">An toàn Học đường AI</p>
+                    <p className="truncate text-[10px] font-medium text-emerald-800">Bảo vệ 24/7 &amp; Góc Phụ huynh</p>
+                  </div>
                 </Link>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Thanh Thống kê Nổi bật */}
-        <div className="relative z-10 mt-10 grid grid-cols-2 gap-4 border-t border-white/10 pt-8 sm:grid-cols-4">
+        {/* Thanh Số liệu Giáo dục Nổi bật */}
+        <div className="relative z-10 mt-10 grid grid-cols-2 gap-4 border-t border-indigo-100/90 pt-7 sm:grid-cols-4">
           {[
-            { value: `${totalLessons}+`, label: "Bài giảng chuẩn GDPT 2018" },
-            { value: "8 Khóa", label: "HTML, CSS, JS, TS, Go, Py, DB" },
-            { value: "Live 0đ", label: "Phòng học Video + Điểm danh" },
-            { value: "2FA + AI", label: "Bảo mật cao & AI Gia sư 24/7" },
+            { value: `${totalLessons}+`, label: "Bài giảng chuẩn GDPT 2018", tone: "text-indigo-700" },
+            { value: "Lớp 1–12", label: "Đủ 3 cấp Tiểu học • THCS • THPT", tone: "text-blue-700" },
+            { value: "8 Khóa", label: "Lập trình STEM chạy ngay trên web", tone: "text-emerald-700" },
+            { value: "100% Free", label: "Mở cho Học sinh, Giáo viên, Phụ huynh", tone: "text-amber-700" },
           ].map((stat) => (
-            <div key={stat.label}>
-              <p className="text-2xl font-extrabold text-white sm:text-3xl">{stat.value}</p>
-              <p className="mt-0.5 text-xs text-slate-400">{stat.label}</p>
+            <div key={stat.label} className="rounded-2xl bg-white/80 px-4 py-3 ring-1 ring-slate-200/60">
+              <p className={`text-2xl font-black sm:text-3xl ${stat.tone}`}>{stat.value}</p>
+              <p className="mt-0.5 text-xs font-medium text-slate-600">{stat.label}</p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* ================= 2. HỆ THỐNG CHÚNG TÔI CÓ GÌ? (6 TRỤ CỘT) ================= */}
+      {/* ================= 2. CHỌN KHÔNG GIAN THEO VAI TRÒ (HỌC SINH • GIÁO VIÊN • PHỤ HUYNH) ================= */}
+      <section className="space-y-5">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-50 px-3 py-1 text-xs font-bold text-indigo-700">
+              <Users className="h-3.5 w-3.5" /> Thiết kế cho Toàn bộ Hệ sinh thái Nhà trường
+            </span>
+            <h2 className="mt-2 text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
+              Bạn tham gia Owlie Edu với vai trò nào?
+            </h2>
+          </div>
+          <Link href="/dang-nhap" className="text-xs font-bold text-indigo-600 hover:underline">
+            Tạo tài khoản miễn phí trong 30 giây →
+          </Link>
+        </div>
+
+        <div className="grid gap-5 lg:grid-cols-3">
+          {ROLE_CARDS.map((card) => {
+            const Icon = card.icon;
+            return (
+              <div
+                key={card.role}
+                className={`flex flex-col justify-between rounded-3xl border p-6 shadow-xs transition hover:shadow-md ${card.accent}`}
+              >
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl shadow-xs ${card.iconCls}`}>
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <span className="text-xs font-extrabold uppercase tracking-wide text-slate-600">
+                      {card.role}
+                    </span>
+                  </div>
+                  <h3 className="text-lg font-extrabold leading-snug text-slate-900">{card.title}</h3>
+                  <p className="text-xs leading-relaxed text-slate-600">{card.desc}</p>
+                </div>
+
+                <div className="mt-5 flex flex-wrap items-center gap-2.5 pt-2">
+                  <Link
+                    href={card.ctaPrimary.href}
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-slate-900 px-4 py-2.5 text-xs font-extrabold text-white hover:bg-slate-800 transition"
+                  >
+                    {card.ctaPrimary.label} <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
+                  <Link
+                    href={card.ctaSecondary.href}
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition"
+                  >
+                    {card.ctaSecondary.label}
+                  </Link>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* ================= 3. CHƯƠNG TRÌNH PHỔ THÔNG 3 CẤP HỌC (LỚP 1–12) ================= */}
+      <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-xs sm:p-8 space-y-6">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700">
+              <BookOpen className="h-3.5 w-3.5" /> Bám sát SGK Kết nối tri thức • Chân trời sáng tạo • Cánh diều
+            </span>
+            <h2 className="mt-2 text-2xl font-extrabold text-slate-900">
+              Chương trình Giáo dục Phổ thông Lớp 1–12
+            </h2>
+            <p className="mt-1 text-xs text-slate-500 sm:text-sm">
+              Chọn Cấp học &amp; Khối lớp để mở ngay kho bài giảng chi tiết kèm bài tập củng cố và đề thi thử tương ứng.
+            </p>
+          </div>
+          <Link
+            href={`/tai-lieu?grade=${selectedGrade}`}
+            className="inline-flex items-center gap-1.5 rounded-xl bg-indigo-50 px-4 py-2 text-xs font-extrabold text-indigo-700 hover:bg-indigo-100 transition"
+          >
+            Mở toàn bộ Lớp {selectedGrade} <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
+
+        {/* Tab 3 Cấp học */}
+        <div className="grid gap-2.5 sm:grid-cols-3">
+          {LEVEL_TABS.map((t) => {
+            const active = selectedLevel === t.id;
+            return (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => handleSelectLevel(t.id)}
+                className={`rounded-2xl border p-3.5 text-left transition ${
+                  active
+                    ? "border-indigo-500 bg-indigo-50/70 ring-1 ring-indigo-300"
+                    : "border-slate-200 bg-slate-50/50 hover:bg-slate-100/70"
+                }`}
+              >
+                <p className={`text-sm font-extrabold ${active ? "text-indigo-800" : "text-slate-800"}`}>
+                  {t.label}
+                </p>
+                <p className="mt-0.5 text-[11px] font-medium text-slate-500">{t.badge}</p>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Nút chọn Khối lớp trong cấp đang chọn */}
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-xs font-bold text-slate-500">Chọn lớp:</span>
+          {currentLevelTab.grades.map((g) => (
+            <button
+              key={g}
+              type="button"
+              onClick={() => setSelectedGrade(g)}
+              className={`rounded-xl px-4 py-2 text-xs font-extrabold transition ${
+                selectedGrade === g
+                  ? "bg-indigo-600 text-white shadow-xs"
+                  : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+              }`}
+            >
+              Lớp {g}
+            </button>
+          ))}
+        </div>
+
+        {/* Lưới Môn học theo Lớp */}
+        <div className="grid gap-3.5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+          {subjectsInGrade.map((s) => {
+            const meta = getSubjectMeta(s.subject_code, s.subject_name);
+            const SubIcon = meta.icon;
+            return (
+              <Link
+                key={s.subject_code}
+                href={`/tai-lieu?grade=${selectedGrade}&subject=${s.subject_code}`}
+                className="group flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 transition hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-sm"
+              >
+                <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${meta.badgeBg}`}>
+                  <SubIcon className="h-5 w-5" />
+                </div>
+                <div className="min-w-0">
+                  <p className="truncate text-xs font-extrabold text-slate-900 group-hover:text-indigo-600">
+                    {s.subject_name}
+                  </p>
+                  <p className="mt-0.5 text-[11px] font-medium text-slate-500">{s.lesson_count} bài giảng</p>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* ================= 4. KHÓA HỌC 5 SAO NỔI BẬT TỪ ĐỘI NGŨ GIÁO VIÊN ================= */}
+      {featuredCourses.length > 0 && (
+        <section className="space-y-5">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1 text-xs font-bold text-amber-800">
+                <Award className="h-3.5 w-3.5 text-amber-600" /> Học bài bản • Hoàn thành nhận Chứng chỉ PDF + QR
+              </span>
+              <h2 className="mt-2 text-2xl font-extrabold text-slate-900">
+                Khóa học Cộng đồng Được Yêu thích nhất
+              </h2>
+            </div>
+            <Link
+              href="/khoa-hoc"
+              className="inline-flex items-center gap-1 text-xs font-extrabold text-indigo-600 hover:underline"
+            >
+              Xem tất cả Khóa học <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+
+          <div className="grid gap-5 md:grid-cols-3">
+            {featuredCourses.map((c) => (
+              <Link
+                key={c.id}
+                href="/khoa-hoc"
+                className="group flex flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xs transition hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-md"
+              >
+                <div
+                  className={`bg-gradient-to-br ${
+                    COVER_THEMES[c.cover_theme] || COVER_THEMES.indigo
+                  } p-5 text-white space-y-2`}
+                >
+                  <div className="flex items-center justify-between gap-2 text-[10px] font-bold">
+                    <span className="rounded-full bg-white/20 px-2.5 py-0.5">{c.subject_name}</span>
+                    <span className="rounded-full bg-emerald-400/25 px-2.5 py-0.5 text-emerald-100">
+                      Miễn phí • Có Chứng chỉ
+                    </span>
+                  </div>
+                  <h3 className="line-clamp-2 text-base font-extrabold leading-snug">{c.title}</h3>
+                  <p className="text-[11px] text-white/85">
+                    {c.grade_label} • {c.modules?.length || 0} bài học
+                  </p>
+                </div>
+
+                <div className="flex flex-1 flex-col justify-between p-5 space-y-4">
+                  <p className="line-clamp-2 text-xs leading-relaxed text-slate-600">{c.summary}</p>
+                  <div className="space-y-2.5 border-t border-slate-100 pt-3">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="inline-flex items-center gap-1 font-bold text-slate-800 truncate">
+                        {c.teacher_name}
+                        {c.teacher_verified && <VerifiedBadge />}
+                      </span>
+                      <span className="inline-flex shrink-0 items-center gap-1 font-extrabold text-amber-600">
+                        <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+                        {c.avg_rating > 0 ? c.avg_rating.toFixed(1) : "5.0"}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-[11px] text-slate-500">
+                      <span>{c.student_count} học viên tham gia</span>
+                      <span className="font-extrabold text-indigo-600 group-hover:underline">Vào học ngay →</span>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ================= 5. ĐỘI NGŨ GIÁO VIÊN TIÊU BIỂU (TÍCH XANH & ĐIỂM UY TÍN) ================= */}
+      {topTeachers.length > 0 && (
+        <section className="rounded-3xl border border-slate-200 bg-gradient-to-br from-slate-50 via-white to-emerald-50/40 p-6 shadow-xs sm:p-8 space-y-5">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700">
+                <ShieldCheck className="h-3.5 w-3.5" /> Xác minh Thẻ Giáo viên • Xếp hạng Uy tín Minh bạch
+              </span>
+              <h2 className="mt-2 text-2xl font-extrabold text-slate-900">
+                Đội ngũ Giáo viên Tiêu biểu trên Owlie Edu
+              </h2>
+            </div>
+            <Link
+              href="/cong-dong"
+              className="inline-flex items-center gap-1 text-xs font-extrabold text-emerald-700 hover:underline"
+            >
+              Khám phá Mạng Xã Hội Giáo Viên <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {topTeachers.map((t) => (
+              <Link
+                key={t.id}
+                href={`/giao-vien?id=${encodeURIComponent(t.id)}`}
+                className="group rounded-2xl border border-slate-200 bg-white p-5 shadow-2xs transition hover:-translate-y-0.5 hover:border-emerald-300 hover:shadow-md space-y-3"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-indigo-600 text-base font-black text-white shadow-xs">
+                    {t.full_name.slice(0, 1).toUpperCase()}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="flex items-center gap-1 truncate text-sm font-extrabold text-slate-900 group-hover:text-indigo-600">
+                      <span className="truncate">{t.full_name}</span>
+                      {t.is_verified && <VerifiedBadge />}
+                    </p>
+                    <p className="truncate text-[11px] text-slate-500">{t.school_name}</p>
+                  </div>
+                </div>
+
+                {t.reputation_label && (
+                  <div className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-[10px] font-extrabold text-amber-800 ring-1 ring-amber-200">
+                    <Award className="h-3 w-3 text-amber-500" />
+                    {t.reputation_label} • {t.reputation_score ?? 0}đ
+                  </div>
+                )}
+
+                <div className="flex items-center justify-between border-t border-slate-100 pt-2.5 text-[11px] font-semibold text-slate-500">
+                  <span>{t.post_count} giáo án chia sẻ</span>
+                  <span className="text-indigo-600 font-bold">Xem hồ sơ →</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ================= 6. HỆ SINH THÁI HỌC TẬP 6 TRỤ CỘT ================= */}
       <section className="space-y-6">
         <div className="mx-auto max-w-2xl text-center">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-50 px-3 py-1 text-xs font-bold text-indigo-700">
-            <Sparkles className="h-3.5 w-3.5" /> Hệ sinh thái Toàn diện
+            <Sparkles className="h-3.5 w-3.5" /> Trải nghiệm Giáo dục Toàn diện
           </span>
           <h2 className="mt-2 text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
-            Website chúng tôi mang lại gì cho bạn?
+            Mọi công cụ học &amp; dạy hiện đại trên một nền tảng
           </h2>
           <p className="mt-2 text-sm text-slate-600">
-            Mọi công cụ học tập, giảng dạy trực tuyến và thực hành lập trình hiện đại — thiết kế mở để ai cũng có thể học và phát triển.
+            Thiết kế khoa học, trực quan cho học sinh từ Tiểu học đến THPT — giúp việc tự học nhẹ nhàng, hứng thú và đo lường được tiến bộ mỗi ngày.
           </p>
         </div>
 
         <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {PLATFORM_FEATURES.map((f) => {
+          {EDU_PILLARS.map((f) => {
             const Icon = f.icon;
             return (
               <Link
@@ -372,7 +774,7 @@ export default function LandingPage() {
                   <p className="mt-1.5 text-xs leading-relaxed text-slate-600">{f.desc}</p>
                 </div>
                 <div className="mt-4 inline-flex items-center gap-1 text-xs font-bold text-indigo-600">
-                  Khám phá ngay <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" />
+                  Tìm hiểu thêm <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" />
                 </div>
               </Link>
             );
@@ -380,34 +782,34 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ================= 3. LỘ TRÌNH 8 KHÓA LẬP TRÌNH THỰC CHIẾN ================= */}
-      <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-xs sm:p-8 space-y-6">
+      {/* ================= 7. HỌC VIỆN STEM & LẬP TRÌNH THỰC HÀNH (8 NGÔN NGỮ) ================= */}
+      <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-xs sm:p-8 space-y-5">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700">
-              <Code2 className="h-3.5 w-3.5" /> Học đi đôi với Hành • Chấm Test Tự động
+              <Code2 className="h-3.5 w-3.5" /> Giáo dục STEM Hiện đại • Thực hành trực tiếp không cần cài đặt
             </span>
             <h2 className="mt-2 text-2xl font-extrabold text-slate-900">
-              8 Khóa Lập trình Code ngay trên Trình duyệt
+              Góc Tư duy Lập trình &amp; Công nghệ (8 Ngôn ngữ)
             </h2>
-            <p className="mt-1 text-xs sm:text-sm text-slate-600">
-              Không cần cài đặt phức tạp. Viết code, bấm chạy kiểm tra — <strong>đạt 100% test case mới được mở khóa bài tiếp theo</strong> để đảm bảo vững nền tảng!
+            <p className="mt-1 text-xs text-slate-600 sm:text-sm">
+              Dành cho học sinh yêu thích Tin học, STEM và sinh viên tự học — làm bài tập có kiểm tra tự động và lưu tiến độ vào Học bạ Số.
             </p>
           </div>
           <Link
             href="/lap-trinh"
-            className="inline-flex items-center gap-1.5 rounded-xl bg-slate-900 px-4 py-2.5 text-xs font-bold text-white hover:bg-slate-800 transition"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2.5 text-xs font-extrabold text-white shadow-xs hover:bg-emerald-500 transition"
           >
-            Mở Phòng Thực hành Code <ArrowRight className="h-3.5 w-3.5" />
+            Mở Phòng Thực hành STEM <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>
 
-        <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {CODING_TRACKS.map((track) => (
             <Link
               key={track.id}
               href={`/lap-trinh?track=${track.id}`}
-              className="group rounded-2xl border border-slate-200 bg-slate-50/60 p-4 transition hover:border-indigo-400 hover:bg-white hover:shadow-sm"
+              className="group rounded-2xl border border-slate-200 bg-slate-50/50 p-4 transition hover:border-emerald-300 hover:bg-white hover:shadow-xs"
             >
               <div className="flex items-center justify-between gap-2">
                 <span
@@ -415,113 +817,49 @@ export default function LandingPage() {
                 >
                   {track.shortName}
                 </span>
-                <span className="text-[10px] font-bold uppercase text-slate-400">
-                  {track.category}
-                </span>
+                <span className="text-[10px] font-bold uppercase text-slate-400">{track.category}</span>
               </div>
-              <h3 className="mt-3 text-sm font-bold text-slate-900 group-hover:text-indigo-600">
+              <h3 className="mt-2.5 text-sm font-bold text-slate-900 group-hover:text-emerald-700">
                 {track.name}
               </h3>
               <p className="mt-1 line-clamp-2 text-xs text-slate-500">{track.tagline}</p>
-              <div className="mt-3 flex items-center justify-between border-t border-slate-200/70 pt-2.5 text-[11px] font-semibold text-slate-600">
-                <span className="inline-flex items-center gap-1">
-                  <Lock className="h-3 w-3 text-amber-600" /> {track.lessons.length} bài có chấm test
-                </span>
-                <span className="font-bold text-indigo-600">Code →</span>
-              </div>
             </Link>
           ))}
         </div>
       </section>
 
-      {/* ================= 4. KHÁM PHÁ NHANH CHƯƠNG TRÌNH LỚP 1–12 ================= */}
-      <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-xs sm:p-8 space-y-5">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h2 className="flex items-center gap-2 text-xl font-extrabold text-slate-900">
-              <GraduationCap className="h-6 w-6 text-indigo-600" />
-              Chương trình Giáo dục Phổ thông Lớp 1–12
-            </h2>
-            <p className="mt-0.5 text-xs text-slate-500">
-              Chọn khối lớp để truy cập ngay kho bài giảng phân theo từng Môn học (Toán, Lý, Hóa, Sinh, Sử, Địa...).
-            </p>
+      {/* ================= 8. LỜI MỜI ĐỒNG HÀNH & TẢI APP MOBILE ================= */}
+      <section className="relative overflow-hidden rounded-[32px] bg-gradient-to-r from-indigo-700 via-blue-700 to-emerald-700 p-8 text-center text-white shadow-xl sm:p-12">
+        <div className="relative z-10 mx-auto max-w-2xl space-y-4">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-3xl bg-white/15 p-2 shadow-lg ring-1 ring-white/25 backdrop-blur-xs">
+            <CuBongLogoMark className="h-12 w-12" />
           </div>
-          <Link
-            href={`/tai-lieu?grade=${selectedGrade}`}
-            className="text-xs font-bold text-indigo-600 hover:underline"
-          >
-            Xem toàn bộ Lớp {selectedGrade} →
-          </Link>
-        </div>
-
-        <div className="flex flex-wrap gap-1.5">
-          {Array.from({ length: 12 }, (_, i) => i + 1).map((g) => (
-            <button
-              key={g}
-              type="button"
-              onClick={() => setSelectedGrade(g)}
-              className={`rounded-xl px-3.5 py-2 text-xs font-bold transition ${
-                selectedGrade === g
-                  ? "bg-indigo-600 text-white shadow-xs"
-                  : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-              }`}
+          <h2 className="text-2xl font-black sm:text-3xl">
+            Bắt đầu hành trình học tập miễn phí cùng Owlie Edu ngay hôm nay
+          </h2>
+          <p className="text-xs leading-relaxed text-indigo-100 sm:text-sm">
+            Đăng ký trong 30 giây bằng Email, Google hoặc Facebook — hoàn toàn miễn phí cho Học sinh, Giáo viên và Phụ huynh trên cả Web lẫn Điện thoại.
+          </p>
+          <div className="flex flex-wrap justify-center gap-3 pt-2">
+            <Link
+              href="/dang-nhap"
+              className="inline-flex items-center gap-2 rounded-2xl bg-white px-6 py-3 text-sm font-extrabold text-indigo-700 shadow-lg hover:bg-indigo-50 transition"
             >
-              Lớp {g}
-            </button>
-          ))}
-        </div>
-
-        <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
-          {subjectsInGrade.map((s) => {
-            const meta = getSubjectMeta(s.subject_code, s.subject_name);
-            const SubIcon = meta.icon;
-            return (
-              <Link
-                key={s.subject_code}
-                href={`/tai-lieu?grade=${selectedGrade}&subject=${s.subject_code}`}
-                className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50/50 p-3.5 transition hover:border-indigo-300 hover:bg-white hover:shadow-xs"
-              >
-                <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${meta.badgeBg}`}>
-                  <SubIcon className="h-5 w-5" />
-                </div>
-                <div className="min-w-0">
-                  <p className="truncate text-xs font-bold text-slate-900">{s.subject_name}</p>
-                  <p className="text-[11px] text-slate-500">{s.lesson_count} bài giảng</p>
-                </div>
-              </Link>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* ================= 5. COMMUNITY CALL-TO-ACTION ================= */}
-      <section className="rounded-3xl bg-gradient-to-r from-indigo-600 via-violet-600 to-indigo-700 p-8 text-center text-white shadow-lg sm:p-12">
-        <Users className="mx-auto h-10 w-10 text-indigo-200" />
-        <h2 className="mt-3 text-2xl font-extrabold sm:text-3xl">
-          Cùng xây dựng Cộng đồng Học tập &amp; Lập trình Mở
-        </h2>
-        <p className="mx-auto mt-2 max-w-xl text-sm text-indigo-100">
-          Tạo tài khoản miễn phí bằng Email, Google hoặc Facebook — lưu trọn bộ tiến độ code 8 ngôn ngữ, vào lớp học trực tuyến và bảo vệ tài khoản bằng 2FA.
-        </p>
-        <div className="mt-6 flex flex-wrap justify-center gap-3">
-          <Link
-            href="/tai-app"
-            className="rounded-2xl bg-emerald-400 px-6 py-3 text-sm font-extrabold text-slate-950 shadow hover:bg-emerald-300 transition"
-          >
-            Tải App Android &amp; iOS tại đây
-          </Link>
-          <Link
-            href="/dang-nhap"
-            className="rounded-2xl bg-white px-6 py-3 text-sm font-extrabold text-indigo-700 shadow hover:bg-indigo-50 transition"
-          >
-            Đăng ký Miễn phí ngay
-          </Link>
-          <Link
-            href="/lap-trinh"
-            className="rounded-2xl bg-indigo-950/40 px-6 py-3 text-sm font-bold text-white ring-1 ring-white/25 hover:bg-indigo-950/60 transition"
-          >
-            Code thử ngay không cần đăng nhập
-          </Link>
+              <GraduationCap className="h-4 w-4" /> Đăng ký Miễn phí ngay
+            </Link>
+            <Link
+              href="/phu-huynh"
+              className="inline-flex items-center gap-2 rounded-2xl bg-amber-400 px-6 py-3 text-sm font-extrabold text-slate-950 shadow-lg hover:bg-amber-300 transition"
+            >
+              <HeartHandshake className="h-4 w-4" /> Dành cho Phụ huynh
+            </Link>
+            <Link
+              href="/tai-app"
+              className="inline-flex items-center gap-2 rounded-2xl bg-white/15 px-5 py-3 text-sm font-bold text-white ring-1 ring-white/30 hover:bg-white/25 transition"
+            >
+              <Smartphone className="h-4 w-4" /> Tải App Android &amp; iOS
+            </Link>
+          </div>
         </div>
       </section>
     </div>

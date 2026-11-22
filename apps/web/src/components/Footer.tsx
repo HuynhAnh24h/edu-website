@@ -78,6 +78,21 @@ export function Footer() {
                   Đăng ký Lớp học &amp; Live
                 </Link>
               </li>
+              <li>
+                <Link href="/hoc-ba" className="hover:text-white transition">
+                  Học bạ Số &amp; Hồ sơ Năng lực
+                </Link>
+              </li>
+              <li>
+                <Link href="/chung-chi" className="hover:text-white transition">
+                  Chứng chỉ PDF &amp; Xác thực QR
+                </Link>
+              </li>
+              <li>
+                <Link href="/phu-huynh" className="font-semibold text-emerald-300 hover:text-white transition">
+                  Chế độ Phụ huynh Đồng hành
+                </Link>
+              </li>
             </ul>
           </div>
 
