@@ -9,6 +9,7 @@ import {
   BookPlus,
   CheckCircle2,
   ClipboardCheck,
+  Code2,
   Database,
   ExternalLink,
   FileQuestion,
@@ -47,6 +48,7 @@ import { StorageQuotaPanel, StorageStatsPayload } from "@/components/cms/Storage
 import { AdminOpsPanel } from "@/components/cms/AdminOpsPanel";
 import { EmailMarketingPanel } from "@/components/cms/EmailMarketingPanel";
 import { MonetizationPanel } from "@/components/cms/MonetizationPanel";
+import { CodingLessonsPanel } from "@/components/cms/CodingLessonsPanel";
 import { CuBongLogoMark } from "@/components/BrandLogo";
 import {
   createEmptyDraftQuestion,
@@ -94,6 +96,7 @@ type DashboardTab =
   | "classrooms"
   | "live"
   | "lessons"
+  | "coding"
   | "questions"
   | "exams"
   | "import"
@@ -123,6 +126,10 @@ const TAB_META: Record<DashboardTab, { title: string; subtitle: string }> = {
   lessons: {
     title: "Soạn Bài giảng (Kiểu Word)",
     subtitle: "Trình soạn thảo trực quan hỗ trợ công thức Toán/Lý/Hóa, tài liệu đính kèm và câu hỏi củng cố.",
+  },
+  coding: {
+    title: "Bài tập Lập trình theo Lộ trình (12 Môn)",
+    subtitle: "Cấp bài thực hành code & Test Case tự động chấm cho từng môn trong 6 Cụm Stack (HTML, CSS, JS, TS, React, Next.js, Node, NestJS, Go, Python, MongoDB, PostgreSQL).",
   },
   questions: {
     title: "Ngân hàng Câu hỏi Trực quan",
@@ -214,6 +221,11 @@ function buildQuestionPayload(q: DraftQuestion, gradeId: number, subjectCode: st
 export default function CMSAdminPage() {
   const { user, accessToken, loading, isStaff, isAdmin, logout } = useAuth();
   const [activeTab, setActiveTab] = useState<DashboardTab>("overview");
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const t = new URLSearchParams(window.location.search).get("tab") as DashboardTab | null;
+    if (t && t in TAB_META) setActiveTab(t);
+  }, []);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [questions, setQuestions] = useState<CMSQuestion[]>([]);
@@ -608,6 +620,12 @@ export default function CMSAdminPage() {
           label: "Soạn Bài giảng (Word)",
           desc: "Trình soạn thảo kiểu Word",
           icon: BookPlus,
+        },
+        {
+          id: "coding",
+          label: "Bài tập Lập trình (12 Môn)",
+          desc: "Cấp bài theo lộ trình 6 Cụm",
+          icon: Code2,
         },
         {
           id: "questions",
@@ -1655,6 +1673,11 @@ export default function CMSAdminPage() {
                 void loadDashboardOverview();
               }}
             />
+          )}
+
+          {/* === TAB 3B: BÀI TẬP LẬP TRÌNH THEO LỘ TRÌNH 12 MÔN === */}
+          {activeTab === "coding" && (
+            <CodingLessonsPanel accessToken={accessToken} onToast={showToast} />
           )}
 
           {/* === TAB 6-0: MỞ KHÓA THI & TỔNG HỢP ĐỀ THEO CẤP (ADMIN) === */}

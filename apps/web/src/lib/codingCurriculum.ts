@@ -50,6 +50,9 @@ export interface CodingLesson {
   mongoCollections?: Record<string, Record<string, unknown>[]>;
   goTestImports?: string[];
   tests: TestCaseSpec[];
+  isAdminAuthored?: boolean;
+  createdBy?: string;
+  is_published?: boolean;
 }
 
 export interface CodingTrack {
