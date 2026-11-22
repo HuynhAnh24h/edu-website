@@ -104,7 +104,7 @@ export function Footer() {
             <ul className="space-y-2 text-xs text-slate-400">
               <li>
                 <Link href="/khoa-hoc" className="font-semibold text-amber-300 hover:text-white transition">
-                  Khóa học Trực tuyến &amp; Đánh giá 5★
+                  Khóa học Trực tuyến &amp; Đánh giá 5 sao
                 </Link>
               </li>
               <li>

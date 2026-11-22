@@ -22,3 +22,94 @@ body {
   overflow-y: hidden;
   padding: 0.5rem 0;
 }
+
+/* ================= OWLIE LOADING SCREEN PLAYFUL ANIMATIONS ================= */
+@keyframes owlieStretch {
+  0%, 100% { transform: translateY(0) scale(1, 1); }
+  40% { transform: translateY(-8px) scale(0.95, 1.07); }
+  70% { transform: translateY(2px) scale(1.06, 0.94); }
+}
+
+@keyframes owlieReadWiggle {
+  0%, 100% { transform: rotate(-4deg) translateY(0); }
+  50% { transform: rotate(4deg) translateY(-6px); }
+}
+
+@keyframes owlieSpinHop {
+  0% { transform: translateY(0) rotate(0deg) scale(1); }
+  35% { transform: translateY(-28px) rotate(180deg) scale(1.08); }
+  70% { transform: translateY(-10px) rotate(360deg) scale(1.02); }
+  88% { transform: translateY(4px) rotate(360deg) scale(1.06, 0.93); }
+  100% { transform: translateY(0) rotate(360deg) scale(1); }
+}
+
+@keyframes owlieHoverFly {
+  0%, 100% { transform: translateY(-10px) rotate(-2deg); }
+  50% { transform: translateY(-22px) rotate(2deg); }
+}
+
+@keyframes owlieWingLeft {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-28deg); }
+}
+
+@keyframes owlieWingRight {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(28deg); }
+}
+
+@keyframes owlieCapToss {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  45% { transform: translateY(-26px) rotate(-14deg); }
+  75% { transform: translateY(-6px) rotate(8deg); }
+}
+
+@keyframes owlieBlink {
+  0%, 88%, 100% { transform: scaleY(1); }
+  94% { transform: scaleY(0.1); }
+}
+
+@keyframes owlieOrbitFloat {
+  0%, 100% { transform: translateY(0px) scale(1); opacity: 0.9; }
+  50% { transform: translateY(-10px) scale(1.12); opacity: 1; }
+}
+
+.owlie-stage-stretch {
+  animation: owlieStretch 0.85s ease-in-out infinite;
+}
+
+.owlie-stage-read {
+  animation: owlieReadWiggle 0.7s ease-in-out infinite;
+}
+
+.owlie-stage-spin {
+  animation: owlieSpinHop 0.95s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+}
+
+.owlie-stage-fly {
+  animation: owlieHoverFly 0.55s ease-in-out infinite;
+}
+
+.owlie-wing-l {
+  transform-origin: 48px 118px;
+  animation: owlieWingLeft 0.28s ease-in-out infinite;
+}
+
+.owlie-wing-r {
+  transform-origin: 152px 118px;
+  animation: owlieWingRight 0.28s ease-in-out infinite;
+}
+
+.owlie-cap-toss {
+  transform-origin: 100px 44px;
+  animation: owlieCapToss 0.8s ease-in-out infinite;
+}
+
+.owlie-eyes-blink {
+  transform-origin: 100px 92px;
+  animation: owlieBlink 1.8s ease-in-out infinite;
+}
+
+.owlie-orbit-item {
+  animation: owlieOrbitFloat 1.4s ease-in-out infinite;
+}

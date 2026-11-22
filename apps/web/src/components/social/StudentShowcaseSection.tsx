@@ -7,6 +7,7 @@ import {
   BookOpen,
   Code2,
   ExternalLink,
+  FileText,
   Laptop,
   MessageCircle,
   Plus,
@@ -255,8 +256,8 @@ export function StudentShowcaseSection({
                 onChange={(e) => setSubType(e.target.value as typeof subType)}
                 className="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold"
               >
-                <option value="software_project">💻 Sản phẩm Phần mềm / Ứng dụng / Website</option>
-                <option value="student_article">📝 Bài viết học tập / Nghiên cứu / Tổng hợp kiến thức</option>
+                <option value="software_project">Sản phẩm Phần mềm / Ứng dụng / Website</option>
+                <option value="student_article">Bài viết học tập / Nghiên cứu / Tổng hợp kiến thức</option>
               </select>
             </div>
             <div>
@@ -347,23 +348,27 @@ export function StudentShowcaseSection({
       {/* Bộ lọc loại bài */}
       <div className="flex flex-wrap gap-2">
         {[
-          { id: "all", label: "Tất cả sản phẩm & bài viết" },
-          { id: "software_project", label: "💻 Sản phẩm Phần mềm" },
-          { id: "student_article", label: "📝 Bài viết Học thuật" },
-        ].map((f) => (
-          <button
-            key={f.id}
-            type="button"
-            onClick={() => setFilterType(f.id as typeof filterType)}
-            className={`rounded-xl px-3.5 py-2 text-xs font-bold transition ${
-              filterType === f.id
-                ? "bg-slate-900 text-white"
-                : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
-            }`}
-          >
-            {f.label}
-          </button>
-        ))}
+          { id: "all", label: "Tất cả sản phẩm & bài viết", icon: Award },
+          { id: "software_project", label: "Sản phẩm Phần mềm", icon: Laptop },
+          { id: "student_article", label: "Bài viết Học thuật", icon: FileText },
+        ].map((f) => {
+          const TabIcon = f.icon;
+          return (
+            <button
+              key={f.id}
+              type="button"
+              onClick={() => setFilterType(f.id as typeof filterType)}
+              className={`inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-bold transition ${
+                filterType === f.id
+                  ? "bg-slate-900 text-white"
+                  : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+              }`}
+            >
+              <TabIcon className="h-3.5 w-3.5" />
+              {f.label}
+            </button>
+          );
+        })}
       </div>
 
       {/* Danh sách Sản phẩm & Đánh giá từ Giáo viên */}

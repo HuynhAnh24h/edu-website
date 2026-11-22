@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import {
   BadgeCheck,
   CheckCircle2,
+  Clock,
   ExternalLink,
   FileText,
   RefreshCw,
@@ -145,7 +146,7 @@ export function TeacherVerificationPanel({
                       </Link>
                       {t.is_verified && <VerifiedBadge />}
                       <span
-                        className={`rounded-full px-2.5 py-0.5 text-[10px] font-extrabold ${
+                        className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-extrabold ${
                           t.verification_status === "pending"
                             ? "bg-amber-100 text-amber-800"
                             : t.is_verified
@@ -155,13 +156,19 @@ export function TeacherVerificationPanel({
                                 : "bg-slate-100 text-slate-600"
                         }`}
                       >
-                        {t.verification_status === "pending"
-                          ? "⏳ Đang chờ duyệt Tích xanh"
-                          : t.is_verified
-                            ? "✓ Đã cấp Tích xanh"
-                            : t.verification_status === "rejected"
-                              ? "Đã từ chối"
-                              : "Chưa gửi hồ sơ"}
+                        {t.verification_status === "pending" ? (
+                          <>
+                            <Clock className="h-3 w-3" /> Đang chờ duyệt Tích xanh
+                          </>
+                        ) : t.is_verified ? (
+                          <>
+                            <CheckCircle2 className="h-3 w-3" /> Đã cấp Tích xanh
+                          </>
+                        ) : t.verification_status === "rejected" ? (
+                          "Đã từ chối"
+                        ) : (
+                          "Chưa gửi hồ sơ"
+                        )}
                       </span>
                     </div>
                     <p className="text-xs text-slate-500">

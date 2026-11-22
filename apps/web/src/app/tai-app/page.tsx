@@ -115,7 +115,7 @@ export default function DownloadAppPage() {
       const reg = await navigator.serviceWorker.ready.catch(() => null);
       reg?.active?.postMessage({
         type: "SHOW_NOTIFICATION",
-        title: "🦉 Owlie Edu — Đã bật Thông báo Đẩy!",
+        title: "Owlie Edu — Đã bật Thông báo Đẩy!",
         body: "Bạn sẽ nhận ngay thông báo lịch mở phòng thi, điểm số mới, tin nhắn thầy cô và lớp Live.",
         link: "/tai-app",
       });

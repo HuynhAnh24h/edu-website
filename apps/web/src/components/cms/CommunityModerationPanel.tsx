@@ -151,8 +151,8 @@ export function CommunityModerationPanel({
                 <div className="space-y-1 flex-1 min-w-[240px]">
                   <div className="flex flex-wrap items-center gap-2 text-[11px]">
                     {p.is_pinned && (
-                      <span className="rounded-full bg-indigo-100 px-2.5 py-0.5 font-bold text-indigo-700">
-                        📌 Đang ghim
+                      <span className="inline-flex items-center gap-1 rounded-full bg-indigo-100 px-2.5 py-0.5 font-bold text-indigo-700">
+                        <Pin className="h-3 w-3" /> Đang ghim
                       </span>
                     )}
                     {p.status === "hidden" && (

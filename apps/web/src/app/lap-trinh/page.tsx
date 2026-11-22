@@ -677,7 +677,13 @@ function CodingAcademyInner() {
                                 : "bg-white text-slate-600 ring-1 ring-slate-200"
                           }`}
                         >
-                          {clusterDone ? "Hoàn thành cụm ✓" : `${cDone}/${cTotal} bài (${cPct}%)`}
+                          {clusterDone ? (
+                            <>
+                              <CheckCircle2 className="h-3.5 w-3.5" /> Hoàn thành cụm
+                            </>
+                          ) : (
+                            `${cDone}/${cTotal} bài (${cPct}%)`
+                          )}
                         </span>
                       </div>
                     </div>

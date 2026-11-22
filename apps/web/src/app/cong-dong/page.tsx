@@ -25,6 +25,7 @@ import {
   Send,
   ShieldCheck,
   Sparkles,
+  Star,
   Trash2,
   Upload,
   UserCheck,
@@ -920,11 +921,11 @@ export default function TeacherSocialPage() {
               <button
                 type="button"
                 onClick={() => setSortMode("top")}
-                className={`rounded-lg px-2.5 py-1.5 transition ${
+                className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 transition ${
                   sortMode === "top" ? "bg-amber-400 text-slate-950 shadow-2xs" : "text-slate-600 hover:text-slate-900"
                 }`}
               >
-                ★ Giáo án Chuẩn
+                <Star className="h-3 w-3 fill-current" /> Giáo án Chuẩn
               </button>
               <button
                 type="button"
@@ -1267,8 +1268,8 @@ export default function TeacherSocialPage() {
                         {catInfo.label}
                       </span>
                       {post.is_featured_lesson && (
-                        <span className="rounded-full bg-amber-100 px-2.5 py-0.5 font-extrabold text-amber-800 ring-1 ring-amber-300">
-                          ★ Giáo án Chuẩn ({post.quality_score}đ)
+                        <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-0.5 font-extrabold text-amber-800 ring-1 ring-amber-300">
+                          <Star className="h-3 w-3 fill-amber-500 text-amber-500" /> Giáo án Chuẩn ({post.quality_score}đ)
                         </span>
                       )}
                       <span className="rounded-full bg-slate-100 px-2.5 py-0.5 font-semibold text-slate-700">

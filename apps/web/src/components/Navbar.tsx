@@ -126,7 +126,7 @@ export function Navbar() {
           }),
         }).catch(() => {});
       }
-      showNativePush("🦉 Owlie Edu", "Đã bật Thông báo Đẩy thành công trên thiết bị này!", "/");
+      showNativePush("Owlie Edu", "Đã bật Thông báo Đẩy thành công trên thiết bị này!", "/");
     }
   };
 
@@ -603,9 +603,10 @@ export function Navbar() {
             <button
               type="button"
               onClick={() => setLiveToast(null)}
-              className="text-xs font-bold opacity-80 hover:opacity-100"
+              aria-label="Đóng thông báo"
+              className="rounded-md p-0.5 opacity-80 hover:opacity-100"
             >
-              ✕
+              <X className="h-3.5 w-3.5" />
             </button>
           </div>
           {liveToast.message && (

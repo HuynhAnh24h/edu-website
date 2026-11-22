@@ -127,7 +127,7 @@ export function SafetyCenterPanel({
       onStatus: setLiveConnected,
       onEvent: (ev) => {
         if (ev.type === "safety_alert") {
-          onToast("err", `🚨 CẢNH BÁO REAL-TIME: ${String(ev.title || "Phát hiện vi phạm mới!")}`);
+          onToast("err", `CẢNH BÁO REAL-TIME: ${String(ev.title || "Phát hiện vi phạm mới!")}`);
           void loadIncidents();
         } else if (ev.type === "incident_updated") {
           void loadIncidents();
@@ -233,8 +233,9 @@ export function SafetyCenterPanel({
       {evidencePreview && (
         <div className="rounded-2xl border-2 border-indigo-500 bg-slate-950 p-5 text-slate-100 shadow-lg space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <p className="text-sm font-extrabold text-emerald-400">
-              ✅ Đã xuất Hồ sơ Bằng chứng: {evidencePreview.filename}
+            <p className="inline-flex items-center gap-1.5 text-sm font-extrabold text-emerald-400">
+              <CheckCircle2 className="h-4 w-4 shrink-0" />
+              Đã xuất Hồ sơ Bằng chứng: {evidencePreview.filename}
             </p>
             <div className="flex gap-2">
               <button
@@ -298,8 +299,8 @@ export function SafetyCenterPanel({
                       <span className={`rounded-full px-2.5 py-0.5 font-bold ${cat.cls}`}>{cat.label}</span>
                       <span className={`rounded-full px-2.5 py-0.5 font-bold ${st.cls}`}>{st.label}</span>
                       {!inc.suspect_is_active && (
-                        <span className="rounded-full bg-slate-900 px-2 py-0.5 font-bold text-rose-300">
-                          🔒 TÀI KHOẢN ĐÃ KHÓA
+                        <span className="inline-flex items-center gap-1 rounded-full bg-slate-900 px-2 py-0.5 font-bold text-rose-300">
+                          <Lock className="h-3 w-3" /> TÀI KHOẢN ĐÃ KHÓA
                         </span>
                       )}
                     </div>

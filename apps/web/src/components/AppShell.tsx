@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
+import { OwlieLoadingScreen } from "@/components/OwlieLoadingScreen";
 
 /**
  * Tách biệt hoàn toàn giao diện Dashboard Quản trị (/quan-tri)
@@ -23,11 +24,17 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }, []);
 
   if (isAdminDashboard) {
-    return <div className="min-h-screen bg-slate-100">{children}</div>;
+    return (
+      <div className="min-h-screen bg-slate-100">
+        <OwlieLoadingScreen />
+        {children}
+      </div>
+    );
   }
 
   return (
     <div className="flex min-h-screen flex-col bg-slate-50/70">
+      <OwlieLoadingScreen />
       <Navbar />
       <main
         className={`mx-auto w-full max-w-7xl flex-1 px-4 py-6 sm:px-6 sm:py-8 ${

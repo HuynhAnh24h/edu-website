@@ -3,8 +3,11 @@
 import React from "react";
 import {
   Check,
+  CheckCircle2,
   Copy,
+  FileEdit,
   HelpCircle,
+  Lightbulb,
   Plus,
   Trash2,
 } from "lucide-react";
@@ -229,8 +232,9 @@ export function VisualQuestionBuilder({
               {/* Label Nội dung câu hỏi + Phím tắt chèn toán nhanh */}
               <div className="space-y-1.5">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <label className="text-xs font-bold uppercase tracking-wide text-slate-700">
-                    📝 Nội dung câu hỏi
+                  <label className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-slate-700">
+                    <FileEdit className="h-3.5 w-3.5 text-indigo-600" />
+                    Nội dung câu hỏi
                   </label>
                   <div className="flex flex-wrap items-center gap-1">
                     <span className="text-[11px] text-slate-400">Chèn nhanh:</span>
@@ -269,15 +273,17 @@ export function VisualQuestionBuilder({
 
               {/* Khu vực ĐIỀN ĐÁP ÁN TRỰC QUAN THEO LABEL */}
               <div className="space-y-2">
-                <label className="block text-xs font-bold uppercase tracking-wide text-slate-700">
-                  ✅{" "}
-                  {q.q_type === "single_choice"
-                    ? "Điền các phương án & Bấm vào nhãn (A/B/C/D) để đánh dấu ĐÁP ÁN ĐÚNG"
-                    : q.q_type === "multi_choice"
-                    ? "Điền các phương án & Tick chọn TẤT CẢ các đáp án đúng"
-                    : q.q_type === "true_false_group"
-                    ? "Điền 4 mệnh đề (a, b, c, d) & Gạt chọn Đúng / Sai cho từng ý"
-                    : "Nhập đáp án đúng học sinh cần điền"}
+                <label className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-slate-700">
+                  <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-600" />
+                  <span>
+                    {q.q_type === "single_choice"
+                      ? "Điền các phương án & Bấm vào nhãn (A/B/C/D) để đánh dấu ĐÁP ÁN ĐÚNG"
+                      : q.q_type === "multi_choice"
+                      ? "Điền các phương án & Tick chọn TẤT CẢ các đáp án đúng"
+                      : q.q_type === "true_false_group"
+                      ? "Điền 4 mệnh đề (a, b, c, d) & Gạt chọn Đúng / Sai cho từng ý"
+                      : "Nhập đáp án đúng học sinh cần điền"}
+                  </span>
                 </label>
 
                 {/* Dạng 1 đáp án hoặc nhiều đáp án */}
@@ -401,8 +407,9 @@ export function VisualQuestionBuilder({
 
               {/* Label Lời giải chi tiết */}
               <div className="space-y-1">
-                <label className="block text-xs font-bold uppercase tracking-wide text-slate-600">
-                  💡 Lời giải chi tiết (Hiện sau khi học sinh làm xong)
+                <label className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-slate-600">
+                  <Lightbulb className="h-3.5 w-3.5 shrink-0 text-amber-500" />
+                  Lời giải chi tiết (Hiện sau khi học sinh làm xong)
                 </label>
                 <input
                   type="text"

@@ -318,7 +318,7 @@ export default function LandingPage() {
                     href="/khoa-hoc"
                     className="inline-flex items-center gap-1.5 rounded-xl bg-amber-400 px-4 py-2 text-xs font-extrabold text-slate-950 shadow-2xs hover:bg-amber-300 transition"
                   >
-                    <GraduationCap className="h-4 w-4" /> Khóa học 5★
+                    <GraduationCap className="h-4 w-4" /> Khóa học 5 sao
                   </Link>
                   <Link
                     href={`/tai-lieu?grade=${user.current_grade || 12}`}
@@ -379,7 +379,7 @@ export default function LandingPage() {
                 className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-3.5 text-sm font-extrabold text-slate-800 shadow-xs hover:border-indigo-300 hover:text-indigo-700 transition"
               >
                 <GraduationCap className="h-4 w-4 text-amber-500" />
-                Khám phá Khóa học 5★
+                Khám phá Khóa học 5 sao
               </Link>
               <Link
                 href="/thi"

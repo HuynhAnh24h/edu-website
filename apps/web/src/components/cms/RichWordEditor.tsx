@@ -96,7 +96,7 @@ export function RichWordEditor({ value, onChange }: RichWordEditorProps) {
 
   const handleInsertCallout = () => {
     insertHtml(
-      `<div style="background:#eef2ff;border-left:4px solid #4f46e5;padding:12px 16px;border-radius:10px;margin:12px 0;"><strong>💡 Ghi nhớ trọng tâm:</strong> Nhập nội dung công thức hoặc lưu ý quan trọng cho học sinh tại đây...</div><p><br></p>`
+      `<div style="background:#eef2ff;border-left:4px solid #4f46e5;padding:12px 16px;border-radius:10px;margin:12px 0;"><strong>Ghi nhớ trọng tâm:</strong> Nhập nội dung công thức hoặc lưu ý quan trọng cho học sinh tại đây...</div><p><br></p>`
     );
   };
 

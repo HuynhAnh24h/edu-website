@@ -1001,9 +1001,16 @@ export default function CoursesPage() {
                     <button
                       type="button"
                       onClick={() => setSelectedId(c.id)}
-                      className="flex-1 rounded-xl bg-indigo-600 py-2.5 text-xs font-extrabold text-white shadow-xs hover:bg-indigo-500 transition"
+                      className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-indigo-600 py-2.5 text-xs font-extrabold text-white shadow-xs hover:bg-indigo-500 transition"
                     >
-                      {c.enrolled_by_me ? "Tiếp tục học & Đánh giá →" : "Vào học & Đánh giá 5★ →"}
+                      {c.enrolled_by_me ? (
+                        "Tiếp tục học & Đánh giá →"
+                      ) : (
+                        <>
+                          <Star className="h-3.5 w-3.5 fill-amber-300 text-amber-300" />
+                          Vào học &amp; Đánh giá 5 sao →
+                        </>
+                      )}
                     </button>
                     {canDelete && (
                       <button

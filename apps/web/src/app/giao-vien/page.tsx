@@ -666,7 +666,8 @@ function TeacherProfileInner() {
                   href="/khoa-hoc"
                   className="inline-flex items-center gap-1 text-xs font-extrabold text-indigo-600 hover:underline"
                 >
-                  Vào học &amp; Đánh giá 5★ →
+                  <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-500" />
+                  Vào học &amp; Đánh giá 5 sao →
                 </Link>
               </div>
             ))
@@ -686,8 +687,13 @@ function TeacherProfileInner() {
               <div key={r.id} className="rounded-2xl border border-amber-100 bg-white p-4 shadow-xs space-y-1.5">
                 <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
                   <span className="font-extrabold text-slate-900">{r.user_name}</span>
-                  <span className="rounded-full bg-amber-100 px-2.5 py-0.5 font-extrabold text-amber-900">
-                    {"★".repeat(Math.round(r.rating))} ({r.rating}.0/5.0)
+                  <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-0.5 font-extrabold text-amber-900">
+                    <span className="inline-flex items-center gap-0.5">
+                      {Array.from({ length: Math.max(1, Math.min(5, Math.round(r.rating))) }).map((_, idx) => (
+                        <Star key={idx} className="h-3 w-3 fill-amber-500 text-amber-500" />
+                      ))}
+                    </span>
+                    ({r.rating}.0/5.0)
                   </span>
                 </div>
                 <p className="text-[11px] font-semibold text-indigo-600">Khóa học: {r.course_title}</p>

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import {
   CheckCircle2,
   Gift,
+  GraduationCap,
   Mail,
   Megaphone,
   RefreshCw,
@@ -52,7 +53,8 @@ interface MailHostPayload {
 const PRESET_TEMPLATES = [
   {
     id: "course_launch" as const,
-    label: "🎓 Khai giảng Khóa học mới",
+    label: "Khai giảng Khóa học mới",
+    icon: GraduationCap,
     accent: "bg-indigo-600",
     light: "bg-indigo-50 border-indigo-300 text-indigo-800",
     defaultTitle: "Khai giảng Khóa học Lập trình Fullstack (React, Next.js & NestJS)",
@@ -65,7 +67,8 @@ const PRESET_TEMPLATES = [
   },
   {
     id: "discount_promo" as const,
-    label: "🎁 Chương trình Giảm giá / Học bổng",
+    label: "Chương trình Giảm giá / Học bổng",
+    icon: Gift,
     accent: "bg-rose-600",
     light: "bg-rose-50 border-rose-300 text-rose-800",
     defaultTitle: "Ưu đãi Học bổng Mùa thi — Giảm 50% Gói Luyện đề Chuyên sâu",
@@ -78,7 +81,8 @@ const PRESET_TEMPLATES = [
   },
   {
     id: "exam_event" as const,
-    label: "📢 Mở Kỳ thi thử & Sự kiện",
+    label: "Mở Kỳ thi thử & Sự kiện",
+    icon: Megaphone,
     accent: "bg-emerald-600",
     light: "bg-emerald-50 border-emerald-300 text-emerald-800",
     defaultTitle: "Mở Phòng Thi thử Trắc nghiệm Toàn quốc chuẩn cấu trúc 2025+",
@@ -343,20 +347,24 @@ export function EmailMarketingPanel({
 
           {/* 3 Mẫu chiến dịch 1 chạm */}
           <div className="grid gap-2 sm:grid-cols-3">
-            {PRESET_TEMPLATES.map((p) => (
-              <button
-                key={p.id}
-                type="button"
-                onClick={() => applyPreset(p.id)}
-                className={`rounded-xl border px-3 py-2 text-left text-xs font-extrabold transition ${
-                  templateType === p.id
-                    ? "border-indigo-600 bg-indigo-50 text-indigo-800 ring-1 ring-indigo-300"
-                    : "border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100"
-                }`}
-              >
-                {p.label}
-              </button>
-            ))}
+            {PRESET_TEMPLATES.map((p) => {
+              const PresetIcon = p.icon;
+              return (
+                <button
+                  key={p.id}
+                  type="button"
+                  onClick={() => applyPreset(p.id)}
+                  className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-left text-xs font-extrabold transition ${
+                    templateType === p.id
+                      ? "border-indigo-600 bg-indigo-50 text-indigo-800 ring-1 ring-indigo-300"
+                      : "border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100"
+                  }`}
+                >
+                  <PresetIcon className="h-4 w-4 shrink-0" />
+                  <span>{p.label}</span>
+                </button>
+              );
+            })}
           </div>
 
           {/* Nhóm người nhận */}
@@ -490,16 +498,18 @@ export function EmailMarketingPanel({
 
           <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md">
             <div className={`${currentPreset.accent} p-5 text-white`}>
-              <p className="text-[10px] font-extrabold uppercase tracking-wider opacity-90">
-                🦉 OWLIE EDU • {templateType === "discount_promo" ? "ƯU ĐÃI & HỌC BỔNG" : templateType === "exam_event" ? "KỲ THI & SỰ KIỆN" : "KHAI GIẢNG KHÓA HỌC"}
+              <p className="inline-flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-wider opacity-90">
+                <GraduationCap className="h-3.5 w-3.5" />
+                OWLIE EDU • {templateType === "discount_promo" ? "ƯU ĐÃI & HỌC BỔNG" : templateType === "exam_event" ? "KỲ THI & SỰ KIỆN" : "KHAI GIẢNG KHÓA HỌC"}
               </p>
               <h4 className="mt-1.5 text-base font-black leading-snug">{title || "Tiêu đề Email"}</h4>
             </div>
 
             <div className="p-5 space-y-3.5">
               {highlightBadge && (
-                <div className={`rounded-xl border border-dashed p-3 text-center text-xs font-extrabold ${currentPreset.light}`}>
-                  ✨ {highlightBadge}
+                <div className={`flex items-center justify-center gap-1.5 rounded-xl border border-dashed p-3 text-center text-xs font-extrabold ${currentPreset.light}`}>
+                  <Sparkles className="h-3.5 w-3.5 shrink-0" />
+                  <span>{highlightBadge}</span>
                 </div>
               )}
 

@@ -10,6 +10,7 @@ import {
   RefreshCw,
   Sparkles,
   Unlock,
+  Zap,
 } from "lucide-react";
 import { CORE_API_URL } from "@/lib/api";
 
@@ -331,9 +332,16 @@ export function ExamLevelControlPanel({
                     type="button"
                     disabled={busy}
                     onClick={() => void handleGenerateLevelExam(lvl)}
-                    className="w-full rounded-xl bg-slate-900 py-2.5 text-xs font-extrabold text-white shadow hover:bg-indigo-600 transition disabled:opacity-50"
+                    className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-slate-900 py-2.5 text-xs font-extrabold text-white shadow hover:bg-indigo-600 transition disabled:opacity-50"
                   >
-                    {busy ? "Đang tổng hợp..." : "⚡ Tổng hợp & Mở khóa Đề cấp này"}
+                    {busy ? (
+                      "Đang tổng hợp..."
+                    ) : (
+                      <>
+                        <Zap className="h-3.5 w-3.5 text-amber-400" />
+                        Tổng hợp &amp; Mở khóa Đề cấp này
+                      </>
+                    )}
                   </button>
                 </div>
               </div>
