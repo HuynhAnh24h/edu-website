@@ -17,6 +17,7 @@ import { handleCourseRoutes } from "./courses";
 import { handleTeachersAndFilesRoutes } from "./teachers-files";
 import { handlePortfolioAndParentRoutes } from "./portfolio-parent";
 import { handleAdminOpsAndPushRoutes, recordAuditLog, runFullDatabaseBackup } from "./admin-ops";
+import { handleMonetizationRoutes } from "./monetization";
 import { pushRealtimeEvent, RealtimeHub } from "./realtime";
 
 export { RealtimeHub };
@@ -36,6 +37,7 @@ export interface Env {
   RESEND_API_KEY?: string;
   BREVO_API_KEY?: string;
   FROM_EMAIL?: string;
+  BANK_WEBHOOK_SECRET?: string;
 }
 
 interface QuestionRow {
@@ -308,6 +310,13 @@ export default {
         forwardUrl.searchParams.set("name", claims?.name || "Khách");
         forwardUrl.searchParams.set("role", claims?.role || "guest");
         return stub.fetch(new Request(forwardUrl.toString(), request));
+      }
+
+      // === HỆ THỐNG KIẾM TIỀN: GÓI OWLIE PRO, VIETQR, MÃ GIẢM GIÁ, AFFILIATE & WEBHOOK NGÂN HÀNG ===
+      if (path.startsWith("/api/v1/monetization")) {
+        const claims = await getClaims(request, env);
+        const monResp = await handleMonetizationRoutes(request, env, path, method, claims, jsonRes);
+        if (monResp) return monResp;
       }
 
       // === NHẬT KÝ QUẢN TRỊ, SAO LƯU TỰ ĐỘNG, QUÊN MẬT KHẨU EMAIL, HOST MAIL, TÊN MIỀN & PUSH ===

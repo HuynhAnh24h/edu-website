@@ -29,6 +29,7 @@ import {
   Trash2,
   Upload,
   Users,
+  Wallet,
   X,
 } from "lucide-react";
 import { AI_API_URL, CORE_API_URL } from "@/lib/api";
@@ -45,6 +46,7 @@ import { TeacherVerificationPanel } from "@/components/cms/TeacherVerificationPa
 import { StorageQuotaPanel, StorageStatsPayload } from "@/components/cms/StorageQuotaPanel";
 import { AdminOpsPanel } from "@/components/cms/AdminOpsPanel";
 import { EmailMarketingPanel } from "@/components/cms/EmailMarketingPanel";
+import { MonetizationPanel } from "@/components/cms/MonetizationPanel";
 import { CuBongLogoMark } from "@/components/BrandLogo";
 import {
   createEmptyDraftQuestion,
@@ -99,6 +101,7 @@ type DashboardTab =
   | "verifications"
   | "safety"
   | "storage"
+  | "revenue"
   | "mail"
   | "ops"
   | "community"
@@ -148,6 +151,10 @@ const TAB_META: Record<DashboardTab, { title: string; subtitle: string }> = {
   storage: {
     title: "Kho Lưu trữ & Dung lượng Tài liệu",
     subtitle: "Theo dõi dung lượng thực tế (khóa trần an toàn 0đ), kiểm soát tệp đề thi PDF/Word/Ảnh và xóa giải phóng bộ nhớ.",
+  },
+  revenue: {
+    title: "Doanh thu, VietQR & Kiếm tiền",
+    subtitle: "Cấu hình tài khoản ngân hàng nhận tiền VietQR, duyệt đơn Owlie Pro, quản lý mã giảm giá & hoa hồng Affiliate.",
   },
   mail: {
     title: "Host Mail & Chiến dịch Email (Khai giảng / Ưu đãi)",
@@ -652,6 +659,12 @@ export default function CMSAdminPage() {
                   ? `${storageSummary.used_mb} MB / ${storageSummary.safety_cap_gb} GB`
                   : "Theo dõi hạn mức 0đ & tệp",
                 icon: Database,
+              },
+              {
+                id: "revenue" as DashboardTab,
+                label: "Doanh thu & VietQR",
+                desc: "Gói Pro • Mã giảm giá • Affiliate",
+                icon: Wallet,
               },
               {
                 id: "mail" as DashboardTab,
@@ -1674,6 +1687,11 @@ export default function CMSAdminPage() {
               onToast={showToast}
               onStatsLoaded={setStorageSummary}
             />
+          )}
+
+          {/* === TAB 6A2A: DOANH THU, VIETQR, MÃ GIẢM GIÁ & AFFILIATE === */}
+          {activeTab === "revenue" && isAdmin && (
+            <MonetizationPanel accessToken={accessToken} onToast={showToast} />
           )}
 
           {/* === TAB 6A2B: HOST MAIL & GỬI EMAIL CHIẾN DỊCH (KHAI GIẢNG / GIẢM GIÁ) === */}

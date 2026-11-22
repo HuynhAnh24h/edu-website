@@ -103,7 +103,12 @@ export function Footer() {
             </h3>
             <ul className="space-y-2 text-xs text-slate-400">
               <li>
-                <Link href="/khoa-hoc" className="font-semibold text-amber-300 hover:text-white transition">
+                <Link href="/bang-gia" className="font-bold text-amber-300 hover:text-white transition">
+                  Bảng giá Owlie Pro &amp; Kiếm tiền 20%
+                </Link>
+              </li>
+              <li>
+                <Link href="/khoa-hoc" className="font-semibold text-indigo-300 hover:text-white transition">
                   Khóa học Trực tuyến &amp; Đánh giá 5 sao
                 </Link>
               </li>

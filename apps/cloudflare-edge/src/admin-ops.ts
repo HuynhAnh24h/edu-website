@@ -38,13 +38,14 @@ async function sendTransactionalEmail(
   const sender = parseFromHeader(fromRaw);
 
   // Ưu tiên 1: Brevo (Sendinblue) — 300 email/ngày miễn phí, gửi được từ Gmail cá nhân mà chưa cần mua tên miền riêng
-  if (env.BREVO_API_KEY) {
+  const brevoKey = (env.BREVO_API_KEY || "").trim();
+  if (brevoKey) {
     try {
       const r = await fetch("https://api.brevo.com/v3/smtp/email", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "api-key": env.BREVO_API_KEY,
+          "api-key": brevoKey,
         },
         body: JSON.stringify({
           sender: { name: sender.name, email: sender.email },
@@ -62,13 +63,14 @@ async function sendTransactionalEmail(
   }
 
   // Ưu tiên 2: Resend — 3.000 email/tháng miễn phí, siêu nhanh & chuẩn deliverability
-  if (env.RESEND_API_KEY) {
+  const resendKey = (env.RESEND_API_KEY || "").trim();
+  if (resendKey) {
     try {
       const r = await fetch("https://api.resend.com/emails", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${env.RESEND_API_KEY}`,
+          Authorization: `Bearer ${resendKey}`,
         },
         body: JSON.stringify({
           from: fromRaw,

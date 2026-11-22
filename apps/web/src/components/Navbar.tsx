@@ -12,6 +12,7 @@ import {
   CheckSquare,
   ChevronDown,
   Code2,
+  Crown,
   Download,
   FileSpreadsheet,
   GraduationCap,
@@ -43,6 +44,7 @@ const EXPLORE_LINKS = [
   { href: "/phu-huynh", label: "Góc Phụ huynh", desc: "Theo dõi điểm số & an toàn của con miễn phí", icon: HeartHandshake },
   { href: "/bai-tap", label: "Bài tập 1–12", desc: "4 định dạng câu hỏi mới 2025+", icon: CheckSquare },
   { href: "/ai-gia-su", label: "AI Gia sư 24/7", desc: "Gợi mở tư duy học từng bước", icon: Bot },
+  { href: "/bang-gia", label: "Owlie Pro & Affiliate", desc: "Nâng cấp VietQR & kiếm hoa hồng 20%", icon: Crown },
   { href: "/tai-app", label: "Tải App Mobile", desc: "Cài bản Android (.APK) & iPhone", icon: Download },
 ];
 
@@ -322,6 +324,17 @@ export function Navbar() {
               </>
             )}
           </div>
+          <Link
+            href="/bang-gia"
+            className={`ml-1 inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-extrabold transition ${
+              pathname.startsWith("/bang-gia")
+                ? "bg-amber-400 text-slate-950 shadow-xs"
+                : "bg-gradient-to-r from-amber-100 to-orange-100 text-amber-900 ring-1 ring-amber-300/70 hover:from-amber-200 hover:to-orange-200"
+            }`}
+          >
+            <Crown className="h-3.5 w-3.5 text-amber-600" />
+            <span>Bảng giá Pro</span>
+          </Link>
         </nav>
 
         {/* Phải: Nút Studio/Quản trị (GV/Admin) + Chuông + Profile Menu */}
