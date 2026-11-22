@@ -24,6 +24,7 @@ import {
 import { CORE_API_URL } from "@/lib/api";
 import { getSubjectMeta, SUBJECT_ORDER } from "@/lib/subjects";
 import { CODING_TRACKS } from "@/lib/codingCurriculum";
+import { CODING_ROADMAPS } from "@/lib/codingRoadmaps";
 import { useAuth } from "@/context/AuthContext";
 import { CuBongLogoMark } from "@/components/BrandLogo";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
@@ -782,47 +783,73 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ================= 7. HỌC VIỆN STEM & LẬP TRÌNH THỰC HÀNH (8 NGÔN NGỮ) ================= */}
-      <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-xs sm:p-8 space-y-5">
+      {/* ================= 7. HỌC VIỆN LẬP TRÌNH & CHỌN LỘ TRÌNH STACK (KIỂU F8) ================= */}
+      <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-xs sm:p-8 space-y-6">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700">
-              <Code2 className="h-3.5 w-3.5" /> Giáo dục STEM Hiện đại • Thực hành trực tiếp không cần cài đặt
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-50 px-3 py-1 text-xs font-bold text-rose-700">
+              <Code2 className="h-3.5 w-3.5" /> Học theo Lộ trình Nghề nghiệp &amp; Tự chọn Stack cá nhân
             </span>
             <h2 className="mt-2 text-2xl font-extrabold text-slate-900">
-              Góc Tư duy Lập trình &amp; Công nghệ (8 Ngôn ngữ)
+              Học viện Lập trình STEM — Chọn đúng Stack bạn muốn
             </h2>
             <p className="mt-1 text-xs text-slate-600 sm:text-sm">
-              Dành cho học sinh yêu thích Tin học, STEM và sinh viên tự học — làm bài tập có kiểm tra tự động và lưu tiến độ vào Học bạ Số.
+              Chọn lộ trình bài bản theo hướng <strong>Front-end, Back-end, Fullstack, Python AI</strong> hoặc <strong>tự lắp ghép Stack riêng</strong> và code chấm test tự động ngay trên trình duyệt!
             </p>
           </div>
           <Link
-            href="/lap-trinh"
-            className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2.5 text-xs font-extrabold text-white shadow-xs hover:bg-emerald-500 transition"
+            href="/lap-trinh?path=custom"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-rose-600 px-4 py-2.5 text-xs font-extrabold text-white shadow-xs hover:bg-rose-500 transition"
           >
-            Mở Phòng Thực hành STEM <ArrowRight className="h-3.5 w-3.5" />
+            Tự chọn Stack riêng của bạn <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {/* 4 Lộ trình Stack kiểu F8 */}
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {CODING_ROADMAPS.map((rm) => (
+            <Link
+              key={rm.id}
+              href={`/lap-trinh?path=${rm.id}`}
+              className="group flex flex-col justify-between overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xs transition hover:-translate-y-0.5 hover:border-rose-300 hover:shadow-md"
+            >
+              <div className={`bg-gradient-to-br ${rm.gradient} p-4 text-white`}>
+                <span className="inline-block rounded-full bg-black/20 px-2.5 py-0.5 text-[10px] font-bold">
+                  {rm.badge}
+                </span>
+                <h3 className="mt-2 text-base font-black">{rm.shortTitle}</h3>
+                <p className="mt-0.5 text-[11px] text-white/90">{rm.durationLabel}</p>
+              </div>
+              <div className="flex flex-1 flex-col justify-between p-4 space-y-3">
+                <p className="line-clamp-2 text-xs leading-relaxed text-slate-600">{rm.audience}</p>
+                <div className="flex flex-wrap gap-1">
+                  {rm.tracks.map((tid) => (
+                    <span
+                      key={tid}
+                      className="rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-bold uppercase text-slate-700"
+                    >
+                      {tid}
+                    </span>
+                  ))}
+                </div>
+                <span className="inline-flex items-center gap-1 text-xs font-extrabold text-rose-600 group-hover:underline">
+                  Xem lộ trình từng bước <ArrowRight className="h-3.5 w-3.5" />
+                </span>
+              </div>
+            </Link>
+          ))}
+        </div>
+
+        {/* Lối tắt 8 công nghệ lẻ */}
+        <div className="flex flex-wrap items-center gap-2 border-t border-slate-100 pt-4">
+          <span className="text-xs font-bold text-slate-500">Hoặc vào thẳng 8 ngôn ngữ:</span>
           {CODING_TRACKS.map((track) => (
             <Link
               key={track.id}
               href={`/lap-trinh?track=${track.id}`}
-              className="group rounded-2xl border border-slate-200 bg-slate-50/50 p-4 transition hover:border-emerald-300 hover:bg-white hover:shadow-xs"
+              className={`rounded-xl border px-3 py-1.5 text-xs font-extrabold transition hover:shadow-xs ${track.accentBg} ${track.accentText} ${track.accentBorder}`}
             >
-              <div className="flex items-center justify-between gap-2">
-                <span
-                  className={`rounded-lg border px-2.5 py-1 text-xs font-extrabold ${track.accentBg} ${track.accentText} ${track.accentBorder}`}
-                >
-                  {track.shortName}
-                </span>
-                <span className="text-[10px] font-bold uppercase text-slate-400">{track.category}</span>
-              </div>
-              <h3 className="mt-2.5 text-sm font-bold text-slate-900 group-hover:text-emerald-700">
-                {track.name}
-              </h3>
-              <p className="mt-1 line-clamp-2 text-xs text-slate-500">{track.tagline}</p>
+              {track.shortName}
             </Link>
           ))}
         </div>
