@@ -19,17 +19,25 @@ export interface RunResult {
 // ================= TYPESCRIPT -> JAVASCRIPT LIGHTWEIGHT STRIPPER =================
 function stripTypeScript(tsCode: string): string {
   let code = tsCode;
+  // Remove decorators like @Injectable(), @Controller('courses')
+  code = code.replace(/^\s*@\w+(?:\([^)]*\))?\s*$/gm, "");
+  // Remove export keywords (export default, export function, export class)
+  code = code.replace(/\bexport\s+default\s+/g, "");
+  code = code.replace(/\bexport\s+(?=(?:async\s+)?(?:function|class|const|let|var)\b)/g, "");
   // Remove interface / type blocks
   code = code.replace(/\binterface\s+\w+(?:<[^>]+>)?\s*\{[\s\S]*?\}/g, "");
   code = code.replace(/\btype\s+\w+(?:<[^>]+>)?\s*=\s*[^;]+;/g, "");
+  // Remove class field type annotations: items: { ... }[] = []; or private x: number = 0;
+  code = code.replace(/^(\s*)(?:public|private|protected|readonly)\s+/gm, "$1");
+  code = code.replace(/^(\s*[A-Za-z_$][\w$]*)\??\s*:\s*[^=\n;]+(?=\s*=)/gm, "$1");
   // Remove generic type params on functions: function foo<T>(...)
   code = code.replace(/(function\s+\w+)\s*<[^>]+>/g, "$1");
   // Remove return type annotations: ): Type { or ): Type | null {
-  code = code.replace(/\)\s*:\s*[A-Za-z0-9_<>\[\]\|\s&?]+(?=\s*\{)/g, ")");
-  // Remove parameter type annotations inside (...)
-  code = code.replace(/(\b[A-Za-z_$][\w$]*)\??\s*:\s*[A-Za-z0-9_<>\[\]\|\s&]+(?=[,)])/g, "$1");
-  // Remove variable type annotations: const x: number = ...
-  code = code.replace(/\b(const|let|var)\s+([A-Za-z_$][\w$]*)\s*:\s*[A-Za-z0-9_<>\[\]\|\s&]+(?=\s*=)/g, "$1 $2");
+  code = code.replace(/\)\s*:\s*[A-Za-z0-9_<>\[\]\|\s&?{}.,;]+(?=\s*\{)/g, ")");
+  // Remove parameter type annotations with object literals: ({ a, b }: { a: string; b: boolean }) or (x: { ... } | null)
+  code = code.replace(/(\{[^}]+\}|[A-Za-z_$][\w$]*)\??\s*:\s*(?:\{[^}]*\}(?:\[\])?|[A-Za-z0-9_<>\[\]]+)(?:\s*\|\s*(?:\{[^}]*\}|[A-Za-z0-9_<>\[\]]+))*(?=[,)])/g, "$1");
+  // Remove variable type annotations: const x: number = ... or const errors: string[] = ...
+  code = code.replace(/\b(const|let|var)\s+([A-Za-z_$][\w$]*)\s*:\s*[^=\n;]+(?=\s*=)/g, "$1 $2");
   return code;
 }
 
@@ -722,6 +730,10 @@ export async function executeCodingLesson(
     case "javascript":
       return runJsOrTs(lesson, code, false);
     case "typescript":
+    case "react":
+    case "nextjs":
+    case "nodejs":
+    case "nestjs":
       return runJsOrTs(lesson, code, true);
     case "python":
       return runPython(lesson, code);

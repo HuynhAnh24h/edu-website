@@ -12,7 +12,6 @@ import {
   Brain,
   Check,
   CheckCircle2,
-  Code2,
   Compass,
   Database,
   Eye,
@@ -32,11 +31,18 @@ import {
 import { CORE_API_URL } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 import { CODING_TRACKS, CodingLanguage, getTrackById } from "@/lib/codingCurriculum";
-import { CODING_ROADMAPS, RoadmapId, TRACK_VISUAL_META } from "@/lib/codingRoadmaps";
+import {
+  ClusterId,
+  CODING_CLUSTERS,
+  CODING_ROADMAPS,
+  getClusterById,
+  RoadmapId,
+  TRACK_VISUAL_META,
+} from "@/lib/codingRoadmaps";
 import { executeCodingLesson, RunResult } from "@/lib/codeRunner";
 
 const LOCAL_PROGRESS_KEY = "eduk12_coding_progress_v1";
-const LOCAL_STACK_KEY = "owlie_coding_stack_pref_v1";
+const LOCAL_STACK_KEY = "owlie_coding_cluster_stack_v2";
 
 function loadLocalProgress(): Record<string, { code: string; passedAt: string }> {
   if (typeof window === "undefined") return {};
@@ -56,24 +62,25 @@ function saveLocalProgress(map: Record<string, { code: string; passedAt: string 
   }
 }
 
-function loadSavedStack(): { roadmapId: RoadmapId; customTracks: CodingLanguage[] } {
+function loadSavedClusterPref(): { roadmapId: RoadmapId; customClusters: ClusterId[] } {
   if (typeof window === "undefined") {
-    return { roadmapId: "frontend", customTracks: ["html", "css", "javascript"] };
+    return { roadmapId: "frontend", customClusters: ["html-css", "js-ts", "react-next"] };
   }
   try {
     const raw = JSON.parse(localStorage.getItem(LOCAL_STACK_KEY) || "null");
     if (raw && raw.roadmapId) {
       return {
         roadmapId: raw.roadmapId as RoadmapId,
-        customTracks: Array.isArray(raw.customTracks) && raw.customTracks.length > 0
-          ? (raw.customTracks as CodingLanguage[])
-          : ["html", "css", "javascript"],
+        customClusters:
+          Array.isArray(raw.customClusters) && raw.customClusters.length > 0
+            ? (raw.customClusters as ClusterId[])
+            : ["html-css", "js-ts", "react-next"],
       };
     }
   } catch {
     // ignore
   }
-  return { roadmapId: "frontend", customTracks: ["html", "css", "javascript"] };
+  return { roadmapId: "frontend", customClusters: ["html-css", "js-ts", "react-next"] };
 }
 
 function CodingAcademyInner() {
@@ -84,15 +91,15 @@ function CodingAcademyInner() {
   const pathParam = searchParams.get("path") as RoadmapId | null;
   const hasExplicitTrack = Boolean(trackParam && CODING_TRACKS.some((t) => t.id === trackParam));
 
-  // F8-style View Mode: "hub" (Lộ trình & Chọn Stack kiểu F8) | "ide" (Phòng Thực hành Code)
+  // Mode 1: "hub" (Lộ trình phân cấp theo Cụm kiểu F8) | Mode 2: "ide" (Phòng Thực hành Code)
   const [viewMode, setViewMode] = useState<"hub" | "ide">(hasExplicitTrack ? "ide" : "hub");
   const [selectedRoadmapId, setSelectedRoadmapId] = useState<RoadmapId>(() => {
-    if (pathParam && ["frontend", "backend", "fullstack", "python-ai", "custom"].includes(pathParam)) {
+    if (pathParam && ["frontend", "backend-node", "fullstack", "go-python-ai", "custom"].includes(pathParam)) {
       return pathParam;
     }
     return "frontend";
   });
-  const [customTracks, setCustomTracks] = useState<CodingLanguage[]>(["html", "css", "javascript"]);
+  const [customClusters, setCustomClusters] = useState<ClusterId[]>(["html-css", "js-ts", "react-next"]);
   const [catalogFilter, setCatalogFilter] = useState<"all" | "Frontend" | "Backend" | "Database">("all");
 
   const [activeTrackId, setActiveTrackId] = useState<CodingLanguage>(
@@ -107,20 +114,18 @@ function CodingAcademyInner() {
   const [revealedTier, setRevealedTier] = useState<0 | 1 | 2 | 3>(0);
   const [lockNotice, setLockNotice] = useState("");
 
-  // Khôi phục Stack đã chọn từ localStorage (nếu không có ?path= trên URL)
   useEffect(() => {
-    const saved = loadSavedStack();
-    setCustomTracks(saved.customTracks);
+    const saved = loadSavedClusterPref();
+    setCustomClusters(saved.customClusters);
     if (!pathParam) {
       setSelectedRoadmapId(saved.roadmapId);
     }
   }, [pathParam]);
 
-  // Lưu lựa chọn Stack/Lộ trình của người dùng
-  const persistStackPref = useCallback((rid: RoadmapId, cTracks: CodingLanguage[]) => {
+  const persistStackPref = useCallback((rid: RoadmapId, cClusters: ClusterId[]) => {
     if (typeof window === "undefined") return;
     try {
-      localStorage.setItem(LOCAL_STACK_KEY, JSON.stringify({ roadmapId: rid, customTracks: cTracks }));
+      localStorage.setItem(LOCAL_STACK_KEY, JSON.stringify({ roadmapId: rid, customClusters: cClusters }));
     } catch {
       // ignore
     }
@@ -128,20 +133,22 @@ function CodingAcademyInner() {
 
   const handleChooseRoadmap = (rid: RoadmapId) => {
     setSelectedRoadmapId(rid);
-    persistStackPref(rid, customTracks);
+    persistStackPref(rid, customClusters);
   };
 
-  const handleToggleCustomTrack = (tid: CodingLanguage) => {
-    setCustomTracks((prev) => {
-      const exists = prev.includes(tid);
+  const handleToggleCustomCluster = (cid: ClusterId) => {
+    setCustomClusters((prev) => {
+      const exists = prev.includes(cid);
       const next = exists
         ? prev.length > 1
-          ? prev.filter((x) => x !== tid)
+          ? prev.filter((x) => x !== cid)
           : prev
-        : [...prev, tid];
+        : [...prev, cid];
+      // Giữ thứ tự phân cấp chuẩn (Cấp 1 -> Cấp 2 -> Cấp 3 -> Cấp 4)
+      const ordered = CODING_CLUSTERS.map((c) => c.id).filter((id) => next.includes(id));
       setSelectedRoadmapId("custom");
-      persistStackPref("custom", next);
-      return next;
+      persistStackPref("custom", ordered);
+      return ordered;
     });
   };
 
@@ -150,10 +157,20 @@ function CodingAcademyInner() {
     [selectedRoadmapId]
   );
 
+  const activeClusterIds: ClusterId[] = useMemo(() => {
+    if (selectedRoadmapId === "custom") return customClusters;
+    return activeRoadmapObj ? activeRoadmapObj.clusters : CODING_ROADMAPS[0].clusters;
+  }, [selectedRoadmapId, customClusters, activeRoadmapObj]);
+
   const roadmapTracks: CodingLanguage[] = useMemo(() => {
-    if (selectedRoadmapId === "custom") return customTracks;
-    return activeRoadmapObj ? activeRoadmapObj.tracks : CODING_ROADMAPS[0].tracks;
-  }, [selectedRoadmapId, customTracks, activeRoadmapObj]);
+    const list: CodingLanguage[] = [];
+    for (const cid of activeClusterIds) {
+      for (const tid of getClusterById(cid).tracks) {
+        if (!list.includes(tid)) list.push(tid);
+      }
+    }
+    return list;
+  }, [activeClusterIds]);
 
   const track = useMemo(() => getTrackById(activeTrackId), [activeTrackId]);
   const lesson = track.lessons[lessonIdx] || track.lessons[0];
@@ -183,7 +200,6 @@ function CodingAcademyInner() {
       .catch(() => {});
   }, [accessToken]);
 
-  // Khi đổi bài hoặc đổi khóa -> nạp code mẫu hoặc code đã làm trước đó
   useEffect(() => {
     const saved = passedMap[lesson.id]?.code;
     setCode(saved && saved.trim() ? saved : lesson.starterCode);
@@ -194,7 +210,6 @@ function CodingAcademyInner() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lesson.id]);
 
-  // Kiểm tra xem bài idx có được mở khóa hay chưa
   const isLessonUnlocked = useCallback(
     (idx: number) => {
       if (idx === 0) return true;
@@ -222,7 +237,6 @@ function CodingAcademyInner() {
     []
   );
 
-  // Thống kê tiến độ của riêng Lộ trình / Stack người dùng đang chọn
   const roadmapProgress = useMemo(() => {
     let passed = 0;
     let total = 0;
@@ -246,7 +260,6 @@ function CodingAcademyInner() {
   const openTrackInIde = useCallback(
     (id: CodingLanguage) => {
       const tr = getTrackById(id);
-      // Tự động nhảy đúng vào bài học đầu tiên chưa hoàn thành (giống F8!)
       let startIdx = 0;
       for (let i = 0; i < tr.lessons.length; i++) {
         if (!passedMap[tr.lessons[i].id]) {
@@ -311,7 +324,6 @@ function CodingAcademyInner() {
     }
   }, [lesson, code, passedMap, accessToken, track.id]);
 
-  // Phím tắt Ctrl+Enter để chạy & chấm bài nhanh trong chế độ IDE
   useEffect(() => {
     if (viewMode !== "ide") return;
     const onKey = (e: KeyboardEvent) => {
@@ -340,30 +352,37 @@ function CodingAcademyInner() {
       ? roadmapTracks[currentIdxInRoadmap + 1]
       : null;
 
+  const activeClusterForIde = useMemo(
+    () => CODING_CLUSTERS.find((c) => c.tracks.includes(activeTrackId)) || CODING_CLUSTERS[0],
+    [activeTrackId]
+  );
+
   // =========================================================================
-  // CHẾ ĐỘ 1: TRUNG TÂM LỘ TRÌNH & CHỌN STACK KIỂU F8 (MẶC ĐỊNH)
+  // CHẾ ĐỘ 1: LỘ TRÌNH PHÂN CẤP THEO CỤM CÔNG NGHỆ KIỂU F8
   // =========================================================================
   if (viewMode === "hub") {
-    const visibleCatalogTracks =
+    const visibleCatalogClusters =
       catalogFilter === "all"
-        ? CODING_TRACKS
-        : CODING_TRACKS.filter((t) => t.category === catalogFilter);
+        ? CODING_CLUSTERS
+        : CODING_CLUSTERS.filter((c) => c.category === catalogFilter);
 
     return (
       <div className="space-y-8 pb-12">
-        {/* Banner F8 Style: Sáng rõ, truyền cảm hứng chọn Lộ trình & Stack */}
+        {/* Banner F8 Style */}
         <section className="relative overflow-hidden rounded-[28px] bg-gradient-to-r from-orange-500 via-rose-500 to-indigo-600 p-6 text-white shadow-xl sm:p-9">
           <div className="pointer-events-none absolute -top-20 -right-20 h-64 w-64 rounded-full bg-white/15 blur-3xl" />
           <div className="relative z-10 flex flex-wrap items-center justify-between gap-6">
             <div className="max-w-2xl space-y-2.5">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-xs font-extrabold backdrop-blur-xs">
-                <Flame className="h-3.5 w-3.5 text-amber-200" /> Học Lập trình Thực chiến theo Lộ trình • Miễn phí 100%
+                <Flame className="h-3.5 w-3.5 text-amber-200" /> 6 Cụm Công nghệ • 12 Khóa Thực chiến • Chấm Test Tự động
               </span>
               <h1 className="text-2xl font-black tracking-tight sm:text-4xl leading-tight">
-                Chọn Stack &amp; Lộ trình Học Lập trình theo đúng mục tiêu của bạn
+                Lộ trình Học Lập trình Phân cấp theo Cụm Stack chuẩn Doanh nghiệp
               </h1>
               <p className="text-xs leading-relaxed text-white/90 sm:text-sm">
-                Không còn loay hoay không biết bắt đầu từ đâu — chọn sẵn lộ trình <strong>Front-end, Back-end, Fullstack, Python AI</strong> hoặc <strong>tự lắp ghép Stack riêng</strong> rồi thực hành code chấm test tự động ngay trên trình duyệt!
+                Học theo từng cụm bài bản: <strong>HTML &amp; CSS</strong> → <strong>JS &amp; TS</strong> →{" "}
+                <strong>React &amp; Next.js</strong> → <strong>Node.js &amp; NestJS</strong> →{" "}
+                <strong>Golang &amp; Python</strong> → <strong>MongoDB &amp; PostgreSQL</strong> — chọn lộ trình sẵn hoặc tự ghép cụm bạn muốn!
               </p>
               <div className="flex flex-wrap gap-2.5 pt-2">
                 <button
@@ -373,20 +392,19 @@ function CodingAcademyInner() {
                 >
                   <Play className="h-4 w-4 text-rose-600" />
                   {roadmapProgress.passed > 0
-                    ? `Học tiếp lộ trình (${getTrackById(roadmapProgress.nextTrackToLearn).shortName})`
+                    ? `Học tiếp (${getTrackById(roadmapProgress.nextTrackToLearn).shortName})`
                     : `Bắt đầu ngay (${getTrackById(roadmapProgress.nextTrackToLearn).shortName})`}
                   <ArrowRight className="h-4 w-4" />
                 </button>
                 <a
-                  href="#free-courses-grid"
+                  href="#all-clusters-catalog"
                   className="inline-flex items-center gap-2 rounded-2xl bg-slate-950/25 px-5 py-3 text-xs font-bold text-white ring-1 ring-white/30 hover:bg-slate-950/40 transition"
                 >
-                  <Layers className="h-4 w-4" /> Xem tất cả 8 Khóa học
+                  <Layers className="h-4 w-4" /> Xem tất cả 6 Cụm (12 Khóa)
                 </a>
               </div>
             </div>
 
-            {/* Thẻ tiến độ cá nhân */}
             <div className="min-w-[230px] rounded-2xl bg-white/15 p-5 ring-1 ring-white/25 backdrop-blur-xs space-y-2.5">
               <div className="flex items-center gap-2.5">
                 <Trophy className="h-7 w-7 text-amber-300" />
@@ -406,7 +424,7 @@ function CodingAcademyInner() {
                 />
               </div>
               <p className="text-[11px] text-white/85">
-                Tự động đồng bộ vào{" "}
+                Tự động lưu tiến độ vào{" "}
                 <Link href="/hoc-ba" className="font-extrabold underline">
                   Học bạ Số
                 </Link>
@@ -415,26 +433,24 @@ function CodingAcademyInner() {
           </div>
         </section>
 
-        {/* PHẦN 1: CHỌN LỘ TRÌNH MỤC TIÊU HOẶC TỰ LẮP GHÉP STACK (ĐÚNG CHẤT F8!) */}
+        {/* PHẦN 1: CHỌN LỘ TRÌNH MỤC TIÊU HOẶC TỰ LẮP GHÉP CỤM STACK */}
         <section className="space-y-4">
-          <div className="flex flex-wrap items-end justify-between gap-3">
-            <div>
-              <h2 className="flex items-center gap-2 text-xl font-extrabold text-slate-900 sm:text-2xl">
-                <Compass className="h-6 w-6 text-rose-500" />
-                Bước 1: Bạn muốn theo đuổi Lộ trình / Stack nào?
-              </h2>
-              <p className="mt-1 text-xs text-slate-600 sm:text-sm">
-                Bấm chọn 1 trong 4 lộ trình nghề nghiệp chuẩn bên dưới — hoặc chọn <strong>&quot;Tự thiết kế Stack riêng&quot;</strong> để tự tích chọn các công nghệ bạn muốn học!
-              </p>
-            </div>
+          <div>
+            <h2 className="flex items-center gap-2 text-xl font-extrabold text-slate-900 sm:text-2xl">
+              <Compass className="h-6 w-6 text-rose-500" />
+              Bước 1: Chọn Lộ trình Nghề nghiệp hoặc Tự ghép Cụm Stack
+            </h2>
+            <p className="mt-1 text-xs text-slate-600 sm:text-sm">
+              Mỗi lộ trình tự động sắp xếp đúng thứ tự từ Nền tảng → Ngôn ngữ cốt lõi → Framework → Cơ sở dữ liệu.
+            </p>
           </div>
 
-          {/* 5 Thẻ chọn Lộ trình / Stack */}
           <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-5">
             {CODING_ROADMAPS.map((rm) => {
               const active = selectedRoadmapId === rm.id;
-              const rmTotal = rm.tracks.reduce((s, tid) => s + getTrackById(tid).lessons.length, 0);
-              const rmDone = rm.tracks.reduce(
+              const rmTracks = rm.clusters.flatMap((cid) => getClusterById(cid).tracks);
+              const rmTotal = rmTracks.reduce((s, tid) => s + getTrackById(tid).lessons.length, 0);
+              const rmDone = rmTracks.reduce(
                 (s, tid) => s + getTrackById(tid).lessons.filter((l) => Boolean(passedMap[l.id])).length,
                 0
               );
@@ -459,19 +475,28 @@ function CodingAcademyInner() {
                       {active && <CheckCircle2 className="h-4 w-4 text-rose-600 shrink-0" />}
                     </div>
                     <h3 className="text-sm font-extrabold text-slate-900">{rm.title}</h3>
-                    <p className="line-clamp-2 text-[11px] leading-relaxed text-slate-500">{rm.audience}</p>
+                    <div className="flex flex-wrap gap-1 pt-0.5">
+                      {rm.clusters.map((cid) => (
+                        <span
+                          key={cid}
+                          className="rounded bg-slate-100 px-1.5 py-0.5 text-[9px] font-bold text-slate-700"
+                        >
+                          {getClusterById(cid).shortLabel}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                   <div className="mt-3 flex items-center justify-between border-t border-slate-100 pt-2.5 text-[10px] font-bold text-slate-500">
-                    <span>{rm.tracks.length} khóa học</span>
+                    <span>{rm.clusters.length} cụm ({rmTracks.length} khóa)</span>
                     <span className={rmDone > 0 ? "text-emerald-700" : "text-slate-400"}>
-                      {rmDone}/{rmTotal} bài xong
+                      {rmDone}/{rmTotal} bài
                     </span>
                   </div>
                 </button>
               );
             })}
 
-            {/* Thẻ #5: TỰ CHỌN STACK THEO MONG MUỐN */}
+            {/* Thẻ #5: TỰ LẮP GHÉP CỤM STACK RIÊNG */}
             <button
               type="button"
               onClick={() => handleChooseRoadmap("custom")}
@@ -484,60 +509,66 @@ function CodingAcademyInner() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between gap-2">
                   <span className="inline-flex items-center gap-1 rounded-lg bg-slate-900 px-2.5 py-1 text-[10px] font-extrabold text-white">
-                    <Sliders className="h-3 w-3" /> Tùy biến 100%
+                    <Sliders className="h-3 w-3" /> Tự chọn Cụm
                   </span>
                   {selectedRoadmapId === "custom" && <CheckCircle2 className="h-4 w-4 text-indigo-600 shrink-0" />}
                 </div>
-                <h3 className="text-sm font-extrabold text-slate-900">Tự chọn Stack theo mong muốn</h3>
+                <h3 className="text-sm font-extrabold text-slate-900">Tự lắp ghép Cụm Stack riêng</h3>
                 <p className="text-[11px] leading-relaxed text-slate-600">
-                  Tự tích chọn đúng các ngôn ngữ bạn cần (VD: Python + SQL, hay JS + MongoDB) để tạo lộ trình cá nhân.
+                  Tích chọn đúng các cụm bạn muốn (VD: React &amp; Next.js + Node &amp; NestJS + Postgres).
                 </p>
               </div>
               <div className="mt-3 flex items-center justify-between border-t border-indigo-200/70 pt-2.5 text-[10px] font-extrabold text-indigo-700">
-                <span>Đang chọn: {customTracks.length} công nghệ</span>
+                <span>Đang chọn: {customClusters.length} cụm</span>
                 <span>Tùy chỉnh →</span>
               </div>
             </button>
           </div>
         </section>
 
-        {/* BỘ LẮP GHÉP STACK TỰ DO (HIỂN THỊ KHI CHỌN "TỰ CHỌN STACK") */}
+        {/* BỘ TỰ CHỌN CỤM STACK (HIỆN KHI CHỌN CUSTOM) */}
         {selectedRoadmapId === "custom" && (
           <section className="rounded-3xl border border-indigo-200 bg-indigo-50/40 p-6 shadow-xs space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div>
                 <h3 className="flex items-center gap-2 text-base font-extrabold text-slate-900">
                   <Sliders className="h-4 w-4 text-indigo-600" />
-                  Tự lắp ghép Stack học tập của riêng bạn
+                  Tích chọn các Cụm Công nghệ cho Lộ trình riêng của bạn
                 </h3>
                 <p className="text-xs text-slate-600">
-                  Bấm chọn hoặc bỏ chọn các công nghệ bên dưới — lộ trình từng bước của bạn sẽ tự động cập nhật và lưu lại trên trình duyệt!
+                  Hệ thống sẽ tự động sắp xếp các cụm bạn chọn theo đúng thứ tự phân cấp từ Nền tảng → Framework → Database!
                 </p>
               </div>
               <span className="rounded-full bg-indigo-600 px-3 py-1 text-xs font-extrabold text-white">
-                Đã chọn {customTracks.length} khóa học
+                {customClusters.length} cụm ({roadmapTracks.length} khóa học)
               </span>
             </div>
 
-            <div className="flex flex-wrap gap-2.5">
-              {CODING_TRACKS.map((t) => {
-                const picked = customTracks.includes(t.id);
+            <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
+              {CODING_CLUSTERS.map((c) => {
+                const picked = customClusters.includes(c.id);
                 return (
                   <button
-                    key={t.id}
+                    key={c.id}
                     type="button"
-                    onClick={() => handleToggleCustomTrack(t.id)}
-                    className={`inline-flex items-center gap-2 rounded-2xl border px-4 py-2.5 text-xs font-extrabold transition ${
+                    onClick={() => handleToggleCustomCluster(c.id)}
+                    className={`flex items-center justify-between gap-3 rounded-2xl border p-3.5 text-left transition ${
                       picked
                         ? "border-indigo-600 bg-indigo-600 text-white shadow-sm"
-                        : "border-slate-200 bg-white text-slate-700 hover:border-indigo-300"
+                        : "border-slate-200 bg-white text-slate-800 hover:border-indigo-300"
                     }`}
                   >
-                    {picked ? <Check className="h-3.5 w-3.5" /> : <span className="h-3.5 w-3.5 rounded-full border border-slate-300" />}
-                    <span>{t.name}</span>
-                    <span className={`rounded px-1.5 py-0.5 text-[10px] ${picked ? "bg-white/20 text-white" : "bg-slate-100 text-slate-500"}`}>
-                      {t.category}
-                    </span>
+                    <div>
+                      <p className={`text-[10px] font-bold ${picked ? "text-indigo-200" : "text-slate-400"}`}>
+                        {c.stageLevel}
+                      </p>
+                      <p className="text-xs font-extrabold">{c.title}</p>
+                    </div>
+                    {picked ? (
+                      <Check className="h-4 w-4 shrink-0" />
+                    ) : (
+                      <span className="h-4 w-4 shrink-0 rounded-full border border-slate-300" />
+                    )}
                   </button>
                 );
               })}
@@ -545,22 +576,22 @@ function CodingAcademyInner() {
           </section>
         )}
 
-        {/* PHẦN 2: CHI TIẾT LỘ TRÌNH TỪNG BƯỚC (BƯỚC 1 -> BƯỚC 2 -> ... CHUẨN F8) */}
+        {/* PHẦN 2: CÂY LỘ TRÌNH PHÂN CẤP THEO TỪNG CỤM (GIAI ĐOẠN 1 -> 2 -> 3 -> 4) */}
         <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-xs sm:p-8 space-y-6">
           <div className="flex flex-wrap items-start justify-between gap-4 border-b border-slate-100 pb-5">
             <div className="max-w-2xl space-y-1.5">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-50 px-3 py-1 text-[11px] font-extrabold text-rose-700">
                 <Sparkles className="h-3.5 w-3.5" />
-                {activeRoadmapObj ? activeRoadmapObj.badge : "Lộ trình Cá nhân hóa theo Stack bạn chọn"}
+                {activeRoadmapObj ? activeRoadmapObj.badge : "Lộ trình Cá nhân hóa theo Cụm Stack"}
               </span>
               <h2 className="text-2xl font-black text-slate-900">
-                {activeRoadmapObj ? activeRoadmapObj.title : "Lộ trình Stack Cá nhân của bạn"}
+                {activeRoadmapObj ? activeRoadmapObj.title : "Lộ trình Cụm Stack Cá nhân của bạn"}
               </h2>
               <p className="text-xs leading-relaxed text-slate-600 sm:text-sm">
                 {activeRoadmapObj
                   ? activeRoadmapObj.description
-                  : `Lộ trình gồm ${customTracks.length} công nghệ bạn tự chọn: ${customTracks
-                      .map((id) => getTrackById(id).shortName)
+                  : `Lộ trình phân cấp gồm ${activeClusterIds.length} cụm: ${activeClusterIds
+                      .map((cid) => getClusterById(cid).shortLabel)
                       .join(" → ")}.`}
               </p>
               {activeRoadmapObj && (
@@ -570,7 +601,7 @@ function CodingAcademyInner() {
               )}
             </div>
 
-            <div className="min-w-[220px] rounded-2xl border border-slate-200 bg-slate-50 p-4 space-y-2">
+            <div className="min-w-[230px] rounded-2xl border border-slate-200 bg-slate-50 p-4 space-y-2">
               <div className="flex items-center justify-between text-xs font-extrabold text-slate-800">
                 <span>Tiến độ Lộ trình này</span>
                 <span className="text-indigo-700">{roadmapProgress.percent}%</span>
@@ -589,100 +620,135 @@ function CodingAcademyInner() {
                 onClick={() => openTrackInIde(roadmapProgress.nextTrackToLearn)}
                 className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-rose-600 py-2 text-xs font-extrabold text-white shadow-xs hover:bg-rose-500 transition"
               >
-                <Play className="h-3.5 w-3.5" /> Học ngay Bước tiếp theo
+                <Play className="h-3.5 w-3.5" /> Học ngay bài tiếp theo
               </button>
             </div>
           </div>
 
-          {/* Danh sách từng Bước trong Lộ trình */}
-          <div className="space-y-4">
-            {roadmapTracks.map((tid, stepIdx) => {
-              const tr = getTrackById(tid);
-              const vis = TRACK_VISUAL_META[tid];
-              const doneCnt = tr.lessons.filter((l) => Boolean(passedMap[l.id])).length;
-              const isDone = doneCnt === tr.lessons.length;
-              const pct = Math.round((doneCnt / tr.lessons.length) * 100);
+          {/* TIMELINE PHÂN CẤP CÁC CỤM CÔNG NGHỆ */}
+          <div className="relative space-y-6">
+            {activeClusterIds.map((cid, stageIdx) => {
+              const cluster = getClusterById(cid);
+              const cTracks = cluster.tracks.map((tid) => getTrackById(tid));
+              const cTotal = cTracks.reduce((s, tr) => s + tr.lessons.length, 0);
+              const cDone = cTracks.reduce(
+                (s, tr) => s + tr.lessons.filter((l) => Boolean(passedMap[l.id])).length,
+                0
+              );
+              const cPct = cTotal > 0 ? Math.round((cDone / cTotal) * 100) : 0;
+              const clusterDone = cDone === cTotal;
 
               return (
-                <div
-                  key={tid}
-                  className="grid items-center gap-5 rounded-2xl border border-slate-200 bg-slate-50/50 p-4 transition hover:border-indigo-300 hover:bg-white hover:shadow-sm md:grid-cols-12"
-                >
-                  {/* Bìa Khóa học rực rỡ kiểu F8 */}
+                <div key={cid} className="relative pl-10 sm:pl-12">
+                  {/* Đường nối phân cấp giữa các Cụm */}
+                  {stageIdx < activeClusterIds.length - 1 && (
+                    <div className="absolute top-10 bottom-[-24px] left-4 w-0.5 bg-slate-200 sm:left-5" />
+                  )}
+
+                  {/* Số thứ tự Giai đoạn */}
                   <div
-                    className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${vis.coverGradient} p-5 text-white shadow-xs md:col-span-4`}
+                    className={`absolute top-1 left-0 flex h-8 w-8 items-center justify-center rounded-full text-xs font-black shadow-sm sm:h-10 sm:w-10 sm:text-sm ${
+                      clusterDone
+                        ? "bg-emerald-600 text-white"
+                        : "bg-slate-900 text-white"
+                    }`}
                   >
-                    <span className="inline-block rounded-full bg-black/25 px-2.5 py-0.5 text-[10px] font-extrabold">
-                      Bước {stepIdx + 1} / {roadmapTracks.length}
-                    </span>
-                    <p className="mt-3 text-2xl font-black tracking-tight">{tr.shortName}</p>
-                    <p className="mt-0.5 text-xs font-semibold text-white/90">{vis.subtitle}</p>
-                    <div className="mt-3 flex items-center justify-between text-[10px] font-bold text-white/85">
-                      <span>{tr.runtimeLabel}</span>
-                      <span>Miễn phí</span>
-                    </div>
+                    {clusterDone ? <Check className="h-4 w-4" /> : stageIdx + 1}
                   </div>
 
-                  {/* Nội dung & Tiến độ bước học */}
-                  <div className="space-y-2.5 md:col-span-8">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
+                  {/* Khối Cụm Công nghệ (Gồm 2 công nghệ đi cặp bên trong) */}
+                  <div className="rounded-3xl border border-slate-200 bg-slate-50/60 p-5 space-y-4">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
                       <div>
-                        <span className="text-[11px] font-extrabold uppercase tracking-wider text-indigo-600">
-                          {tr.category} • {vis.levelLabel}
+                        <span className="inline-block rounded-full bg-white px-2.5 py-0.5 text-[10px] font-extrabold text-indigo-700 ring-1 ring-slate-200">
+                          Giai đoạn {stageIdx + 1} • {cluster.stageLevel}
                         </span>
-                        <h3 className="text-lg font-extrabold text-slate-900">{tr.name}</h3>
+                        <h3 className="mt-1 text-lg font-black text-slate-900">{cluster.title}</h3>
+                        <p className="text-xs text-slate-600">{cluster.tagline}</p>
                       </div>
-                      {isDone ? (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-3 py-1 text-xs font-extrabold text-emerald-800">
-                          <CheckCircle2 className="h-3.5 w-3.5" /> Đã hoàn thành 100%
+
+                      <div className="min-w-[150px] text-right space-y-1">
+                        <span
+                          className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-[11px] font-extrabold ${
+                            clusterDone
+                              ? "bg-emerald-100 text-emerald-800"
+                              : cDone > 0
+                                ? "bg-amber-100 text-amber-800"
+                                : "bg-white text-slate-600 ring-1 ring-slate-200"
+                          }`}
+                        >
+                          {clusterDone ? "Hoàn thành cụm ✓" : `${cDone}/${cTotal} bài (${cPct}%)`}
                         </span>
-                      ) : doneCnt > 0 ? (
-                        <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-extrabold text-amber-800">
-                          Đang học ({doneCnt}/{tr.lessons.length} bài)
-                        </span>
-                      ) : (
-                        <span className="rounded-full bg-slate-200/70 px-3 py-1 text-xs font-bold text-slate-600">
-                          {tr.lessons.length} bài chấm test tự động
-                        </span>
-                      )}
+                      </div>
                     </div>
 
-                    <p className="text-xs leading-relaxed text-slate-600">{vis.whatYouBuild}</p>
+                    {/* 2 Thẻ công nghệ con nằm cạnh nhau gọn gàng trong Cụm */}
+                    <div className="grid gap-4 md:grid-cols-2">
+                      {cTracks.map((tr, subIdx) => {
+                        const vis = TRACK_VISUAL_META[tr.id];
+                        const doneCnt = tr.lessons.filter((l) => Boolean(passedMap[l.id])).length;
+                        const isDone = doneCnt === tr.lessons.length;
 
-                    {/* Tiến độ + Nút Vào học */}
-                    <div className="flex flex-wrap items-center justify-between gap-4 pt-1">
-                      <div className="flex-1 min-w-[160px] space-y-1">
-                        <div className="h-2 overflow-hidden rounded-full bg-slate-200">
+                        return (
                           <div
-                            className={`h-full rounded-full transition-all ${isDone ? "bg-emerald-500" : "bg-indigo-600"}`}
-                            style={{ width: `${Math.max(doneCnt > 0 ? 12 : 0, pct)}%` }}
-                          />
-                        </div>
-                        <div className="flex flex-wrap gap-1.5 text-[10px] font-semibold text-slate-500">
-                          {tr.lessons.map((ls) => (
-                            <span
-                              key={ls.id}
-                              className={`rounded px-1.5 py-0.5 ${
-                                passedMap[ls.id]
-                                  ? "bg-emerald-50 text-emerald-700 font-bold"
-                                  : "bg-slate-100 text-slate-500"
-                              }`}
-                            >
-                              {passedMap[ls.id] ? "✓ " : ""}Bài {ls.order}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
+                            key={tr.id}
+                            className="flex flex-col justify-between overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xs transition hover:border-indigo-300 hover:shadow-md"
+                          >
+                            <div className={`bg-gradient-to-br ${vis.coverGradient} p-4 text-white`}>
+                              <div className="flex items-center justify-between text-[10px] font-extrabold">
+                                <span className="rounded-full bg-black/25 px-2.5 py-0.5">
+                                  Phần {stageIdx + 1}.{subIdx + 1} • {vis.levelLabel}
+                                </span>
+                                <span className="rounded-full bg-white/20 px-2 py-0.5">
+                                  {doneCnt}/{tr.lessons.length} bài
+                                </span>
+                              </div>
+                              <p className="mt-2.5 text-xl font-black">{tr.name}</p>
+                              <p className="mt-0.5 text-[11px] text-white/90">{vis.subtitle}</p>
+                            </div>
 
-                      <button
-                        type="button"
-                        onClick={() => openTrackInIde(tid)}
-                        className="inline-flex items-center gap-1.5 rounded-xl bg-slate-900 px-5 py-2.5 text-xs font-extrabold text-white shadow-xs hover:bg-indigo-600 transition"
-                      >
-                        <Terminal className="h-3.5 w-3.5" />
-                        {isDone ? "Ôn lại & Code" : doneCnt > 0 ? "Tiếp tục học" : "Vào học ngay"}
-                        <ArrowRight className="h-3.5 w-3.5" />
-                      </button>
+                            <div className="flex flex-1 flex-col justify-between p-4 space-y-3">
+                              <p className="text-xs leading-relaxed text-slate-600">{vis.whatYouBuild}</p>
+
+                              {/* Danh sách 3 bài học nhỏ trong khóa */}
+                              <div className="space-y-1">
+                                {tr.lessons.map((ls) => {
+                                  const ok = Boolean(passedMap[ls.id]);
+                                  return (
+                                    <div
+                                      key={ls.id}
+                                      className="flex items-center justify-between rounded-lg bg-slate-50 px-2.5 py-1.5 text-[11px]"
+                                    >
+                                      <span className="truncate font-semibold text-slate-700">{ls.title}</span>
+                                      {ok ? (
+                                        <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-600" />
+                                      ) : (
+                                        <span className="shrink-0 text-[10px] font-bold text-slate-400">
+                                          {ls.difficulty}
+                                        </span>
+                                      )}
+                                    </div>
+                                  );
+                                })}
+                              </div>
+
+                              <button
+                                type="button"
+                                onClick={() => openTrackInIde(tr.id)}
+                                className={`flex w-full items-center justify-center gap-1.5 rounded-xl py-2.5 text-xs font-extrabold transition ${
+                                  isDone
+                                    ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+                                    : "bg-slate-900 text-white hover:bg-indigo-600"
+                                }`}
+                              >
+                                <Terminal className="h-3.5 w-3.5" />
+                                {isDone ? "Ôn lại & Code" : doneCnt > 0 ? "Tiếp tục học & Code" : `Bắt đầu học ${tr.shortName}`}
+                                <ArrowRight className="h-3.5 w-3.5" />
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 </div>
@@ -691,15 +757,15 @@ function CodingAcademyInner() {
           </div>
         </section>
 
-        {/* PHẦN 3: KHO TẤT CẢ 8 KHÓA HỌC LẬP TRÌNH MIỄN PHÍ (CARD GRID CHUẨN F8) */}
-        <section id="free-courses-grid" className="space-y-5">
+        {/* PHẦN 3: TOÀN BỘ 6 CỤM CÔNG NGHỆ (LỌC NHANH FRONTEND / BACKEND / DATABASE) */}
+        <section id="all-clusters-catalog" className="space-y-5">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <h2 className="text-xl font-extrabold text-slate-900 sm:text-2xl">
-                Khóa học Lập trình Miễn phí (8 Công nghệ cốt lõi)
+                Toàn bộ 6 Cụm Khóa học Lập trình Miễn phí (12 Công nghệ)
               </h2>
               <p className="text-xs text-slate-500">
-                Chọn học lẻ từng ngôn ngữ bất kỳ — chạy code &amp; chấm test ngay trên trình duyệt không cần cài đặt.
+                Chọn học lẻ bất kỳ công nghệ nào trong 6 cụm — tất cả đều chạy &amp; chấm test tự động ngay trên trình duyệt.
               </p>
             </div>
 
@@ -715,47 +781,50 @@ function CodingAcademyInner() {
                       : "text-slate-600 hover:bg-slate-100"
                   }`}
                 >
-                  {cat === "all" ? "Tất cả (8)" : cat}
+                  {cat === "all" ? "Tất cả (6 Cụm)" : cat}
                 </button>
               ))}
             </div>
           </div>
 
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {visibleCatalogTracks.map((t) => {
-              const vis = TRACK_VISUAL_META[t.id];
-              const doneCnt = t.lessons.filter((l) => Boolean(passedMap[l.id])).length;
+          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+            {visibleCatalogClusters.map((c) => {
+              const cTracks = c.tracks.map((tid) => getTrackById(tid));
               return (
-                <button
-                  key={t.id}
-                  type="button"
-                  onClick={() => openTrackInIde(t.id)}
-                  className="group flex flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white text-left shadow-xs transition hover:-translate-y-1 hover:border-indigo-300 hover:shadow-lg"
+                <div
+                  key={c.id}
+                  className="flex flex-col justify-between overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xs transition hover:border-indigo-300 hover:shadow-md"
                 >
-                  <div className={`bg-gradient-to-br ${vis.coverGradient} p-5 text-white`}>
-                    <div className="flex items-center justify-between text-[10px] font-extrabold">
-                      <span className="rounded-full bg-black/20 px-2.5 py-0.5">{t.category}</span>
-                      <span className="rounded-full bg-white/25 px-2 py-0.5">Miễn phí</span>
-                    </div>
-                    <p className="mt-4 text-2xl font-black tracking-tight">{t.shortName}</p>
-                    <p className="mt-1 line-clamp-1 text-[11px] text-white/90">{vis.subtitle}</p>
+                  <div className={`bg-gradient-to-br ${c.gradient} p-5 text-white`}>
+                    <span className="inline-block rounded-full bg-black/20 px-2.5 py-0.5 text-[10px] font-bold">
+                      {c.stageLevel}
+                    </span>
+                    <h3 className="mt-2 text-xl font-black">{c.title}</h3>
+                    <p className="mt-1 line-clamp-2 text-xs text-white/90">{c.tagline}</p>
                   </div>
 
-                  <div className="flex flex-1 flex-col justify-between p-4 space-y-3">
-                    <div>
-                      <h3 className="text-sm font-extrabold text-slate-900 group-hover:text-indigo-600 transition">
-                        {t.name}
-                      </h3>
-                      <p className="mt-1 line-clamp-2 text-xs text-slate-500">{t.tagline}</p>
-                    </div>
-                    <div className="flex items-center justify-between border-t border-slate-100 pt-2.5 text-[11px] font-bold">
-                      <span className={doneCnt === t.lessons.length ? "text-emerald-600" : "text-slate-500"}>
-                        {doneCnt}/{t.lessons.length} bài hoàn thành
-                      </span>
-                      <span className="text-indigo-600 group-hover:underline">Học ngay →</span>
-                    </div>
+                  <div className="grid grid-cols-2 gap-2.5 p-4">
+                    {cTracks.map((tr) => {
+                      const doneCnt = tr.lessons.filter((l) => Boolean(passedMap[l.id])).length;
+                      return (
+                        <button
+                          key={tr.id}
+                          type="button"
+                          onClick={() => openTrackInIde(tr.id)}
+                          className="rounded-2xl border border-slate-200 bg-slate-50/70 p-3 text-left hover:border-indigo-400 hover:bg-white transition"
+                        >
+                          <p className="text-xs font-extrabold text-slate-900">{tr.shortName}</p>
+                          <p className="mt-0.5 text-[10px] font-semibold text-slate-500">
+                            {doneCnt}/{tr.lessons.length} bài xong
+                          </p>
+                          <span className="mt-2 inline-block text-[11px] font-extrabold text-indigo-600">
+                            Code ngay →
+                          </span>
+                        </button>
+                      );
+                    })}
                   </div>
-                </button>
+                </div>
               );
             })}
           </div>
@@ -769,7 +838,7 @@ function CodingAcademyInner() {
   // =========================================================================
   return (
     <div className="space-y-5 pb-8">
-      {/* Thanh điều hướng quay về Lộ trình F8 & chuyển nhanh các khóa trong Stack */}
+      {/* Thanh đầu trang IDE + Chuyển nhanh giữa 2 công nghệ trong cùng Cụm */}
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-gradient-to-r from-slate-950 via-indigo-950 to-slate-900 p-4 text-white shadow-md sm:px-6">
         <div className="flex flex-wrap items-center gap-3">
           <button
@@ -777,12 +846,11 @@ function CodingAcademyInner() {
             onClick={() => setViewMode("hub")}
             className="inline-flex items-center gap-1.5 rounded-xl bg-white/15 px-3.5 py-2 text-xs font-extrabold text-white ring-1 ring-white/20 hover:bg-white/25 transition"
           >
-            <ArrowLeft className="h-4 w-4" /> Về Lộ trình &amp; Chọn Stack
+            <ArrowLeft className="h-4 w-4" /> Về Lộ trình Cụm Stack
           </button>
           <div>
             <p className="text-[10px] font-bold uppercase tracking-wider text-amber-300">
-              {activeRoadmapObj ? activeRoadmapObj.shortTitle : "Stack Cá nhân"}
-              {currentIdxInRoadmap >= 0 ? ` • Bước ${currentIdxInRoadmap + 1}/${roadmapTracks.length}` : ""}
+              {activeClusterForIde.title} • {activeClusterForIde.stageLevel}
             </p>
             <h1 className="text-base font-extrabold sm:text-lg">
               {track.name} — <span className="text-indigo-300">{track.runtimeLabel}</span>
@@ -790,56 +858,74 @@ function CodingAcademyInner() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2.5 rounded-xl bg-white/10 px-3.5 py-2 text-xs ring-1 ring-white/15">
-          <Trophy className="h-4 w-4 text-amber-400" />
-          <span className="font-extrabold">
-            {totalPassedAllTracks}/{totalLessonsAllTracks} bài toàn hệ thống
-          </span>
+        {/* Chuyển nhanh sang công nghệ cặp đôi trong cùng Cụm (VD: HTML <-> CSS, React <-> Next.js) */}
+        <div className="flex flex-wrap items-center gap-2">
+          {activeClusterForIde.tracks.map((tid) => {
+            const tr = getTrackById(tid);
+            const active = tid === activeTrackId;
+            return (
+              <button
+                key={tid}
+                type="button"
+                onClick={() => openTrackInIde(tid)}
+                className={`rounded-xl px-3 py-1.5 text-xs font-extrabold transition ${
+                  active
+                    ? "bg-amber-400 text-slate-950 shadow"
+                    : "bg-white/10 text-white hover:bg-white/20"
+                }`}
+              >
+                {tr.shortName}
+              </button>
+            );
+          })}
+          <div className="hidden items-center gap-1.5 rounded-xl bg-white/10 px-3 py-1.5 text-xs ring-1 ring-white/15 sm:flex">
+            <Trophy className="h-3.5 w-3.5 text-amber-400" />
+            <span className="font-extrabold">
+              {totalPassedAllTracks}/{totalLessonsAllTracks}
+            </span>
+          </div>
         </div>
       </div>
 
-      {/* Bộ chọn nhanh 8 Khóa học (đánh dấu các khóa thuộc Stack đang theo học) */}
-      <div data-tour="coding-tracks" className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-8">
-        {CODING_TRACKS.map((t) => {
-          const passedInTrack = t.lessons.filter((l) => passedMap[l.id]).length;
-          const active = t.id === activeTrackId;
-          const inStack = roadmapTracks.includes(t.id);
+      {/* Thanh chọn nhanh 6 Cụm (12 công nghệ) */}
+      <div className="flex flex-wrap gap-2">
+        {CODING_CLUSTERS.map((c) => {
+          const isActiveCluster = c.id === activeClusterForIde.id;
           return (
-            <button
-              key={t.id}
-              type="button"
-              onClick={() => openTrackInIde(t.id)}
-              className={`rounded-2xl border p-2.5 text-left transition ${
-                active
-                  ? "border-indigo-600 bg-indigo-600 text-white shadow-md"
-                  : inStack
-                    ? "border-rose-200 bg-rose-50/40 text-slate-800 hover:border-rose-400"
-                    : "border-slate-200 bg-white text-slate-700 hover:border-indigo-300"
+            <div
+              key={c.id}
+              className={`flex items-center gap-1 rounded-2xl border px-2.5 py-1.5 text-xs ${
+                isActiveCluster
+                  ? "border-indigo-400 bg-indigo-50/70"
+                  : "border-slate-200 bg-white"
               }`}
             >
-              <div className="flex items-center justify-between gap-1">
-                <span className="text-xs font-extrabold">{t.shortName}</span>
-                {passedInTrack === t.lessons.length ? (
-                  <CheckCircle2 className={`h-3.5 w-3.5 ${active ? "text-emerald-300" : "text-emerald-600"}`} />
-                ) : (
-                  <span
-                    className={`rounded px-1.5 py-0.5 text-[10px] font-bold ${
-                      active ? "bg-white/20 text-white" : "bg-slate-100 text-slate-600"
+              <span className="px-1 text-[10px] font-extrabold text-slate-500">{c.shortLabel}:</span>
+              {c.tracks.map((tid) => {
+                const tr = getTrackById(tid);
+                const active = tid === activeTrackId;
+                const done = tr.lessons.filter((l) => passedMap[l.id]).length;
+                return (
+                  <button
+                    key={tid}
+                    type="button"
+                    onClick={() => openTrackInIde(tid)}
+                    className={`rounded-lg px-2 py-1 text-[11px] font-extrabold transition ${
+                      active
+                        ? "bg-indigo-600 text-white shadow-2xs"
+                        : "text-slate-700 hover:bg-slate-100"
                     }`}
                   >
-                    {passedInTrack}/{t.lessons.length}
-                  </span>
-                )}
-              </div>
-              <p className={`mt-0.5 truncate text-[10px] ${active ? "text-indigo-100" : inStack ? "text-rose-600 font-semibold" : "text-slate-400"}`}>
-                {inStack ? "★ Trong Stack" : t.category}
-              </p>
-            </button>
+                    {tr.shortName} ({done}/{tr.lessons.length})
+                  </button>
+                );
+              })}
+            </div>
           );
         })}
       </div>
 
-      {/* Thanh Lộ trình Bài học (Hiển thị rõ Khóa / Đã qua) */}
+      {/* Thanh Lộ trình Bài học */}
       <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
@@ -897,9 +983,9 @@ function CodingAcademyInner() {
         )}
       </div>
 
-      {/* KHÔNG GIAN IDE CHIA ĐÔI: LÝ THUYẾT & ĐỀ BÀI (TRÁI) | CODE EDITOR & CHẤM TEST (PHẢI) */}
+      {/* KHÔNG GIAN IDE CHIA ĐÔI */}
       <div className="grid gap-5 lg:grid-cols-12">
-        {/* CỘT TRÁI: LÝ THUYẾT + YÊU CẦU + DỮ LIỆU MẪU + GỢI MỞ 3 TẦNG */}
+        {/* CỘT TRÁI: LÝ THUYẾT + YÊU CẦU + GỢI MỞ 3 TẦNG */}
         <div className="space-y-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-xs lg:col-span-5">
           <div className="flex items-center justify-between gap-2">
             <span className={`rounded-lg px-2.5 py-1 text-[11px] font-bold ${track.accentBg} ${track.accentText}`}>
@@ -917,7 +1003,6 @@ function CodingAcademyInner() {
             <p className="mt-1 text-xs text-slate-600">{lesson.summary}</p>
           </div>
 
-          {/* Kiến thức nhanh */}
           <div className="rounded-xl border border-slate-100 bg-slate-50 p-3.5 space-y-2">
             <h4 className="flex items-center gap-1.5 text-xs font-bold uppercase text-slate-700">
               <BookOpen className="h-3.5 w-3.5 text-indigo-600" /> Kiến thức trọng tâm
@@ -929,7 +1014,6 @@ function CodingAcademyInner() {
             </ul>
           </div>
 
-          {/* Đề bài kiểm tra */}
           <div className="rounded-xl border border-indigo-200 bg-indigo-50/50 p-4 space-y-1.5">
             <h4 className="text-xs font-extrabold uppercase tracking-wide text-indigo-800">
               Yêu cầu Bài kiểm tra
@@ -939,7 +1023,6 @@ function CodingAcademyInner() {
             </p>
           </div>
 
-          {/* Bảng / Collection mẫu cho PostgreSQL & MongoDB */}
           {lesson.sqlTables && (
             <div className="space-y-2 rounded-xl border border-slate-200 bg-slate-50 p-3.5">
               <h4 className="flex items-center gap-1.5 text-xs font-bold text-slate-800">
@@ -993,7 +1076,7 @@ function CodingAcademyInner() {
             </div>
           )}
 
-          {/* HỆ THỐNG GỢI MỞ TƯ DUY 3 TẦNG */}
+          {/* GỢI MỞ TƯ DUY 3 TẦNG */}
           <div
             data-tour="coding-hints"
             onCopy={(e) => e.preventDefault()}
@@ -1090,17 +1173,19 @@ function CodingAcademyInner() {
                   {lesson.id}.
                   {track.id === "javascript"
                     ? "js"
-                    : track.id === "typescript"
+                    : track.id === "typescript" || track.id === "nestjs" || track.id === "nodejs"
                       ? "ts"
-                      : track.id === "python"
-                        ? "py"
-                        : track.id === "golang"
-                          ? "go"
-                          : track.id === "postgresql"
-                            ? "sql"
-                            : track.id === "mongodb"
-                              ? "mongosh.js"
-                              : track.id}
+                      : track.id === "react" || track.id === "nextjs"
+                        ? "tsx"
+                        : track.id === "python"
+                          ? "py"
+                          : track.id === "golang"
+                            ? "go"
+                            : track.id === "postgresql"
+                              ? "sql"
+                              : track.id === "mongodb"
+                                ? "mongosh.js"
+                                : track.id}
                 </span>
               </div>
 
@@ -1317,7 +1402,7 @@ export default function CodingAcademyPage() {
     <Suspense
       fallback={
         <div className="p-10 text-center text-sm text-slate-500">
-          Đang khởi tạo Học viện Lập trình &amp; Lộ trình Stack...
+          Đang khởi tạo Lộ trình Học Lập trình theo Cụm Stack...
         </div>
       }
     >

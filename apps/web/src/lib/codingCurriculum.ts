@@ -3,6 +3,10 @@ export type CodingLanguage =
   | "css"
   | "javascript"
   | "typescript"
+  | "react"
+  | "nextjs"
+  | "nodejs"
+  | "nestjs"
   | "golang"
   | "python"
   | "mongodb"
@@ -891,6 +895,465 @@ export const CODING_TRACKS: CodingTrack[] = [
             id: "t2",
             label: 'Hàng đầu tiên: full_name = "Nguyễn An", course_name = "PostgreSQL"',
             checkFirstRow: { full_name: "Nguyễn An", course_name: "PostgreSQL" },
+          },
+        ],
+      },
+    ],
+  },
+
+  // ================= 9. REACT =================
+  {
+    id: "react",
+    name: "ReactJS Hiện đại",
+    shortName: "React",
+    tagline: "Xây dựng giao diện theo Component, Props, Immutability State & Custom Hook.",
+    category: "Frontend",
+    accentBg: "bg-cyan-50",
+    accentText: "text-cyan-700",
+    accentBorder: "border-cyan-200",
+    runtimeLabel: "React Component & Hook Sandbox",
+    lessons: [
+      {
+        id: "react-1",
+        trackId: "react",
+        order: 1,
+        title: "Bài 1: Component & Props — Thẻ Khóa học",
+        difficulty: "Cơ bản",
+        summary: "Viết Functional Component `CourseCard(props)` trả về chuỗi HTML hiển thị tên khóa học và nhãn Miễn phí / Pro.",
+        theory: [
+          "Trong React, mỗi phần giao diện độc lập được đóng gói thành một Component nhận tham số `props`.",
+          "Dùng toán tử điều kiện `props.isFree ? 'Miễn phí' : 'Pro'` để render có điều kiện (Conditional Rendering).",
+        ],
+        taskPrompt:
+          'Viết hàm `CourseCard(props)` nhận `{ title: string; isFree: boolean }` và trả về chuỗi dạng `<div class="card"><h3>${title}</h3><span>${badge}</span></div>`, trong đó `badge` là `"Miễn phí"` nếu `isFree` là `true`, ngược lại là `"Pro"`.',
+        thinkingHints: [
+          "Component nhận vào 1 object `props` gồm 2 trường nào? Nhãn `<span>` phụ thuộc vào trường boolean nào?",
+          "Bước 1: Lấy `title` và `isFree` từ `props` (có thể dùng destructuring `{ title, isFree }`).\nBước 2: Tính `badge = isFree ? 'Miễn phí' : 'Pro'`.\nBước 3: Trả về template string `<div class=\"card\"><h3>${title}</h3><span>${badge}</span></div>`.",
+          "Khung tự điền:\nfunction CourseCard({ title, isFree }: { title: string; isFree: boolean }): string {\n  const badge = ___ ? \"Miễn phí\" : \"Pro\";\n  return `<div class=\"card\"><h3>${___}</h3><span>${___}</span></div>`;\n}",
+        ],
+        starterCode: `function CourseCard(props: { title: string; isFree: boolean }): string {\n  // Hãy trả về chuỗi HTML chứa <h3> và <span> đúng yêu cầu\n  return "";\n}`,
+        tests: [
+          {
+            id: "t1",
+            label: 'CourseCard({ title: "ReactJS", isFree: true }) chứa "ReactJS" và "Miễn phí"',
+            jsCheck: `(() => { const out = CourseCard({ title: "ReactJS", isFree: true }); return out.includes("<h3>ReactJS</h3>") && out.includes("<span>Miễn phí</span>"); })()`,
+          },
+          {
+            id: "t2",
+            label: 'CourseCard({ title: "Next.js", isFree: false }) hiển thị nhãn "Pro"',
+            jsCheck: `(() => { const out = CourseCard({ title: "Next.js", isFree: false }); return out.includes("<h3>Next.js</h3>") && out.includes("<span>Pro</span>"); })()`,
+          },
+        ],
+      },
+      {
+        id: "react-2",
+        trackId: "react",
+        order: 2,
+        title: "Bài 2: Cập nhật State Bất biến (Immutability)",
+        difficulty: "Trung bình",
+        summary: "Viết hàm `toggleTodo(todos, id)` đổi trạng thái `done` của mục có `id` khớp mà KHÔNG làm biến đổi mảng gốc.",
+        theory: [
+          "React phát hiện thay đổi State bằng so sánh tham chiếu — tuyệt đối không dùng `.push()` hay sửa trực tiếp object cũ.",
+          "Dùng `.map()` kết hợp spread `{ ...item, done: !item.done }` để tạo mảng & object mới sạch sẽ.",
+        ],
+        taskPrompt:
+          "Viết hàm `toggleTodo(todos, id)` trả về mảng mới (khác tham chiếu mảng gốc) trong đó phần tử có `item.id === id` bị đảo ngược thuộc tính `done` (`!item.done`), các phần tử khác giữ nguyên.",
+        thinkingHints: [
+          "Nếu dùng `for` rồi sửa `todos[i].done = !todos[i].done`, mảng gốc sẽ bị thay đổi (mutate) và React không re-render! Method mảng nào luôn tạo ra mảng mới cùng độ dài?",
+          "Bước 1: Dùng `todos.map((item) => ...)`.\nBước 2: Nếu `item.id === id`, trả về `{ ...item, done: !item.done }`.\nBước 3: Nếu không khớp, trả về chính `item`.",
+          "Khung tự điền:\nfunction toggleTodo(todos: { id: number; done: boolean }[], id: number) {\n  return todos.___((item) =>\n    item.id === id ? { ...item, done: ___ } : item\n  );\n}",
+        ],
+        starterCode: `function toggleTodo(todos: { id: number; title: string; done: boolean }[], id: number) {\n  // Dùng .map() để trả về mảng mới không làm thay đổi mảng gốc\n  return todos;\n}`,
+        tests: [
+          {
+            id: "t1",
+            label: "Đảo trạng thái done của mục id = 2 thành true",
+            jsCheck: `(() => { const src = [{ id: 1, title: "A", done: false }, { id: 2, title: "B", done: false }]; const res = toggleTodo(src, 2); return res[1].done === true && res[0].done === false; })()`,
+          },
+          {
+            id: "t2",
+            label: "Không làm biến đổi mảng gốc (Immutable chuẩn React)",
+            jsCheck: `(() => { const src = [{ id: 1, title: "A", done: false }]; const res = toggleTodo(src, 1); return res !== src && src[0].done === false && res[0].done === true; })()`,
+          },
+        ],
+      },
+      {
+        id: "react-3",
+        trackId: "react",
+        order: 3,
+        title: "Bài 3: Custom Hook tính Tiến độ Khóa học",
+        difficulty: "Thực chiến",
+        summary: "Viết hàm `useCourseProgress(completed, total)` trả về `{ percent, isCompleted }` làm tròn phần trăm.",
+        theory: [
+          "Custom Hook trong React luôn bắt đầu bằng tiền tố `use...` để tái sử dụng logic giữa nhiều Component.",
+          "Luôn kiểm tra trường hợp biên `total <= 0` để tránh chia cho 0 (`NaN`).",
+        ],
+        taskPrompt:
+          "Viết hàm `useCourseProgress(completed: number, total: number)` trả về object `{ percent: number, isCompleted: boolean }`. Nếu `total <= 0` thì `percent = 0, isCompleted = false`; ngược lại `percent = Math.min(100, Math.round((completed / total) * 100))` và `isCompleted = completed >= total`.",
+        thinkingHints: [
+          "Cần xử lý điều kiện đặc biệt nào trước khi thực hiện phép chia `completed / total`?",
+          "Bước 1: Nếu `total <= 0`, trả về `{ percent: 0, isCompleted: false }`.\nBước 2: Tính `percent = Math.min(100, Math.round((completed / total) * 100))`.\nBước 3: Trả về `{ percent, isCompleted: completed >= total }`.",
+          "Khung tự điền:\nfunction useCourseProgress(completed: number, total: number) {\n  if (total <= 0) return { percent: 0, isCompleted: false };\n  const percent = Math.min(100, Math.round((___ / ___) * 100));\n  return { percent, isCompleted: completed >= ___ };\n}",
+        ],
+        starterCode: `function useCourseProgress(completed: number, total: number) {\n  // Tính percent và isCompleted chuẩn Custom Hook\n  return { percent: 0, isCompleted: false };\n}`,
+        tests: [
+          {
+            id: "t1",
+            label: "useCourseProgress(2, 4) -> { percent: 50, isCompleted: false }",
+            jsCheck: `(() => { const r = useCourseProgress(2, 4); return r.percent === 50 && r.isCompleted === false; })()`,
+          },
+          {
+            id: "t2",
+            label: "useCourseProgress(5, 5) -> { percent: 100, isCompleted: true }",
+            jsCheck: `(() => { const r = useCourseProgress(5, 5); return r.percent === 100 && r.isCompleted === true; })()`,
+          },
+          {
+            id: "t3",
+            label: "Trường hợp total = 0 trả về percent = 0 an toàn",
+            jsCheck: `(() => { const r = useCourseProgress(0, 0); return r.percent === 0 && r.isCompleted === false; })()`,
+          },
+        ],
+      },
+    ],
+  },
+
+  // ================= 10. NEXT.JS =================
+  {
+    id: "nextjs",
+    name: "Next.js App Router",
+    shortName: "Next.js",
+    tagline: "Xây dựng ứng dụng Fullstack chuẩn SEO với Metadata động, Route Handlers & Caching.",
+    category: "Frontend",
+    accentBg: "bg-slate-100",
+    accentText: "text-slate-800",
+    accentBorder: "border-slate-300",
+    runtimeLabel: "Next.js App Router Sandbox",
+    lessons: [
+      {
+        id: "nextjs-1",
+        trackId: "nextjs",
+        order: 1,
+        title: "Bài 1: SEO Metadata Động (generateMetadata)",
+        difficulty: "Cơ bản",
+        summary: "Viết hàm `generateMetadata(course)` trả về đối tượng Metadata chuẩn SEO cho Next.js App Router.",
+        theory: [
+          "Next.js App Router dùng hàm `generateMetadata` để tự tạo thẻ `<title>` và `openGraph` riêng cho từng trang chi tiết.",
+          "Giúp Google lập chỉ mục tốt hơn và link chia sẻ lên Facebook/Zalo hiện tiêu đề đẹp mắt.",
+        ],
+        taskPrompt:
+          'Viết hàm `generateMetadata(course)` nhận `{ title: string; summary: string }` và trả về `{ title: `${course.title} | Owlie Edu`, description: course.summary, openGraph: { title: course.title } }`.',
+        thinkingHints: [
+          "Cấu trúc object trả về cần đúng 3 khóa cấp ngoài cùng: `title`, `description`, và `openGraph`.",
+          "Bước 1: Nối chuỗi `${course.title} | Owlie Edu` cho thuộc tính `title`.\nBước 2: Gán `description: course.summary`.\nBước 3: Gán `openGraph: { title: course.title }`.",
+          "Khung tự điền:\nfunction generateMetadata(course: { title: string; summary: string }) {\n  return {\n    title: `${___} | Owlie Edu`,\n    description: course.___,\n    openGraph: { title: course.___ },\n  };\n}",
+        ],
+        starterCode: `function generateMetadata(course: { title: string; summary: string }) {\n  return {\n    title: "",\n    description: "",\n    openGraph: { title: "" },\n  };\n}`,
+        tests: [
+          {
+            id: "t1",
+            label: 'title có hậu tố " | Owlie Edu"',
+            jsCheck: `generateMetadata({ title: "Next.js 15", summary: "Học App Router" }).title === "Next.js 15 | Owlie Edu"`,
+          },
+          {
+            id: "t2",
+            label: "openGraph.title và description khớp dữ liệu đầu vào",
+            jsCheck: `(() => { const m = generateMetadata({ title: "React", summary: "Cơ bản" }); return m.description === "Cơ bản" && m.openGraph.title === "React"; })()`,
+          },
+        ],
+      },
+      {
+        id: "nextjs-2",
+        trackId: "nextjs",
+        order: 2,
+        title: "Bài 2: Route Handler — Lọc & Phân trang API",
+        difficulty: "Trung bình",
+        summary: "Viết hàm `GET(items, page, limit)` xử lý phân trang dữ liệu trả về `{ page, total, data }` chuẩn API Route.",
+        theory: [
+          "Next.js Route Handlers (`app/api/.../route.ts`) cho phép viết Backend API ngay trong cùng dự án.",
+          "Công thức cắt mảng phân trang: `start = (page - 1) * limit`, `items.slice(start, start + limit)`.",
+        ],
+        taskPrompt:
+          "Viết hàm `GET(items: string[], page: number, limit: number)` trả về `{ page, total: items.length, data: items.slice(start, start + limit) }` (đảm bảo `page >= 1`).",
+        thinkingHints: [
+          "Trang 1 (limit = 2) lấy chỉ số 0..1; Trang 2 lấy chỉ số 2..3. Công thức tính `start` theo `page` và `limit` là gì?",
+          "Bước 1: Chuẩn hóa `safePage = Math.max(1, page)`.\nBước 2: Tính `start = (safePage - 1) * limit`.\nBước 3: Trả về `{ page: safePage, total: items.length, data: items.slice(start, start + limit) }`.",
+          "Khung tự điền:\nfunction GET(items: string[], page: number, limit: number) {\n  const safePage = Math.max(1, page);\n  const start = (safePage - 1) * ___;\n  return { page: safePage, total: items.length, data: items.slice(start, start + ___) };\n}",
+        ],
+        starterCode: `function GET(items: string[], page: number, limit: number) {\n  // Cắt dữ liệu theo trang và trả về { page, total, data }\n  return { page, total: 0, data: [] };\n}`,
+        tests: [
+          {
+            id: "t1",
+            label: 'GET(["A","B","C","D","E"], 2, 2) trả về data = ["C", "D"], total = 5',
+            jsCheck: `(() => { const r = GET(["A","B","C","D","E"], 2, 2); return r.total === 5 && r.data.length === 2 && r.data[0] === "C" && r.data[1] === "D"; })()`,
+          },
+          {
+            id: "t2",
+            label: "Trang 1 lấy đúng phần tử đầu tiên",
+            jsCheck: `(() => { const r = GET(["A","B","C"], 1, 2); return r.page === 1 && r.data[0] === "A" && r.data[1] === "B"; })()`,
+          },
+        ],
+      },
+      {
+        id: "nextjs-3",
+        trackId: "nextjs",
+        order: 3,
+        title: "Bài 3: Cơ chế Cache & Revalidate dữ liệu",
+        difficulty: "Thực chiến",
+        summary: "Viết hàm `getCachedData(cache, key, loader)` mô phỏng bộ nhớ đệm Next.js (Cache HIT / MISS).",
+        theory: [
+          "Cache giúp trang web tải tức thì mà không cần truy vấn lại Database lặp đi lặp lại.",
+          "Nếu `key` đã có trong `cache` thì trả về ngay (`hit: true`); nếu chưa có thì gọi `loader()`, lưu vào `cache[key]` và trả `hit: false`.",
+        ],
+        taskPrompt:
+          "Viết hàm `getCachedData(cache: Record<string, any>, key: string, loader: () => any)` trả về `{ hit: true, value: cache[key] }` nếu `key in cache`, ngược lại gọi `val = loader()`, gán `cache[key] = val` và trả về `{ hit: false, value: val }`.",
+        thinkingHints: [
+          "Làm thế nào để kiểm tra một khóa `key` đã tồn tại trong object `cache` chưa (`key in cache`)?",
+          "Bước 1: Kiểm tra `if (key in cache) return { hit: true, value: cache[key] }`.\nBước 2: Nếu chưa có, gọi `const value = loader()`.\nBước 3: Lưu `cache[key] = value` rồi trả `{ hit: false, value }`.",
+          "Khung tự điền:\nfunction getCachedData(cache: Record<string, any>, key: string, loader: () => any) {\n  if (key in cache) return { hit: true, value: cache[___] };\n  const value = ___();\n  cache[key] = value;\n  return { hit: false, value };\n}",
+        ],
+        starterCode: `function getCachedData(cache: Record<string, any>, key: string, loader: () => any) {\n  // Cài đặt Cache HIT / MISS chuẩn Next.js\n  return { hit: false, value: null };\n}`,
+        tests: [
+          {
+            id: "t1",
+            label: "Lần 1 trả về hit = false và lưu giá trị vào cache",
+            jsCheck: `(() => { const c = {}; const r = getCachedData(c, "k1", () => 42); return r.hit === false && r.value === 42 && c["k1"] === 42; })()`,
+          },
+          {
+            id: "t2",
+            label: "Lần 2 trả về hit = true mà không gọi lại loader()",
+            jsCheck: `(() => { let calls = 0; const c = {}; getCachedData(c, "k1", () => ++calls); const r2 = getCachedData(c, "k1", () => ++calls); return r2.hit === true && r2.value === 1 && calls === 1; })()`,
+          },
+        ],
+      },
+    ],
+  },
+
+  // ================= 11. NODE.JS =================
+  {
+    id: "nodejs",
+    name: "Node.js & Express API",
+    shortName: "Node.js",
+    tagline: "Xây dựng REST API, Middleware xác thực Bearer Token & Rate Limiter chống spam.",
+    category: "Backend",
+    accentBg: "bg-lime-50",
+    accentText: "text-lime-700",
+    accentBorder: "border-lime-200",
+    runtimeLabel: "Node.js Backend Sandbox",
+    lessons: [
+      {
+        id: "nodejs-1",
+        trackId: "nodejs",
+        order: 1,
+        title: "Bài 1: Auth Middleware kiểm tra Bearer Token",
+        difficulty: "Cơ bản",
+        summary: "Viết Middleware `requireAuth(headers)` tách JWT token từ header `authorization` chuẩn HTTP.",
+        theory: [
+          "Client thường gửi JWT trong header `Authorization: Bearer <token>`.",
+          "Nếu thiếu hoặc không bắt đầu bằng `'Bearer '`, Middleware phải chặn ngay và trả mã `401 Unauthorized`.",
+        ],
+        taskPrompt:
+          'Viết hàm `requireAuth(headers)` nhận object `{ authorization?: string }`. Nếu `authorization` bắt đầu bằng `"Bearer "` và phần token sau khi `.trim()` khác rỗng thì trả `{ ok: true, status: 200, token }`; ngược lại trả `{ ok: false, status: 401, token: null }`.',
+        thinkingHints: [
+          "Kiểm tra chuỗi `auth = headers?.authorization || ''` xem có bắt đầu bằng `'Bearer '` không bằng `.startsWith()`.",
+          "Bước 1: Lấy `auth = headers?.authorization || ''`.\nBước 2: Nếu không bắt đầu bằng `'Bearer '`, trả `{ ok: false, status: 401, token: null }`.\nBước 3: Cắt `token = auth.slice(7).trim()`. Nếu rỗng trả 401, ngược lại trả `{ ok: true, status: 200, token }`.",
+          "Khung tự điền:\nfunction requireAuth(headers: { authorization?: string }) {\n  const auth = headers?.authorization || \"\";\n  if (!auth.startsWith(\"Bearer \")) return { ok: false, status: 401, token: null };\n  const token = auth.slice(___).trim();\n  return token ? { ok: true, status: 200, token } : { ok: false, status: 401, token: null };\n}",
+        ],
+        starterCode: `function requireAuth(headers: { authorization?: string }) {\n  // Tách Bearer token hoặc trả lỗi 401\n  return { ok: false, status: 401, token: null };\n}`,
+        tests: [
+          {
+            id: "t1",
+            label: 'Header "Bearer abc123" trả về ok: true, token: "abc123"',
+            jsCheck: `(() => { const r = requireAuth({ authorization: "Bearer abc123" }); return r.ok === true && r.status === 200 && r.token === "abc123"; })()`,
+          },
+          {
+            id: "t2",
+            label: "Thiếu header hoặc sai định dạng trả về status 401",
+            jsCheck: `requireAuth({}).status === 401 && requireAuth({ authorization: "Basic xyz" }).status === 401`,
+          },
+        ],
+      },
+      {
+        id: "nodejs-2",
+        trackId: "nodejs",
+        order: 2,
+        title: "Bài 2: Xử lý Router CRUD (GET & POST)",
+        difficulty: "Trung bình",
+        summary: "Viết hàm `handleStudentsRoute(method, list, body)` xử lý đọc danh sách và thêm học sinh mới.",
+        theory: [
+          "REST API dùng `GET` để lấy tài nguyên (mã `200`) và `POST` để tạo mới (mã `201`).",
+          "Luôn validate dữ liệu đầu vào trước khi lưu — trả mã `400 Bad Request` nếu thiếu trường bắt buộc.",
+        ],
+        taskPrompt:
+          'Viết hàm `handleStudentsRoute(method, list, body)`: nếu `method === "GET"` trả `{ status: 200, data: list }`. Nếu `method === "POST"`: nếu `!body?.name` trả `{ status: 400, error: "Thiếu tên" }`, ngược lại thêm `{ id: list.length + 1, name: body.name }` vào mảng mới và trả `{ status: 201, data: newItem }`.',
+        thinkingHints: [
+          "Cần phân nhánh theo `method === 'GET'` và `method === 'POST'`.",
+          "Bước 1: Với `GET`, trả `{ status: 200, data: list }`.\nBước 2: Với `POST`, kiểm tra `body?.name`. Nếu trống trả `status: 400`.\nBước 3: Tạo `item = { id: list.length + 1, name: body.name }`, đẩy vào `list` và trả `{ status: 201, data: item }`.",
+          "Khung tự điền:\nfunction handleStudentsRoute(method: string, list: any[], body?: { name?: string }) {\n  if (method === \"GET\") return { status: 200, data: list };\n  if (method === \"POST\") {\n    if (!body?.name) return { status: 400, error: \"Thiếu tên\" };\n    const item = { id: list.length + 1, name: body.name };\n    list.push(item);\n    return { status: ___, data: item };\n  }\n  return { status: 405 };\n}",
+        ],
+        starterCode: `function handleStudentsRoute(method: string, list: any[], body?: { name?: string }) {\n  // Xử lý GET (200) và POST (201 / 400)\n  return { status: 404 };\n}`,
+        tests: [
+          {
+            id: "t1",
+            label: "GET trả về status 200 và danh sách hiện có",
+            jsCheck: `(() => { const r = handleStudentsRoute("GET", [{ id: 1, name: "An" }]); return r.status === 200 && r.data.length === 1; })()`,
+          },
+          {
+            id: "t2",
+            label: "POST hợp lệ trả về status 201 và tăng độ dài danh sách",
+            jsCheck: `(() => { const arr = []; const r = handleStudentsRoute("POST", arr, { name: "Minh" }); return r.status === 201 && r.data.name === "Minh" && arr.length === 1; })()`,
+          },
+          {
+            id: "t3",
+            label: "POST thiếu name trả về status 400",
+            jsCheck: `handleStudentsRoute("POST", [], {}).status === 400`,
+          },
+        ],
+      },
+      {
+        id: "nodejs-3",
+        trackId: "nodejs",
+        order: 3,
+        title: "Bài 3: Rate Limiter Middleware chống Spam",
+        difficulty: "Thực chiến",
+        summary: "Viết hàm `checkRateLimit(store, ip, maxReq)` giới hạn số request tối đa theo địa chỉ IP.",
+        theory: [
+          "Rate Limiting bảo vệ máy chủ khỏi tấn công spam/DDoS bằng cách đếm số lượt gọi của mỗi IP.",
+          "Khi vượt quá ngưỡng cho phép (`count > maxReq`), server trả về mã HTTP `429 Too Many Requests`.",
+        ],
+        taskPrompt:
+          "Viết hàm `checkRateLimit(store: Record<string, number>, ip: string, maxReq: number)`: tăng `store[ip] = (store[ip] || 0) + 1`. Nếu `store[ip] <= maxReq` trả `{ allowed: true, status: 200, remaining: maxReq - store[ip] }`, ngược lại trả `{ allowed: false, status: 429, remaining: 0 }`.",
+        thinkingHints: [
+          "Nếu IP gọi lần đầu tiên thì `store[ip]` đang là `undefined`, ta dùng `(store[ip] || 0) + 1` để bắt đầu từ 1.",
+          "Bước 1: `const count = (store[ip] || 0) + 1; store[ip] = count;`.\nBước 2: Nếu `count > maxReq`, trả `{ allowed: false, status: 429, remaining: 0 }`.\nBước 3: Ngược lại trả `{ allowed: true, status: 200, remaining: maxReq - count }`.",
+          "Khung tự điền:\nfunction checkRateLimit(store: Record<string, number>, ip: string, maxReq: number) {\n  const count = (store[ip] || 0) + 1;\n  store[ip] = count;\n  if (count > ___) return { allowed: false, status: 429, remaining: 0 };\n  return { allowed: true, status: 200, remaining: maxReq - ___ };\n}",
+        ],
+        starterCode: `function checkRateLimit(store: Record<string, number>, ip: string, maxReq: number) {\n  // Đếm lượt gọi theo IP và chặn bằng mã 429 khi vượt ngưỡng\n  return { allowed: true, status: 200, remaining: 0 };\n}`,
+        tests: [
+          {
+            id: "t1",
+            label: "2 lượt gọi đầu (maxReq = 2) được phép và tính đúng remaining",
+            jsCheck: `(() => { const s = {}; const r1 = checkRateLimit(s, "1.1.1.1", 2); const r2 = checkRateLimit(s, "1.1.1.1", 2); return r1.allowed && r1.remaining === 1 && r2.allowed && r2.remaining === 0; })()`,
+          },
+          {
+            id: "t2",
+            label: "Lượt gọi thứ 3 bị chặn với status 429",
+            jsCheck: `(() => { const s = {}; checkRateLimit(s, "1.1.1.1", 2); checkRateLimit(s, "1.1.1.1", 2); const r3 = checkRateLimit(s, "1.1.1.1", 2); return r3.allowed === false && r3.status === 429; })()`,
+          },
+        ],
+      },
+    ],
+  },
+
+  // ================= 12. NESTJS =================
+  {
+    id: "nestjs",
+    name: "NestJS Kiến trúc Doanh nghiệp",
+    shortName: "NestJS",
+    tagline: "Làm chủ mô hình Modular của NestJS: Service, Validation DTO & Role Guard với TypeScript.",
+    category: "Backend",
+    accentBg: "bg-rose-50",
+    accentText: "text-rose-700",
+    accentBorder: "border-rose-200",
+    runtimeLabel: "NestJS TypeScript Sandbox",
+    lessons: [
+      {
+        id: "nestjs-1",
+        trackId: "nestjs",
+        order: 1,
+        title: "Bài 1: Xây dựng Injectable Service (CoursesService)",
+        difficulty: "Cơ bản",
+        summary: "Viết class `CoursesService` đóng gói logic thêm & tìm kiếm khóa học chuẩn kiến trúc NestJS.",
+        theory: [
+          "Trong NestJS, `Controller` chỉ nhận Request/Response; toàn bộ nghiệp vụ được tách vào `Service` (gắn `@Injectable()`).",
+          "Cách tách lớp giúp code dễ bảo trì, tái sử dụng và viết Unit Test cực sạch.",
+        ],
+        taskPrompt:
+          "Hoàn thiện class `CoursesService` có mảng `items = []`, phương thức `create(title: string)` thêm `{ id: this.items.length + 1, title }` rồi trả về phần tử mới, và `findAll()` trả về toàn bộ danh sách.",
+        thinkingHints: [
+          "Bên trong class, truy cập mảng danh sách qua từ khóa `this.items`.",
+          "Bước 1: Trong `create(title)`, tạo object `{ id: this.items.length + 1, title }`.\nBước 2: `this.items.push(course)` và `return course`.\nBước 3: Trong `findAll()`, `return this.items`.",
+          "Khung tự điền:\nclass CoursesService {\n  items: { id: number; title: string }[] = [];\n  create(title: string) {\n    const course = { id: this.items.length + 1, title };\n    this.items.___(course);\n    return ___;\n  }\n  findAll() { return this.___; }\n}",
+        ],
+        starterCode: `class CoursesService {\n  items: { id: number; title: string }[] = [];\n\n  create(title: string) {\n    // Thêm khóa học mới và trả về object vừa tạo\n    return null;\n  }\n\n  findAll() {\n    return this.items;\n  }\n}`,
+        tests: [
+          {
+            id: "t1",
+            label: 'service.create("NestJS Pro") trả về { id: 1, title: "NestJS Pro" }',
+            jsCheck: `(() => { const svc = new CoursesService(); const c = svc.create("NestJS Pro"); return c && c.id === 1 && c.title === "NestJS Pro"; })()`,
+          },
+          {
+            id: "t2",
+            label: "service.findAll() trả về đủ các khóa đã tạo",
+            jsCheck: `(() => { const svc = new CoursesService(); svc.create("A"); svc.create("B"); return svc.findAll().length === 2; })()`,
+          },
+        ],
+      },
+      {
+        id: "nestjs-2",
+        trackId: "nestjs",
+        order: 2,
+        title: "Bài 2: Validation Pipe cho RegisterDto",
+        difficulty: "Trung bình",
+        summary: "Viết hàm `validateRegisterDto(dto)` kiểm tra hợp lệ Email và Mật khẩu chuẩn NestJS ValidationPipe.",
+        theory: [
+          "NestJS dùng DTO + ValidationPipe để chặn dữ liệu bẩn ngay trước khi vào Controller.",
+          "Hàm kiểm tra chuẩn nên trả về danh sách các lỗi (`errors: string[]`) để Frontend hiển thị rõ cho người dùng.",
+        ],
+        taskPrompt:
+          'Viết hàm `validateRegisterDto(dto)` nhận `{ email?: string; password?: string }`. Gom lỗi vào mảng `errors`: nếu `!dto.email || !dto.email.includes("@")` thêm `"Email không hợp lệ"`; nếu `!dto.password || dto.password.length < 6` thêm `"Mật khẩu tối thiểu 6 ký tự"`. Trả về `{ valid: errors.length === 0, errors }`.',
+        thinkingHints: [
+          "Tạo mảng rỗng `const errors: string[] = []` rồi kiểm tra lần lượt từng trường bằng 2 câu lệnh `if` độc lập.",
+          "Bước 1: Kiểm tra email có chứa ký tự `@` không.\nBước 2: Kiểm tra độ dài `password` có `>= 6` không.\nBước 3: Trả về `{ valid: errors.length === 0, errors }`.",
+          "Khung tự điền:\nfunction validateRegisterDto(dto: { email?: string; password?: string }) {\n  const errors: string[] = [];\n  if (!dto.email || !dto.email.includes(\"@\")) errors.push(\"Email không hợp lệ\");\n  if (!dto.password || dto.password.length < ___) errors.push(\"Mật khẩu tối thiểu 6 ký tự\");\n  return { valid: errors.length === 0, errors };\n}",
+        ],
+        starterCode: `function validateRegisterDto(dto: { email?: string; password?: string }) {\n  const errors: string[] = [];\n  // Kiểm tra email và password >= 6 ký tự\n  return { valid: false, errors };\n}`,
+        tests: [
+          {
+            id: "t1",
+            label: "DTO hợp lệ trả về valid: true, errors: []",
+            jsCheck: `(() => { const r = validateRegisterDto({ email: "dev@owlie.vn", password: "Password1" }); return r.valid === true && r.errors.length === 0; })()`,
+          },
+          {
+            id: "t2",
+            label: "DTO sai cả 2 trường trả về valid: false và 2 lỗi",
+            jsCheck: `(() => { const r = validateRegisterDto({ email: "abc", password: "123" }); return r.valid === false && r.errors.length === 2; })()`,
+          },
+        ],
+      },
+      {
+        id: "nestjs-3",
+        trackId: "nestjs",
+        order: 3,
+        title: "Bài 3: RolesGuard phân quyền RBAC",
+        difficulty: "Thực chiến",
+        summary: "Viết class `RolesGuard` với phương thức `canActivate(user, allowedRoles)` bảo vệ API Quản trị.",
+        theory: [
+          "Trong NestJS, `Guard` quyết định một request có được phép đi tiếp vào Controller hay không (`true` / `false`).",
+          "Tài khoản bị khóa (`isActive === false`) luôn bị từ chối truy cập ngay lập tức dù có bất kỳ vai trò nào.",
+        ],
+        taskPrompt:
+          "Viết class `RolesGuard` có phương thức `canActivate(user, allowedRoles)`: trả về `false` nếu `!user || user.isActive === false`. Nếu `allowedRoles.length === 0` trả về `true`; ngược lại trả về `allowedRoles.includes(user.role)`.",
+        thinkingHints: [
+          "Thứ tự kiểm tra bảo mật quan trọng nhất: kiểm tra tài khoản có tồn tại và đang hoạt động (`isActive !== false`) TRƯỚC khi kiểm tra vai trò.",
+          "Bước 1: `if (!user || user.isActive === false) return false;`.\nBước 2: `if (allowedRoles.length === 0) return true;`.\nBước 3: `return allowedRoles.includes(user.role);`.",
+          "Khung tự điền:\nclass RolesGuard {\n  canActivate(user: { role: string; isActive: boolean } | null, allowedRoles: string[]): boolean {\n    if (!user || user.isActive === false) return false;\n    if (allowedRoles.length === 0) return true;\n    return allowedRoles.___(user.role);\n  }\n}",
+        ],
+        starterCode: `class RolesGuard {\n  canActivate(user: { role: string; isActive: boolean } | null, allowedRoles: string[]): boolean {\n    // Cài đặt kiểm tra isActive và phân quyền RBAC\n    return false;\n  }\n}`,
+        tests: [
+          {
+            id: "t1",
+            label: 'Admin đang hoạt động được truy cập route ["admin", "teacher"]',
+            jsCheck: `new RolesGuard().canActivate({ role: "admin", isActive: true }, ["admin", "teacher"]) === true`,
+          },
+          {
+            id: "t2",
+            label: 'Student bị chặn ở route ["admin"]',
+            jsCheck: `new RolesGuard().canActivate({ role: "student", isActive: true }, ["admin"]) === false`,
+          },
+          {
+            id: "t3",
+            label: "Tài khoản bị khóa (isActive: false) luôn bị chặn",
+            jsCheck: `new RolesGuard().canActivate({ role: "admin", isActive: false }, ["admin"]) === false`,
           },
         ],
       },

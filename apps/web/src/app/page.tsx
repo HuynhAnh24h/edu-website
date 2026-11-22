@@ -23,8 +23,7 @@ import {
 } from "lucide-react";
 import { CORE_API_URL } from "@/lib/api";
 import { getSubjectMeta, SUBJECT_ORDER } from "@/lib/subjects";
-import { CODING_TRACKS } from "@/lib/codingCurriculum";
-import { CODING_ROADMAPS } from "@/lib/codingRoadmaps";
+import { CODING_CLUSTERS, CODING_ROADMAPS, getClusterById } from "@/lib/codingRoadmaps";
 import { useAuth } from "@/context/AuthContext";
 import { CuBongLogoMark } from "@/components/BrandLogo";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
@@ -791,21 +790,21 @@ export default function LandingPage() {
               <Code2 className="h-3.5 w-3.5" /> Học theo Lộ trình Nghề nghiệp &amp; Tự chọn Stack cá nhân
             </span>
             <h2 className="mt-2 text-2xl font-extrabold text-slate-900">
-              Học viện Lập trình STEM — Chọn đúng Stack bạn muốn
+              Học viện Lập trình STEM — Phân cấp theo 6 Cụm Công nghệ
             </h2>
             <p className="mt-1 text-xs text-slate-600 sm:text-sm">
-              Chọn lộ trình bài bản theo hướng <strong>Front-end, Back-end, Fullstack, Python AI</strong> hoặc <strong>tự lắp ghép Stack riêng</strong> và code chấm test tự động ngay trên trình duyệt!
+              Gộp bài bản từng cụm: <strong>HTML &amp; CSS</strong> → <strong>JS &amp; TS</strong> → <strong>React &amp; Next.js</strong> → <strong>Node.js &amp; NestJS</strong> → <strong>Golang &amp; Python</strong> → <strong>MongoDB &amp; PostgreSQL</strong>!
             </p>
           </div>
           <Link
             href="/lap-trinh?path=custom"
             className="inline-flex items-center gap-1.5 rounded-xl bg-rose-600 px-4 py-2.5 text-xs font-extrabold text-white shadow-xs hover:bg-rose-500 transition"
           >
-            Tự chọn Stack riêng của bạn <ArrowRight className="h-3.5 w-3.5" />
+            Tự chọn Cụm Stack riêng <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>
 
-        {/* 4 Lộ trình Stack kiểu F8 */}
+        {/* 4 Lộ trình Stack phân cấp theo Cụm kiểu F8 */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {CODING_ROADMAPS.map((rm) => (
             <Link
@@ -823,33 +822,33 @@ export default function LandingPage() {
               <div className="flex flex-1 flex-col justify-between p-4 space-y-3">
                 <p className="line-clamp-2 text-xs leading-relaxed text-slate-600">{rm.audience}</p>
                 <div className="flex flex-wrap gap-1">
-                  {rm.tracks.map((tid) => (
+                  {rm.clusters.map((cid) => (
                     <span
-                      key={tid}
-                      className="rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-bold uppercase text-slate-700"
+                      key={cid}
+                      className="rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-700"
                     >
-                      {tid}
+                      {getClusterById(cid).shortLabel}
                     </span>
                   ))}
                 </div>
                 <span className="inline-flex items-center gap-1 text-xs font-extrabold text-rose-600 group-hover:underline">
-                  Xem lộ trình từng bước <ArrowRight className="h-3.5 w-3.5" />
+                  Xem lộ trình từng cụm <ArrowRight className="h-3.5 w-3.5" />
                 </span>
               </div>
             </Link>
           ))}
         </div>
 
-        {/* Lối tắt 8 công nghệ lẻ */}
+        {/* Lối tắt 6 Cụm Công nghệ (12 khóa) */}
         <div className="flex flex-wrap items-center gap-2 border-t border-slate-100 pt-4">
-          <span className="text-xs font-bold text-slate-500">Hoặc vào thẳng 8 ngôn ngữ:</span>
-          {CODING_TRACKS.map((track) => (
+          <span className="text-xs font-bold text-slate-500">6 Cụm Công nghệ (12 khóa):</span>
+          {CODING_CLUSTERS.map((cluster) => (
             <Link
-              key={track.id}
-              href={`/lap-trinh?track=${track.id}`}
-              className={`rounded-xl border px-3 py-1.5 text-xs font-extrabold transition hover:shadow-xs ${track.accentBg} ${track.accentText} ${track.accentBorder}`}
+              key={cluster.id}
+              href={`/lap-trinh?track=${cluster.tracks[0]}`}
+              className={`rounded-xl border px-3 py-1.5 text-xs font-extrabold transition hover:shadow-xs ${cluster.badgeBg}`}
             >
-              {track.shortName}
+              {cluster.shortLabel}
             </Link>
           ))}
         </div>
