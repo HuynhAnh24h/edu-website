@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import {
   ArrowLeft,
+  Award,
   BookOpen,
   CheckCircle2,
   Circle,
@@ -61,6 +62,7 @@ interface CourseItem {
   student_count: number;
   enrolled_by_me: boolean;
   completed_lessons: string[];
+  my_certificate_code?: string;
   avg_rating: number;
   review_count: number;
   rating_breakdown: Record<number, number>;
@@ -122,6 +124,7 @@ export default function CoursesPage() {
   const [hoverStar, setHoverStar] = useState<number>(0);
   const [reviewComment, setReviewComment] = useState("");
   const [sendingReview, setSendingReview] = useState(false);
+  const [issuingCert, setIssuingCert] = useState(false);
 
   // Create Course modal/panel state (Teacher / Admin)
   const [createOpen, setCreateOpen] = useState(false);
@@ -219,6 +222,29 @@ export default function CoursesPage() {
     });
     if (res.ok) {
       void loadCourses();
+    }
+  };
+
+  const handleIssueCertificate = async (courseId: string) => {
+    if (!accessToken) {
+      showNotice("err", "Vui lòng đăng nhập để nhận Chứng chỉ hoàn thành khóa học.");
+      return;
+    }
+    setIssuingCert(true);
+    try {
+      const res = await fetch(`${CORE_API_URL}/api/v1/courses/${encodeURIComponent(courseId)}/certificate`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      const d = await res.json();
+      if (!res.ok) {
+        showNotice("err", d.error || "Chưa đủ điều kiện cấp chứng chỉ");
+      } else {
+        showNotice("ok", d.message || "Đã cấp Chứng chỉ Hoàn thành thành công!");
+        void loadCourses();
+      }
+    } finally {
+      setIssuingCert(false);
     }
   };
 
@@ -440,6 +466,28 @@ export default function CoursesPage() {
                   <p className="text-[11px] text-slate-200">
                     Đã xong {doneSet.size} / {selectedCourse.modules.length} bài học
                   </p>
+                  {selectedCourse.my_certificate_code ? (
+                    <Link
+                      href={`/chung-chi?code=${encodeURIComponent(selectedCourse.my_certificate_code)}`}
+                      className="mt-1 flex w-full items-center justify-center gap-1.5 rounded-xl bg-amber-400 px-3 py-2 text-xs font-extrabold text-slate-950 shadow hover:bg-amber-300 transition"
+                    >
+                      <Award className="h-4 w-4" /> Xem &amp; In Chứng chỉ (PDF + QR)
+                    </Link>
+                  ) : pct >= 100 ? (
+                    <button
+                      type="button"
+                      disabled={issuingCert}
+                      onClick={() => void handleIssueCertificate(selectedCourse.id)}
+                      className="mt-1 flex w-full items-center justify-center gap-1.5 rounded-xl bg-amber-400 px-3 py-2 text-xs font-extrabold text-slate-950 shadow hover:bg-amber-300 disabled:opacity-50 transition"
+                    >
+                      <Award className="h-4 w-4" />
+                      {issuingCert ? "Đang cấp chứng chỉ..." : "Cấp Chứng chỉ Hoàn thành ngay"}
+                    </button>
+                  ) : (
+                    <p className="text-[10px] text-amber-200/90">
+                      Hoàn thành 100% bài học để nhận Chứng chỉ PDF kèm mã QR xác thực.
+                    </p>
+                  )}
                 </>
               ) : (
                 <button

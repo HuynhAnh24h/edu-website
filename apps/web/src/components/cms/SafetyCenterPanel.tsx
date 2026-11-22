@@ -204,10 +204,10 @@ export function SafetyCenterPanel({
         <div className="space-y-0.5">
           <h2 className="flex items-center gap-2 text-sm font-extrabold text-slate-900">
             <ShieldAlert className="h-4 w-4 text-rose-600" />
-            BOT Quét An toàn &amp; Xử lý Hình phạt (Mạo danh • Giáo án kém • Bạo lực • Quấy rối)
+            BOT Quét AI 2 Tầng (Chống Teencode + Hiểu Ngữ Cảnh) &amp; Xử lý Hình phạt
           </h2>
           <p className="text-xs text-slate-500">
-            Quy trình chuẩn: (1) BOT tự động chặn &amp; niêm phong bằng chứng → (2) Admin gửi thông báo khóa tài khoản &amp; khóa acc → (3) Xuất Biên bản Hồ sơ Bằng chứng chuyển Cơ quan Công an.
+            Tầng 1: Chuẩn hóa tiếng Việt + Giải mã teencode/viết lái (0→o, 3→e, l0n, ch3t...). Tầng 2: AI hiểu ngữ cảnh phát hiện quấy rối, bắt nạt, gạ gẫm tinh vi → Niêm phong bằng chứng &amp; Xuất Hồ sơ chuyển Công an.
           </p>
         </div>
         <div className="flex items-center gap-2">

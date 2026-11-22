@@ -8,6 +8,7 @@ import {
   BookOpen,
   Check,
   Code2,
+  CopyPlus,
   FileText,
   Flag,
   GraduationCap,
@@ -66,6 +67,7 @@ interface SocialPost {
   created_at: string;
   likes_count: number;
   comments_count: number;
+  clones_count?: number;
   liked_by_me: boolean;
   saved_by_me: boolean;
   following_author: boolean;
@@ -165,6 +167,14 @@ export default function TeacherSocialPage() {
     "impersonation" | "low_quality_lesson" | "violence" | "sexual_harassment"
   >("impersonation");
   const [reportReason, setReportReason] = useState("");
+
+  // Clone to My Classroom modal state (Feature #4)
+  const [cloneTarget, setCloneTarget] = useState<SocialPost | null>(null);
+  const [myClassrooms, setMyClassrooms] = useState<{ id: string; code: string; name: string; subject_name: string }[]>([]);
+  const [loadingClasses, setLoadingClasses] = useState(false);
+  const [selectedClassId, setSelectedClassId] = useState("");
+  const [cloneDueAt, setCloneDueAt] = useState("");
+  const [cloning, setCloning] = useState(false);
 
   // Filters
   const [feedMode, setFeedMode] = useState<"all" | "following" | "saved" | "mine">("all");
@@ -442,6 +452,63 @@ export default function TeacherSocialPage() {
     }
   };
 
+  const openCloneModal = async (post: SocialPost) => {
+    if (!accessToken || !isStaff) {
+      showNotice("err", "Chỉ tài khoản Giáo viên / Quản trị viên mới có thể nhân bản giáo án & đề thi về lớp học.");
+      return;
+    }
+    setCloneTarget(post);
+    setCloneDueAt("");
+    setLoadingClasses(true);
+    try {
+      const res = await fetch(`${CORE_API_URL}/api/v1/classrooms/my`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      if (res.ok) {
+        const d = await res.json();
+        const list = (d.classrooms || []) as { id: string; code: string; name: string; subject_name: string }[];
+        setMyClassrooms(list);
+        setSelectedClassId(list[0]?.id || "");
+      }
+    } finally {
+      setLoadingClasses(false);
+    }
+  };
+
+  const handleConfirmClone = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!accessToken || !cloneTarget || !selectedClassId) return;
+    setCloning(true);
+    try {
+      const res = await fetch(
+        `${CORE_API_URL}/api/v1/social/posts/${encodeURIComponent(cloneTarget.id)}/clone-to-class`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({
+            classroom_id: selectedClassId,
+            due_at: cloneDueAt.trim(),
+          }),
+        }
+      );
+      const d = await res.json();
+      if (!res.ok) {
+        showNotice("err", d.error || "Không thể nhân bản về lớp học");
+      } else {
+        setPosts((prev) =>
+          prev.map((p) => (p.id === cloneTarget.id ? { ...p, clones_count: (p.clones_count || 0) + 1 } : p))
+        );
+        setCloneTarget(null);
+        showNotice("ok", d.message || "Đã nhân bản giáo án / đề thi về lớp của bạn thành công!");
+      }
+    } finally {
+      setCloning(false);
+    }
+  };
+
   return (
     <div className="space-y-6 pb-8">
       {/* Banner đầu trang Mạng xã hội Giáo viên */}
@@ -597,6 +664,101 @@ export default function TeacherSocialPage() {
               >
                 Gửi cảnh báo khẩn cho Admin
               </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {/* Modal Nhân bản Giáo án / Đề thi về Lớp học của tôi */}
+      {cloneTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-xs">
+          <form
+            onSubmit={handleConfirmClone}
+            className="w-full max-w-md rounded-2xl border border-indigo-200 bg-white p-6 shadow-2xl space-y-4"
+          >
+            <div>
+              <span className="inline-flex items-center gap-1 rounded-full bg-indigo-50 px-2.5 py-0.5 text-[10px] font-extrabold text-indigo-700">
+                <CopyPlus className="h-3 w-3" /> Nhân bản nhanh về Lớp giảng dạy
+              </span>
+              <h3 className="mt-2 text-base font-extrabold text-slate-900">
+                Nhân bản Giáo án / Đề thi về Lớp của tôi
+              </h3>
+              <p className="mt-1 text-xs text-slate-600 line-clamp-2">
+                Nguồn: <strong>{cloneTarget.title}</strong> (Tác giả: {cloneTarget.author_name})
+              </p>
+            </div>
+
+            {loadingClasses ? (
+              <p className="py-4 text-center text-xs text-slate-500">Đang tải danh sách lớp học của bạn...</p>
+            ) : myClassrooms.length === 0 ? (
+              <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-xs text-amber-800 space-y-2">
+                <p className="font-bold">Bạn chưa có lớp học nào để nhân bản vào.</p>
+                <p>Hãy vào Studio Giảng dạy tạo lớp học đầu tiên trước khi nhân bản tài liệu nhé!</p>
+                <Link
+                  href="/quan-tri"
+                  onClick={() => setCloneTarget(null)}
+                  className="inline-block rounded-lg bg-amber-600 px-3 py-1.5 font-bold text-white hover:bg-amber-500"
+                >
+                  Mở Studio tạo Lớp học →
+                </Link>
+              </div>
+            ) : (
+              <>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700">Chọn lớp học nhận tài liệu</label>
+                  <select
+                    required
+                    value={selectedClassId}
+                    onChange={(e) => setSelectedClassId(e.target.value)}
+                    className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-xs font-bold text-slate-800"
+                  >
+                    {myClassrooms.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name} ({c.code}) — {c.subject_name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700">Hạn hoàn thành giao học sinh (tùy chọn)</label>
+                  <input
+                    type="date"
+                    value={cloneDueAt}
+                    onChange={(e) => setCloneDueAt(e.target.value)}
+                    className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-xs"
+                  />
+                </div>
+              </>
+            )}
+
+            <div className="flex items-center justify-between gap-2 pt-1">
+              <Link
+                href="/lop-hoc"
+                onClick={() => setCloneTarget(null)}
+                className="text-[11px] font-bold text-indigo-600 hover:underline"
+              >
+                Xem các lớp của tôi →
+              </Link>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setCloneTarget(null)}
+                  className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600"
+                >
+                  Hủy
+                </button>
+                {myClassrooms.length > 0 && (
+                  <button
+                    type="submit"
+                    disabled={cloning}
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-bold text-white hover:bg-indigo-500 disabled:opacity-50"
+                  >
+                    <CopyPlus className="h-3.5 w-3.5" />
+                    {cloning ? "Đang nhân bản..." : "Xác nhận Nhân bản"}
+                  </button>
+                )}
+              </div>
             </div>
           </form>
         </div>
@@ -1171,18 +1333,33 @@ export default function TeacherSocialPage() {
                         </button>
                       </div>
 
-                      <button
-                        type="button"
-                        onClick={() => void handleToggleBookmark(post.id)}
-                        className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold transition ${
-                          post.saved_by_me
-                            ? "bg-emerald-50 text-emerald-700"
-                            : "text-slate-600 hover:bg-slate-100"
-                        }`}
-                      >
-                        <Bookmark className={`h-4 w-4 ${post.saved_by_me ? "fill-emerald-600 text-emerald-600" : ""}`} />
-                        <span>{post.saved_by_me ? "Đã lưu" : "Lưu giáo án"}</span>
-                      </button>
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        {isStaff && (
+                          <button
+                            type="button"
+                            onClick={() => void openCloneModal(post)}
+                            className="inline-flex items-center gap-1.5 rounded-xl border border-indigo-200 bg-indigo-50 px-3 py-1.5 text-xs font-extrabold text-indigo-700 hover:bg-indigo-100 transition"
+                            title="Nhân bản bài giảng / đề thi này vào danh sách bài tập lớp bạn đang dạy"
+                          >
+                            <CopyPlus className="h-3.5 w-3.5" />
+                            <span>
+                              Nhân bản về Lớp tôi{post.clones_count ? ` (${post.clones_count})` : ""}
+                            </span>
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => void handleToggleBookmark(post.id)}
+                          className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold transition ${
+                            post.saved_by_me
+                              ? "bg-emerald-50 text-emerald-700"
+                              : "text-slate-600 hover:bg-slate-100"
+                          }`}
+                        >
+                          <Bookmark className={`h-4 w-4 ${post.saved_by_me ? "fill-emerald-600 text-emerald-600" : ""}`} />
+                          <span>{post.saved_by_me ? "Đã lưu" : "Lưu giáo án"}</span>
+                        </button>
+                      </div>
                     </div>
 
                     {/* Khu vực Bình luận */}

@@ -16,16 +16,35 @@ export interface SafetyScanResult {
   severity: "critical" | "high" | "medium" | "low";
   matchedKeywords: string[];
   reason: string;
+  detectedByAi?: boolean;
 }
 
 function normalizeVietnamese(input: string): string {
-  return input
+  // Giải mã teencode / leetspeak & ký tự lách luật (vd: 4nh n0ng, s3x, g.i.e.t, ch3m)
+  const leet = input
     .toLowerCase()
+    .replace(/0/g, "o")
+    .replace(/1/g, "i")
+    .replace(/3/g, "e")
+    .replace(/4/g, "a")
+    .replace(/5/g, "s")
+    .replace(/7/g, "t")
+    .replace(/@/g, "a")
+    .replace(/\$/g, "s");
+
+  const stripped = leet
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/đ/g, "d")
+    .replace(/[._*\-|/~`]+/g, "")
     .replace(/\s+/g, " ")
     .trim();
+
+  return stripped;
+}
+
+function compactNoSpaces(norm: string): string {
+  return norm.replace(/\s+/g, "");
 }
 
 const SEXUAL_HARASSMENT_PATTERNS = [
@@ -107,8 +126,11 @@ export function scanContentWithSafetyBot(
   options?: { isLesson?: boolean }
 ): SafetyScanResult {
   const norm = normalizeVietnamese(rawText);
+  const compact = compactNoSpaces(norm);
 
-  const sexHits = SEXUAL_HARASSMENT_PATTERNS.filter((p) => norm.includes(p));
+  const matchPattern = (p: string) => norm.includes(p) || compact.includes(p.replace(/\s+/g, ""));
+
+  const sexHits = SEXUAL_HARASSMENT_PATTERNS.filter(matchPattern);
   if (sexHits.length > 0) {
     return {
       flagged: true,
@@ -117,11 +139,11 @@ export function scanContentWithSafetyBot(
       severity: "critical",
       matchedKeywords: sexHits,
       reason:
-        "BOT Quét An toàn phát hiện dấu hiệu quấy rối tình dục / gạ gẫm / nội dung nhạy cảm nghiêm trọng.",
+        "BOT Quét An toàn phát hiện dấu hiệu quấy rối tình dục / gạ gẫm / viết lái nội dung nhạy cảm nghiêm trọng.",
     };
   }
 
-  const vioHits = VIOLENCE_PATTERNS.filter((p) => norm.includes(p));
+  const vioHits = VIOLENCE_PATTERNS.filter(matchPattern);
   if (vioHits.length > 0) {
     return {
       flagged: true,
@@ -134,7 +156,7 @@ export function scanContentWithSafetyBot(
     };
   }
 
-  const impHits = IMPERSONATION_PATTERNS.filter((p) => norm.includes(p));
+  const impHits = IMPERSONATION_PATTERNS.filter(matchPattern);
   if (impHits.length > 0) {
     return {
       flagged: true,
@@ -148,7 +170,7 @@ export function scanContentWithSafetyBot(
   }
 
   if (options?.isLesson) {
-    const oldHits = OUTDATED_LESSON_PATTERNS.filter((p) => norm.includes(p));
+    const oldHits = OUTDATED_LESSON_PATTERNS.filter(matchPattern);
     if (oldHits.length > 0 || norm.length < 24) {
       return {
         flagged: true,
@@ -170,6 +192,77 @@ export function scanContentWithSafetyBot(
     matchedKeywords: [],
     reason: "",
   };
+}
+
+/**
+ * BOT Quét 2 tầng: Tầng 1 giải mã teencode/leetspeak cực nhanh (<1ms),
+ * Tầng 2 dùng Cloudflare Workers AI phân tích ngữ cảnh tiếng Việt (bắt viết lái, gạ gẫm tinh vi, đe dọa ẩn ý).
+ */
+export async function scanContentWithHybridAI(
+  ai: Ai | undefined,
+  rawText: string,
+  options?: { isLesson?: boolean }
+): Promise<SafetyScanResult> {
+  const fast = scanContentWithSafetyBot(rawText, options);
+  if (fast.blockImmediately || !ai) return fast;
+
+  const trimmed = rawText.trim();
+  if (trimmed.length < 10) return fast;
+
+  try {
+    const aiOut = (await ai.run("@cf/meta/llama-3.1-8b-instruct" as Parameters<Ai["run"]>[0], {
+      messages: [
+        {
+          role: "system",
+          content:
+            'Bạn là hệ thống kiểm duyệt an toàn học đường tiếng Việt (hiểu cả teencode, viết lái, viết tắt không dấu). Phân loại đoạn văn sau và CHỈ trả về JSON hợp lệ theo mẫu: {"label":"safe|sexual_harassment|violence|impersonation","confidence":0.0,"reason":"ngắn gọn tiếng Việt"}. Chỉ gắn cờ sexual_harassment (gạ gẫm, quấy rối tình dục, dụ gặp riêng nhạy cảm), violence (đe dọa đánh/giết, xúi tự hại, bắt nạt bạo lực), impersonation (giả mạo giáo viên lừa chuyển tiền/bán đề) khi thực sự có dấu hiệu rõ ràng; trao đổi học tập bình thường luôn trả "safe".',
+        },
+        {
+          role: "user",
+          content: trimmed.slice(0, 800),
+        },
+      ],
+      max_tokens: 140,
+      temperature: 0.0,
+    })) as { response?: string };
+
+    const rawResp = String(aiOut?.response || "");
+    const jsonMatch = rawResp.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      const parsed = JSON.parse(jsonMatch[0]) as {
+        label?: string;
+        confidence?: number;
+        reason?: string;
+      };
+      const conf = Number(parsed.confidence ?? 0.85);
+      if (conf >= 0.72 && (parsed.label === "sexual_harassment" || parsed.label === "violence")) {
+        return {
+          flagged: true,
+          blockImmediately: true,
+          category: parsed.label,
+          severity: "critical",
+          matchedKeywords: ["ai_context_detected", parsed.label],
+          reason: `BOT Quét AI Hiểu Ngữ Cảnh phát hiện: ${parsed.reason || "Hành vi bạo lực / quấy rối ẩn ý hoặc viết lái."}`,
+          detectedByAi: true,
+        };
+      }
+      if (conf >= 0.78 && parsed.label === "impersonation") {
+        return {
+          flagged: true,
+          blockImmediately: false,
+          category: "impersonation",
+          severity: "high",
+          matchedKeywords: ["ai_context_detected", "impersonation"],
+          reason: `BOT Quét AI phát hiện nghi vấn mạo danh / lừa đảo: ${parsed.reason || ""}`,
+          detectedByAi: true,
+        };
+      }
+    }
+  } catch {
+    // AI fallback an toàn: giữ nguyên kết quả Tầng 1, không làm gián đoạn người dùng
+  }
+
+  return fast;
 }
 
 function isAdminRole(role?: string): boolean {
@@ -403,7 +496,8 @@ export async function handleSafetyAndChatRoutes(
   url: URL,
   claims: JwtClaims | null,
   jsonRes: JsonFn,
-  hub?: DurableObjectNamespace
+  hub?: DurableObjectNamespace,
+  ai?: Ai
 ): Promise<Response | null> {
   // Kiểm tra tài khoản đã bị khóa giữa chừng hay chưa cho các hành động ghi
   const verifyActiveUser = async (uid: string) => {
@@ -544,8 +638,8 @@ export async function handleSafetyAndChatRoutes(
     const roomKey = makeRoomKey(me.id, peer.id);
     const msgId = `dm-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
 
-    // === BOT QUÉT AN TOÀN TỰ ĐỘNG TRÊN MỌI TIN NHẮN CHAT ===
-    const scan = scanContentWithSafetyBot(content);
+    // === BOT QUÉT AN TOÀN 2 TẦNG (TEENCODE + WORKERS AI HIỂU NGỮ CẢNH) TRÊN MỌI TIN NHẮN ===
+    const scan = await scanContentWithHybridAI(ai, content);
     if (scan.flagged && scan.category) {
       const inc = await createSafetyIncident(
         db,
@@ -558,6 +652,10 @@ export async function handleSafetyAndChatRoutes(
           suspect_name: me.full_name,
           suspect_email: me.email,
           suspect_role: me.role,
+          reporter_id: scan.detectedByAi ? "safety_bot_ai" : "safety_bot",
+          reporter_name: scan.detectedByAi
+            ? "BOT Quét AI Hiểu Ngữ Cảnh (Workers AI)"
+            : "BOT Quét An toàn Owlie",
           matched_keywords: scan.matchedKeywords,
           content_snapshot: content,
           context: {
@@ -747,7 +845,7 @@ export async function handleSafetyAndChatRoutes(
       return jsonRes({ error: "Vui lòng nhập đầy đủ tiêu đề và mô tả sản phẩm / bài viết." }, 400);
     }
 
-    const scan = scanContentWithSafetyBot(`${title}\n${description}`);
+    const scan = await scanContentWithHybridAI(ai, `${title}\n${description}`);
     if (scan.blockImmediately && scan.category) {
       const inc = await createSafetyIncident(
         db,
@@ -759,6 +857,10 @@ export async function handleSafetyAndChatRoutes(
           suspect_name: me.full_name,
           suspect_email: me.email,
           suspect_role: me.role,
+          reporter_id: scan.detectedByAi ? "safety_bot_ai" : "safety_bot",
+          reporter_name: scan.detectedByAi
+            ? "BOT Quét AI Hiểu Ngữ Cảnh (Workers AI)"
+            : "BOT Quét An toàn Owlie",
           matched_keywords: scan.matchedKeywords,
           content_snapshot: `${title}\n\n${description}`,
         },
@@ -1135,6 +1237,16 @@ export async function handleSafetyAndChatRoutes(
         evidence_filename: `HoSo_BangChung_${incidentCode}.txt`,
         evidence_text: reportText,
       });
+    }
+
+    if (action === "unlock_account") {
+      await db.prepare("UPDATE users SET is_active = 1 WHERE id = ?").bind(suspectId).run();
+      await db
+        .prepare("UPDATE safety_incidents SET status = 'resolved', penalty_action = 'Admin đã mở khóa lại tài khoản', admin_note = ?, updated_at = datetime('now') WHERE id = ?")
+        .bind(adminNote, incId)
+        .run();
+      await pushRealtimeEvent(hub, "admin:safety", { type: "incident_updated", id: incId });
+      return jsonRes({ ok: true, message: "Đã mở khóa lại tài khoản thành công!" });
     }
 
     // dismiss

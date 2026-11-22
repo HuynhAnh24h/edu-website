@@ -122,6 +122,38 @@ export interface QuestionGradeDetail {
   explanation_mdx: string;
 }
 
+export interface ExamWeaknessTopic {
+  topic: string;
+  accuracy: number;
+  correct: number;
+  total: number;
+  status: "weak" | "average" | "strong";
+}
+
+export interface ExamWeaknessQType {
+  q_type: string;
+  label: string;
+  accuracy: number;
+  correct: number;
+  total: number;
+}
+
+export interface ExamRecommendedLesson {
+  id: string;
+  grade_id: number;
+  subject_code: string;
+  subject_name: string;
+  chapter: string;
+  title: string;
+}
+
+export interface ExamWeaknessAnalysis {
+  by_topic: ExamWeaknessTopic[];
+  by_qtype: ExamWeaknessQType[];
+  weak_count: number;
+  recommended_lessons: ExamRecommendedLesson[];
+}
+
 export interface ExamAttemptResult {
   attempt_id: string;
   exam_id: string;
@@ -134,6 +166,7 @@ export interface ExamAttemptResult {
   duration_sec: number;
   grading_latency_us?: number;
   details?: QuestionGradeDetail[];
+  weakness_analysis?: ExamWeaknessAnalysis;
 }
 
 export interface LeaderboardEntry {

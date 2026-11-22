@@ -34,16 +34,23 @@ const DEMO_ACCOUNTS = [
     badge: "bg-emerald-50 text-emerald-700 border-emerald-200",
   },
   {
-    label: "Học sinh — Học 1–12, Luyện Code, Thi thử & Hỏi Thầy Cô",
+    label: "Học sinh — Học 1–12, Luyện Code, Thi thử & Học bạ Số",
     email: "hocsinh@eduk12.vn",
     pass: "Student@123",
     badge: "bg-indigo-50 text-indigo-700 border-indigo-200",
+  },
+  {
+    label: "Phụ huynh — Theo dõi Điểm số, Điểm danh Live & An toàn của Con",
+    email: "phuhuynh@eduk12.vn",
+    pass: "Parent@123",
+    badge: "bg-amber-50 text-amber-800 border-amber-200",
   },
 ];
 
 function getLandingRouteByRole(role?: string): string {
   if (role === "super_admin" || role === "content_admin") return "/quan-tri";
   if (role === "teacher") return "/cong-dong";
+  if (role === "parent") return "/phu-huynh";
   return "/";
 }
 
@@ -622,6 +629,7 @@ function AuthPageInner() {
                   >
                     <option value="student">Học sinh / Thành viên</option>
                     <option value="teacher">Giáo viên (Vào Dashboard)</option>
+                    <option value="parent">Phụ huynh (Theo dõi con miễn phí)</option>
                   </select>
                 </div>
 

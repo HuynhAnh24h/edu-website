@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import {
+  Award,
   BadgeCheck,
   Bell,
   BookOpen,
@@ -12,7 +13,9 @@ import {
   ChevronDown,
   Code2,
   Download,
+  FileSpreadsheet,
   GraduationCap,
+  HeartHandshake,
   LayoutDashboard,
   LogIn,
   LogOut,
@@ -35,6 +38,9 @@ const EXPLORE_LINKS = [
   { href: "/lap-trinh", label: "Học Lập trình", desc: "8 ngôn ngữ chạy trực tiếp trên web", icon: Code2 },
   { href: "/lop-hoc", label: "Lớp học & Live", desc: "Học trực tiếp, chat & điểm danh", icon: Radio },
   { href: "/thi", label: "Thi Trắc nghiệm", desc: "Đề tổng hợp theo cấp & chấm điểm ngay", icon: ShieldCheck },
+  { href: "/hoc-ba", label: "Học bạ Số", desc: "Hồ sơ năng lực, điểm thi & mã Phụ huynh", icon: FileSpreadsheet },
+  { href: "/chung-chi", label: "Chứng chỉ QR", desc: "Nhận chứng chỉ PDF & tra cứu xác thực", icon: Award },
+  { href: "/phu-huynh", label: "Góc Phụ huynh", desc: "Theo dõi điểm số & an toàn của con miễn phí", icon: HeartHandshake },
   { href: "/bai-tap", label: "Bài tập 1–12", desc: "4 định dạng câu hỏi mới 2025+", icon: CheckSquare },
   { href: "/ai-gia-su", label: "AI Gia sư 24/7", desc: "Gợi mở tư duy học từng bước", icon: Bot },
   { href: "/tai-app", label: "Tải App Mobile", desc: "Cài bản Android (.APK) & iPhone", icon: Download },
@@ -135,7 +141,9 @@ export function Navbar() {
     }).catch(() => {});
   };
 
-  // Header tinh gọn: chỉ tối đa 4 mục chính + 1 menu "Khám phá" giúp thanh điều hướng cực thoáng & hiện đại
+  const isParent = user?.role === "parent";
+
+  // Header tinh gọn: chỉ tối đa 4 mục chính + 1 menu "Học & Thi" giúp thanh điều hướng cực thoáng & hiện đại
   const primaryLinks = isTeacher
     ? [
         { href: "/cong-dong", label: "Cộng đồng", icon: Users },
@@ -150,12 +158,19 @@ export function Navbar() {
           { href: "/tin-nhan", label: "Chat", icon: MessageCircle },
           { href: "/thi", label: "Phòng thi", icon: ShieldCheck },
         ]
-      : [
-          { href: "/", label: "Trang chủ" },
-          { href: "/khoa-hoc", label: "Khóa học", icon: GraduationCap },
-          { href: "/cong-dong", label: "Cộng đồng", icon: Users },
-          { href: "/tin-nhan", label: "Chat", icon: MessageCircle },
-        ];
+      : isParent
+        ? [
+            { href: "/phu-huynh", label: "Theo dõi Con", icon: HeartHandshake },
+            { href: "/chung-chi", label: "Chứng chỉ", icon: Award },
+            { href: "/tin-nhan", label: "Chat GV", icon: MessageCircle },
+            { href: "/cong-dong", label: "Cộng đồng", icon: Users },
+          ]
+        : [
+            { href: "/", label: "Trang chủ" },
+            { href: "/khoa-hoc", label: "Khóa học", icon: GraduationCap },
+            { href: "/cong-dong", label: "Cộng đồng", icon: Users },
+            { href: "/tin-nhan", label: "Chat", icon: MessageCircle },
+          ];
 
   const isExploreActive = EXPLORE_LINKS.some((l) => pathname.startsWith(l.href));
 
@@ -163,10 +178,12 @@ export function Navbar() {
     ? { label: "Admin", cls: "bg-rose-100 text-rose-700" }
     : isTeacher
       ? { label: "Giáo viên", cls: "bg-emerald-100 text-emerald-700" }
-      : { label: "Học sinh", cls: "bg-indigo-100 text-indigo-700" };
+      : isParent
+        ? { label: "Phụ huynh", cls: "bg-amber-100 text-amber-800" }
+        : { label: "Học sinh", cls: "bg-indigo-100 text-indigo-700" };
 
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/90 shadow-[0_1px_10px_rgba(15,23,42,0.03)] backdrop-blur-lg">
+    <header className="print:hidden sticky top-0 z-40 border-b border-slate-200/80 bg-white/90 shadow-[0_1px_10px_rgba(15,23,42,0.03)] backdrop-blur-lg">
       <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-3 px-4 sm:px-6">
         {/* Trái: Logo chú cú Owlie gọn gàng */}
         <Link href={isTeacher ? "/cong-dong" : "/"} className="group flex shrink-0 items-center gap-2">
@@ -343,7 +360,7 @@ export function Navbar() {
               >
                 <span
                   className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-extrabold text-white ${
-                    isAdmin ? "bg-rose-600" : isTeacher ? "bg-emerald-600" : "bg-indigo-600"
+                    isAdmin ? "bg-rose-600" : isTeacher ? "bg-emerald-600" : isParent ? "bg-amber-600" : "bg-indigo-600"
                   }`}
                 >
                   {user.full_name.slice(0, 1).toUpperCase()}
@@ -372,6 +389,34 @@ export function Navbar() {
                       className="mt-1 flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-bold text-indigo-700 hover:bg-indigo-50"
                     >
                       <UserIcon className="h-3.5 w-3.5" /> Hồ sơ cá nhân (Profile)
+                    </Link>
+
+                    {!isStaff && !isParent && (
+                      <Link
+                        href="/hoc-ba"
+                        onClick={() => setUserMenuOpen(false)}
+                        className="flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-emerald-700 hover:bg-emerald-50"
+                      >
+                        <FileSpreadsheet className="h-3.5 w-3.5" /> Học bạ Số &amp; Mã Phụ huynh
+                      </Link>
+                    )}
+
+                    {isParent && (
+                      <Link
+                        href="/phu-huynh"
+                        onClick={() => setUserMenuOpen(false)}
+                        className="flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-amber-800 hover:bg-amber-50"
+                      >
+                        <HeartHandshake className="h-3.5 w-3.5" /> Theo dõi Con (Phụ huynh)
+                      </Link>
+                    )}
+
+                    <Link
+                      href="/chung-chi"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-amber-700 hover:bg-amber-50"
+                    >
+                      <Award className="h-3.5 w-3.5" /> Tủ Chứng chỉ PDF &amp; QR
                     </Link>
 
                     {isStaff && (

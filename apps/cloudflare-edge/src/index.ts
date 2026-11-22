@@ -15,6 +15,7 @@ import { handleSocialRoutes } from "./social";
 import { handleSafetyAndChatRoutes } from "./safety";
 import { handleCourseRoutes } from "./courses";
 import { handleTeachersAndFilesRoutes } from "./teachers-files";
+import { handlePortfolioAndParentRoutes } from "./portfolio-parent";
 import { pushRealtimeEvent, RealtimeHub } from "./realtime";
 
 export { RealtimeHub };
@@ -328,8 +329,15 @@ export default {
         if (tfResp) return tfResp;
       }
 
-      // === CỔNG KHÓA HỌC TRỰC TUYẾN & ĐÁNH GIÁ 5 SAO REAL-TIME ===
-      if (path.startsWith("/api/v1/courses")) {
+      // === HỌC BẠ SỐ HỌC SINH & CHẾ ĐỘ PHỤ HUYNH ĐỒNG HÀNH ===
+      if (path.startsWith("/api/v1/portfolio") || path.startsWith("/api/v1/parent")) {
+        const claims = await getClaims(request, env);
+        const ppResp = await handlePortfolioAndParentRoutes(request, env.DB, path, method, claims, jsonRes);
+        if (ppResp) return ppResp;
+      }
+
+      // === CỔNG KHÓA HỌC TRỰC TUYẾN, ĐÁNH GIÁ 5 SAO & CHỨNG CHỈ QR ===
+      if (path.startsWith("/api/v1/courses") || path.startsWith("/api/v1/certificates")) {
         const claims = await getClaims(request, env);
         const courseResp = await handleCourseRoutes(
           request,
@@ -339,7 +347,8 @@ export default {
           url,
           claims,
           jsonRes,
-          env.REALTIME_HUB
+          env.REALTIME_HUB,
+          env.AI
         );
         if (courseResp) return courseResp;
       }
@@ -355,12 +364,13 @@ export default {
           url,
           claims,
           jsonRes,
-          env.REALTIME_HUB
+          env.REALTIME_HUB,
+          env.AI
         );
         if (socialResp) return socialResp;
       }
 
-      // === CHAT TRỰC TUYẾN 1-1, SẢN PHẨM HỌC SINH, BOT QUÉT AN TOÀN & XỬ LÝ VI PHẠM ===
+      // === CHAT TRỰC TUYẾN 1-1, SẢN PHẨM HỌC SINH, BOT QUÉT AI & XỬ LÝ VI PHẠM ===
       if (
         path.startsWith("/api/v1/chat") ||
         path.startsWith("/api/v1/showcase") ||
@@ -377,7 +387,8 @@ export default {
           url,
           claims,
           jsonRes,
-          env.REALTIME_HUB
+          env.REALTIME_HUB,
+          env.AI
         );
         if (safetyResp) return safetyResp;
       }
@@ -1069,6 +1080,82 @@ function gradeToLevel(gradeId: number): "primary" | "middle" | "high" {
       if (resultMatch && method === "GET") {
         const att = await env.DB.prepare("SELECT * FROM exam_attempts WHERE id = ?").bind(resultMatch[1]).first<Record<string, unknown>>();
         if (!att) return jsonRes({ error: "Không tìm thấy kết quả" }, 404);
+
+        const details = JSON.parse(String(att.details_json || "[]")) as {
+          question_id: string;
+          is_correct: boolean;
+          earned_points: number;
+          max_points: number;
+        }[];
+
+        // Phân tích điểm yếu theo Chuyên đề & Dạng câu hỏi + Gợi ý bài giảng cần ôn lại
+        const ex = await env.DB.prepare("SELECT grade_id, subject_code, subject_name FROM exams WHERE id = ?")
+          .bind(String(att.exam_id))
+          .first<{ grade_id: number; subject_code: string; subject_name: string }>();
+
+        const topicAgg = new Map<string, { earned: number; max: number; correct: number; total: number }>();
+        const qtypeAgg = new Map<string, { earned: number; max: number; correct: number; total: number }>();
+
+        for (const d of details) {
+          const q = await env.DB.prepare("SELECT topic, q_type FROM questions WHERE id = ?")
+            .bind(d.question_id)
+            .first<{ topic: string; q_type: string }>();
+          const topic = q?.topic || "Kiến thức trọng tâm";
+          const qt = q?.q_type || "single_choice";
+
+          const curT = topicAgg.get(topic) || { earned: 0, max: 0, correct: 0, total: 0 };
+          curT.earned += Number(d.earned_points || 0);
+          curT.max += Number(d.max_points || 0);
+          curT.total += 1;
+          if (d.is_correct) curT.correct += 1;
+          topicAgg.set(topic, curT);
+
+          const curQ = qtypeAgg.get(qt) || { earned: 0, max: 0, correct: 0, total: 0 };
+          curQ.earned += Number(d.earned_points || 0);
+          curQ.max += Number(d.max_points || 0);
+          curQ.total += 1;
+          if (d.is_correct) curQ.correct += 1;
+          qtypeAgg.set(qt, curQ);
+        }
+
+        const QTYPE_LABEL: Record<string, string> = {
+          single_choice: "Trắc nghiệm 1 đáp án",
+          multi_choice: "Chọn nhiều đáp án",
+          true_false_group: "Trắc nghiệm Đúng / Sai (2025+)",
+          short_answer: "Trả lời ngắn (Điền số)",
+        };
+
+        const byTopic = [...topicAgg.entries()]
+          .map(([topic, s]) => ({
+            topic,
+            accuracy: s.max > 0 ? Math.round((s.earned / s.max) * 100) : 0,
+            correct: s.correct,
+            total: s.total,
+            status: s.max > 0 && s.earned / s.max < 0.7 ? "weak" : s.max > 0 && s.earned / s.max >= 0.85 ? "strong" : "average",
+          }))
+          .sort((a, b) => a.accuracy - b.accuracy);
+
+        const byQtype = [...qtypeAgg.entries()].map(([q_type, s]) => ({
+          q_type,
+          label: QTYPE_LABEL[q_type] || q_type,
+          accuracy: s.max > 0 ? Math.round((s.earned / s.max) * 100) : 0,
+          correct: s.correct,
+          total: s.total,
+        }));
+
+        // Gợi ý đúng bài giảng lớp & môn tương ứng trong D1 để ôn lại ngay
+        let recLessons: { id: string; grade_id: number; subject_code: string; subject_name: string; chapter: string; title: string }[] = [];
+        if (ex) {
+          const lRes = await env.DB.prepare(
+            ex.subject_code === "tong-hop"
+              ? "SELECT id, grade_id, subject_code, subject_name, chapter, title FROM lessons WHERE grade_id <= ? ORDER BY grade_id DESC LIMIT 4"
+              : "SELECT id, grade_id, subject_code, subject_name, chapter, title FROM lessons WHERE grade_id = ? AND subject_code = ? LIMIT 4"
+          )
+            .bind(...(ex.subject_code === "tong-hop" ? [ex.grade_id] : [ex.grade_id, ex.subject_code]))
+            .all<{ id: string; grade_id: number; subject_code: string; subject_name: string; chapter: string; title: string }>();
+          recLessons = lRes.results;
+        }
+
         return jsonRes({
           attempt_id: att.id,
           exam_id: att.exam_id,
@@ -1080,7 +1167,13 @@ function gradeToLevel(gradeId: number): "primary" | "middle" | "high" {
           total_questions: att.total_questions,
           duration_sec: att.duration_sec,
           grading_latency_us: att.grading_latency_us,
-          details: JSON.parse(String(att.details_json || "[]")),
+          details,
+          weakness_analysis: {
+            by_topic: byTopic,
+            by_qtype: byQtype,
+            weak_count: byTopic.filter((t) => t.status === "weak").length,
+            recommended_lessons: recLessons,
+          },
         });
       }
 

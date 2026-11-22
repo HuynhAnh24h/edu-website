@@ -36,8 +36,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       >
         {children}
       </main>
-      {!isExamRoom && <Footer />}
-      {!isExamRoom && <MobileBottomNav />}
+      {!isExamRoom && (
+        <div className="print:hidden">
+          <Footer />
+          <MobileBottomNav />
+        </div>
+      )}
     </div>
   );
 }

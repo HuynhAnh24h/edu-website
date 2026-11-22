@@ -1,6 +1,6 @@
 import { JwtClaims } from "./crypto";
 import { SUBJECT_NAMES } from "./seed";
-import { createSafetyIncident, scanContentWithSafetyBot } from "./safety";
+import { createSafetyIncident, notifyUser, scanContentWithHybridAI } from "./safety";
 import { pushRealtimeEvent } from "./realtime";
 
 type JsonFn = (data: unknown, status?: number, extraHeaders?: Record<string, string>) => Response;
@@ -29,7 +29,8 @@ export async function handleSocialRoutes(
   url: URL,
   claims: JwtClaims | null,
   jsonRes: JsonFn,
-  hub?: DurableObjectNamespace
+  hub?: DurableObjectNamespace,
+  ai?: Ai
 ): Promise<Response | null> {
   // 1. GET /api/v1/social/stats — Thống kê nhanh Mạng xã hội Giáo viên
   if (path === "/api/v1/social/stats" && method === "GET") {
@@ -220,11 +221,12 @@ export async function handleSocialRoutes(
       });
     }
 
-    const [likesAll, commentsAll, myLikes, mySaves, myFollows] = await Promise.all([
+    const [likesAll, commentsAll, clonesAll, myLikes, mySaves, myFollows] = await Promise.all([
       db.prepare("SELECT post_id, COUNT(*) as cnt FROM teacher_post_likes GROUP BY post_id").all<{ post_id: string; cnt: number }>(),
       db
         .prepare("SELECT id, post_id, user_id, user_name, user_role, content, created_at FROM teacher_post_comments ORDER BY created_at ASC")
         .all<{ id: string; post_id: string; user_id: string; user_name: string; user_role: string; content: string; created_at: string }>(),
+      db.prepare("SELECT post_id, COUNT(*) as cnt FROM teacher_post_clones GROUP BY post_id").all<{ post_id: string; cnt: number }>(),
       claims
         ? db.prepare("SELECT post_id FROM teacher_post_likes WHERE user_id = ?").bind(claims.uid).all<{ post_id: string }>()
         : Promise.resolve({ results: [] as { post_id: string }[] }),
@@ -237,6 +239,7 @@ export async function handleSocialRoutes(
     ]);
 
     const likeMap = new Map(likesAll.results.map((r) => [r.post_id, r.cnt]));
+    const cloneMap = new Map(clonesAll.results.map((r) => [r.post_id, r.cnt]));
     const myLikeSet = new Set(myLikes.results.map((r) => r.post_id));
     const mySaveSet = new Set(mySaves.results.map((r) => r.post_id));
     const myFollowSet = new Set(myFollows.results.map((r) => r.teacher_id));
@@ -279,6 +282,7 @@ export async function handleSocialRoutes(
         created_at: String(p.created_at),
         likes_count: likeMap.get(id) || 0,
         comments_count: cmts.length,
+        clones_count: cloneMap.get(id) || 0,
         liked_by_me: myLikeSet.has(id),
         saved_by_me: mySaveSet.has(id),
         following_author: myFollowSet.has(authorId),
@@ -336,8 +340,8 @@ export async function handleSocialRoutes(
 
     const postId = `post-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 
-    // === BOT QUÉT AN TOÀN & KIỂM ĐỊNH CHẤT LƯỢNG GIÁO ÁN ===
-    const scan = scanContentWithSafetyBot(`${title}\n${content}`, {
+    // === BOT QUÉT AN TOÀN 2 TẦNG (TEENCODE + WORKERS AI) & KIỂM ĐỊNH GIÁO ÁN ===
+    const scan = await scanContentWithHybridAI(ai, `${title}\n${content}`, {
       isLesson: category === "lesson_share" || category === "exam_share",
     });
 
@@ -459,6 +463,68 @@ export async function handleSocialRoutes(
     return jsonRes({ saved });
   }
 
+  // 7b. POST /api/v1/social/posts/:id/clone-to-class — Nhân bản Giáo án / Đề thi của đồng nghiệp về Lớp tôi
+  const cloneMatch = path.match(/^\/api\/v1\/social\/posts\/([^/]+)\/clone-to-class$/);
+  if (cloneMatch && method === "POST") {
+    if (!claims || !isTeacherOrAdmin(claims.role)) {
+      return jsonRes({ error: "Chỉ Giáo viên & Quản trị viên mới được nhân bản giáo án/đề thi về lớp học." }, 403);
+    }
+    const postId = decodeURIComponent(cloneMatch[1]);
+    const body = (await request.json().catch(() => ({}))) as { classroom_id?: string; due_at?: string };
+    const classroomId = (body.classroom_id || "").trim();
+    if (!classroomId) {
+      return jsonRes({ error: "Vui lòng chọn lớp học muốn nhân bản giáo án / đề thi về." }, 400);
+    }
+
+    const [post, cls] = await Promise.all([
+      db.prepare("SELECT * FROM teacher_posts WHERE id = ?").bind(postId).first<Record<string, unknown>>(),
+      db.prepare("SELECT * FROM classrooms WHERE id = ?").bind(classroomId).first<Record<string, unknown>>(),
+    ]);
+    if (!post) return jsonRes({ error: "Không tìm thấy bài chia sẻ này." }, 404);
+    if (!cls) return jsonRes({ error: "Không tìm thấy lớp học được chọn." }, 404);
+    if (String(cls.teacher_id) !== claims.uid && !isAdminRole(claims.role)) {
+      return jsonRes({ error: "Bạn chỉ có thể nhân bản tài liệu về lớp do chính mình phụ trách." }, 403);
+    }
+
+    const itemType = String(post.category) === "exam_share" ? "exam" : "lesson";
+    const asgId = `asg-clone-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+    const cloneTitle = `[Nhân bản từ ${String(post.author_name)}] ${String(post.title)}`;
+
+    await db.batch([
+      db
+        .prepare(
+          `INSERT INTO classroom_assignments (id, classroom_id, item_type, item_id, item_title, due_at, display_order)
+           VALUES (?, ?, ?, ?, ?, ?, 99)`
+        )
+        .bind(asgId, classroomId, itemType, postId, cloneTitle.slice(0, 180), (body.due_at || "").trim().slice(0, 30)),
+      db
+        .prepare("INSERT OR IGNORE INTO teacher_post_clones (post_id, teacher_id, classroom_id) VALUES (?, ?, ?)")
+        .bind(postId, claims.uid, classroomId),
+    ]);
+
+    if (String(post.author_id) !== claims.uid) {
+      await notifyUser(
+        db,
+        String(post.author_id),
+        "clone",
+        `Đồng nghiệp vừa nhân bản giáo án/đề thi của bạn!`,
+        `${claims.name} đã nhân bản "${String(post.title)}" về giảng dạy cho lớp "${String(cls.name)}".`,
+        "/cong-dong",
+        hub
+      );
+    }
+    await pushRealtimeEvent(hub, "social:feed", { type: "social_update", post_id: postId });
+
+    return jsonRes(
+      {
+        ok: true,
+        assignment_id: asgId,
+        message: `Đã nhân bản "${String(post.title)}" về lớp ${String(cls.name)} thành công!`,
+      },
+      201
+    );
+  }
+
   // 8. GET & POST /api/v1/social/posts/:id/comments — Bình luận thảo luận
   const cmtMatch = path.match(/^\/api\/v1\/social\/posts\/([^/]+)\/comments$/);
   if (cmtMatch && method === "GET") {
@@ -482,7 +548,7 @@ export async function handleSocialRoutes(
       .bind(claims.uid)
       .first<{ full_name: string; email: string; role: string }>();
 
-    const cmtScan = scanContentWithSafetyBot(content);
+    const cmtScan = await scanContentWithHybridAI(ai, content);
     if (cmtScan.blockImmediately && cmtScan.category) {
       const inc = await createSafetyIncident(
         db,

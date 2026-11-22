@@ -1,5 +1,5 @@
 import { JwtClaims } from "./crypto";
-import { createSafetyIncident, notifyUser, scanContentWithSafetyBot } from "./safety";
+import { createSafetyIncident, notifyUser, scanContentWithHybridAI } from "./safety";
 import { pushRealtimeEvent } from "./realtime";
 
 type JsonFn = (data: unknown, status?: number, extraHeaders?: Record<string, string>) => Response;
@@ -28,14 +28,38 @@ export async function handleCourseRoutes(
   url: URL,
   claims: JwtClaims | null,
   jsonRes: JsonFn,
-  hub?: DurableObjectNamespace
+  hub?: DurableObjectNamespace,
+  ai?: Ai
 ): Promise<Response | null> {
+  // 0A. GET /api/v1/certificates/verify?code=... — Xác thực mã QR Chứng chỉ công khai
+  if (path === "/api/v1/certificates/verify" && method === "GET") {
+    const code = (url.searchParams.get("code") || "").trim().toUpperCase();
+    if (!code) return jsonRes({ valid: false, error: "Vui lòng nhập mã chứng chỉ" }, 400);
+    const cert = await db
+      .prepare("SELECT * FROM course_certificates WHERE UPPER(cert_code) = ? LIMIT 1")
+      .bind(code)
+      .first<Record<string, unknown>>();
+    if (!cert) {
+      return jsonRes({ valid: false, error: "Không tìm thấy chứng chỉ hợp lệ với mã này trên hệ thống Owlie Edu." }, 404);
+    }
+    return jsonRes({ valid: true, certificate: cert });
+  }
+
+  // 0B. GET /api/v1/certificates/my — Danh sách chứng chỉ học viên đã đạt được
+  if (path === "/api/v1/certificates/my" && method === "GET") {
+    if (!claims) return jsonRes({ error: "Vui lòng đăng nhập" }, 401);
+    const rows = await db
+      .prepare("SELECT * FROM course_certificates WHERE user_id = ? ORDER BY issued_at DESC")
+      .bind(claims.uid)
+      .all();
+    return jsonRes({ certificates: rows.results });
+  }
   // 1. GET /api/v1/courses — Danh sách khóa học kèm điểm 5 sao, biểu đồ đánh giá & tiến độ học
   if (path === "/api/v1/courses" && method === "GET") {
     const q = (url.searchParams.get("q") || "").trim().toLowerCase();
     const subject = (url.searchParams.get("subject") || "").trim().toLowerCase();
 
-    const [coursesRes, reviewsRes, enrollCountsRes, myEnrollsRes] = await Promise.all([
+    const [coursesRes, reviewsRes, enrollCountsRes, myEnrollsRes, myCertsRes] = await Promise.all([
       db
         .prepare(
           `SELECT c.*, COALESCE(tp.is_verified, 0) as teacher_verified
@@ -54,7 +78,15 @@ export async function handleCourseRoutes(
             .bind(claims.uid)
             .all<{ course_id: string; completed_lessons_json: string }>()
         : Promise.resolve({ results: [] as { course_id: string; completed_lessons_json: string }[] }),
+      claims
+        ? db
+            .prepare("SELECT course_id, cert_code FROM course_certificates WHERE user_id = ?")
+            .bind(claims.uid)
+            .all<{ course_id: string; cert_code: string }>()
+        : Promise.resolve({ results: [] as { course_id: string; cert_code: string }[] }),
     ]);
+
+    const myCertMap = new Map(myCertsRes.results.map((r) => [r.course_id, r.cert_code]));
 
     const enrollCountMap = new Map(enrollCountsRes.results.map((r) => [r.course_id, r.cnt]));
     const myEnrollMap = new Map(
@@ -113,6 +145,7 @@ export async function handleCourseRoutes(
         student_count: enrollCountMap.get(id) || 0,
         enrolled_by_me: myEnrollMap.has(id),
         completed_lessons: myEnrollMap.get(id) || [],
+        my_certificate_code: myCertMap.get(id) || "",
         avg_rating: avgRating,
         review_count: reviews.length,
         rating_breakdown: breakdown,
@@ -182,7 +215,7 @@ export async function handleCourseRoutes(
     }
 
     const allText = `${title}\n${summary}\n${cleanModules.map((m) => `${m.title}\n${m.content}`).join("\n")}`;
-    const scan = scanContentWithSafetyBot(allText, { isLesson: true });
+    const scan = await scanContentWithHybridAI(ai, allText, { isLesson: true });
     const courseId = `course-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
 
     if (scan.blockImmediately && scan.category) {
@@ -353,8 +386,8 @@ export async function handleCourseRoutes(
       return jsonRes({ error: "Vui lòng viết vài dòng nhận xét về khóa học nhé!" }, 400);
     }
 
-    // BOT Quét An toàn cho bình luận đánh giá khóa học
-    const scan = scanContentWithSafetyBot(comment);
+    // BOT Quét An toàn 2 tầng (Teencode + Workers AI) cho bình luận đánh giá khóa học
+    const scan = await scanContentWithHybridAI(ai, comment);
     if (scan.blockImmediately && scan.category) {
       const inc = await createSafetyIncident(
         db,
@@ -412,6 +445,86 @@ export async function handleCourseRoutes(
     await Promise.all(tasks);
 
     return jsonRes({ ok: true, message: `Cảm ơn bạn đã gửi đánh giá ${rating} sao cho khóa học!` }, 201);
+  }
+
+  // 7. POST /api/v1/courses/:id/certificate — Cấp Chứng chỉ Hoàn thành Khóa học (kèm mã QR xác thực)
+  const certMatch = path.match(/^\/api\/v1\/courses\/([^/]+)\/certificate$/);
+  if (certMatch && method === "POST") {
+    if (!claims) return jsonRes({ error: "Vui lòng đăng nhập để nhận chứng chỉ" }, 401);
+    const courseId = decodeURIComponent(certMatch[1]);
+
+    const [course, enroll, userRow, existingCert] = await Promise.all([
+      db.prepare("SELECT * FROM courses WHERE id = ?").bind(courseId).first<Record<string, unknown>>(),
+      db
+        .prepare("SELECT completed_lessons_json FROM course_enrollments WHERE course_id = ? AND user_id = ?")
+        .bind(courseId, claims.uid)
+        .first<{ completed_lessons_json: string }>(),
+      db.prepare("SELECT full_name FROM users WHERE id = ?").bind(claims.uid).first<{ full_name: string }>(),
+      db
+        .prepare("SELECT * FROM course_certificates WHERE course_id = ? AND user_id = ?")
+        .bind(courseId, claims.uid)
+        .first<Record<string, unknown>>(),
+    ]);
+
+    if (!course) return jsonRes({ error: "Không tìm thấy khóa học" }, 404);
+    if (existingCert) {
+      return jsonRes({ ok: true, certificate: existingCert, message: "Bạn đã nhận chứng chỉ khóa học này!" });
+    }
+
+    let modules: CourseModule[] = [];
+    let completed: string[] = [];
+    try {
+      modules = JSON.parse(String(course.modules_json || "[]"));
+      completed = JSON.parse(String(enroll?.completed_lessons_json || "[]"));
+    } catch {
+      // ignore
+    }
+
+    if (modules.length > 0 && completed.length < modules.length) {
+      return jsonRes(
+        {
+          error: `Em mới hoàn thành ${completed.length}/${modules.length} bài học. Hãy đánh dấu hoàn thành đủ 100% bài giảng để nhận Chứng chỉ nhé!`,
+        },
+        400
+      );
+    }
+
+    const certId = `cert-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+    const certCode = `OWLIE-CERT-${new Date().toISOString().slice(0, 10).replace(/-/g, "")}-${Math.random()
+      .toString(36)
+      .slice(2, 6)
+      .toUpperCase()}`;
+
+    await db
+      .prepare(
+        `INSERT INTO course_certificates (id, cert_code, course_id, course_title, subject_name, teacher_name, user_id, user_name)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+      )
+      .bind(
+        certId,
+        certCode,
+        courseId,
+        String(course.title),
+        String(course.subject_name),
+        String(course.teacher_name),
+        claims.uid,
+        userRow?.full_name || claims.name || "Học viên Owlie Edu"
+      )
+      .run();
+
+    const created = await db
+      .prepare("SELECT * FROM course_certificates WHERE id = ?")
+      .bind(certId)
+      .first<Record<string, unknown>>();
+
+    return jsonRes(
+      {
+        ok: true,
+        certificate: created,
+        message: `Chúc mừng! Bạn đã được cấp Chứng chỉ hoàn thành khóa học (${certCode})!`,
+      },
+      201
+    );
   }
 
   return null;

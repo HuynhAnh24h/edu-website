@@ -71,6 +71,10 @@ export async function ensureSeeded(db: D1Database): Promise<void> {
     db.prepare(`CREATE TABLE IF NOT EXISTS exam_level_controls (level TEXT PRIMARY KEY, label TEXT NOT NULL, min_grade INTEGER NOT NULL, max_grade INTEGER NOT NULL, is_unlocked INTEGER NOT NULL DEFAULT 1, exam_id TEXT DEFAULT '', announcement TEXT DEFAULT '', updated_by TEXT DEFAULT '', updated_at TEXT NOT NULL DEFAULT (datetime('now')))`),
     db.prepare(`CREATE TABLE IF NOT EXISTS teacher_profiles (user_id TEXT PRIMARY KEY, is_verified INTEGER NOT NULL DEFAULT 0, verification_status TEXT NOT NULL DEFAULT 'none', specialty TEXT DEFAULT '', bio TEXT DEFAULT '', years_exp INTEGER NOT NULL DEFAULT 1, proof_file_url TEXT DEFAULT '', proof_note TEXT DEFAULT '', admin_review_note TEXT DEFAULT '', verified_at TEXT, updated_at TEXT NOT NULL DEFAULT (datetime('now')))`),
     db.prepare(`CREATE TABLE IF NOT EXISTS uploaded_files (id TEXT PRIMARY KEY, uploader_id TEXT NOT NULL, uploader_name TEXT NOT NULL, filename TEXT NOT NULL, mime_type TEXT NOT NULL, size_bytes INTEGER NOT NULL, purpose TEXT NOT NULL DEFAULT 'general', created_at TEXT NOT NULL DEFAULT (datetime('now')))`),
+    db.prepare(`CREATE TABLE IF NOT EXISTS course_certificates (id TEXT PRIMARY KEY, cert_code TEXT UNIQUE NOT NULL, course_id TEXT NOT NULL, course_title TEXT NOT NULL, subject_name TEXT NOT NULL, teacher_name TEXT NOT NULL, user_id TEXT NOT NULL, user_name TEXT NOT NULL, issued_at TEXT NOT NULL DEFAULT (datetime('now')), UNIQUE(course_id, user_id))`),
+    db.prepare(`CREATE TABLE IF NOT EXISTS parent_student_links (parent_id TEXT NOT NULL, student_id TEXT NOT NULL, relation_label TEXT DEFAULT 'Phụ huynh', linked_at TEXT NOT NULL DEFAULT (datetime('now')), PRIMARY KEY (parent_id, student_id))`),
+    db.prepare(`CREATE TABLE IF NOT EXISTS student_link_codes (student_id TEXT PRIMARY KEY, link_code TEXT UNIQUE NOT NULL, created_at TEXT NOT NULL DEFAULT (datetime('now')))`),
+    db.prepare(`CREATE TABLE IF NOT EXISTS teacher_post_clones (post_id TEXT NOT NULL, teacher_id TEXT NOT NULL, classroom_id TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT (datetime('now')), PRIMARY KEY (post_id, classroom_id))`),
   ]);
 
   // Nâng cấp cột đính kèm tệp cho direct_messages an toàn nếu bảng cũ chưa có
@@ -686,6 +690,40 @@ export async function ensureSeeded(db: D1Database): Promise<void> {
           "Tin học & Lập trình Web / Python / Golang",
           "8 năm đào tạo học sinh giỏi Tin học và hướng dẫn dự án KHKT phần mềm. Tập trung vào thực hành trực tiếp trên trình duyệt và tư duy giải quyết vấn đề.",
           8
+        ),
+    ]);
+  }
+
+  // Seed Mã liên kết Phụ huynh + Tài khoản Phụ huynh mẫu + 1 Chứng chỉ mẫu để thử nghiệm ngay
+  const codeRow = await db.prepare("SELECT COUNT(*) as cnt FROM student_link_codes").first<{ cnt: number }>();
+  if (!codeRow || codeRow.cnt === 0) {
+    const parentHash = await hashPassword("Parent@123");
+    await db.batch([
+      db
+        .prepare(
+          "INSERT OR IGNORE INTO users (id, email, password_hash, full_name, role, tier, school_name) VALUES (?, ?, ?, ?, 'parent', 'free', ?)"
+        )
+        .bind("u-parent-1", "phuhuynh@eduk12.vn", parentHash, "Phụ huynh Nguyễn Văn Hùng", "Gia đình em Minh Anh"),
+      db.prepare(
+        "INSERT OR IGNORE INTO student_link_codes (student_id, link_code) VALUES ('u-student-1', 'PH-MINHANH12')"
+      ),
+      db.prepare(
+        "INSERT OR IGNORE INTO parent_student_links (parent_id, student_id, relation_label) VALUES ('u-parent-1', 'u-student-1', 'Bố / Phụ huynh')"
+      ),
+      db
+        .prepare(
+          `INSERT OR IGNORE INTO course_certificates (id, cert_code, course_id, course_title, subject_name, teacher_name, user_id, user_name)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+        )
+        .bind(
+          "cert-seed-1",
+          "OWLIE-CERT-2026-WEB01",
+          "course-web-starter",
+          "Xây dựng Website Đầu Tiên với HTML, CSS & JavaScript từ con số 0",
+          "Lập trình Web",
+          "Thầy Lê Hoàng Nam (GV Tin học)",
+          "u-student-1",
+          "Nguyễn Minh Anh"
         ),
     ]);
   }
