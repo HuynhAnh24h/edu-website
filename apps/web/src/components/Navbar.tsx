@@ -92,6 +92,44 @@ export function Navbar() {
     }
   }, [accessToken]);
 
+  const showNativePush = useCallback((title: string, body: string, link = "/") => {
+    if (typeof window === "undefined" || !("Notification" in window) || Notification.permission !== "granted") {
+      return;
+    }
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.ready
+        .then((reg) => {
+          reg.active?.postMessage({ type: "SHOW_NOTIFICATION", title, body, link });
+        })
+        .catch(() => {});
+    }
+  }, []);
+
+  const handleQuickEnablePush = async () => {
+    if (typeof window === "undefined" || !("Notification" in window)) return;
+    const perm = await Notification.requestPermission();
+    if (perm === "granted") {
+      if (accessToken) {
+        await fetch(`${CORE_API_URL}/api/v1/push/subscribe`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({
+            device_label: navigator.userAgent.slice(0, 80),
+            platform: /android/i.test(navigator.userAgent)
+              ? "android-pwa"
+              : /iphone|ipad/i.test(navigator.userAgent)
+                ? "ios-pwa"
+                : "desktop-web",
+          }),
+        }).catch(() => {});
+      }
+      showNativePush("🦉 Owlie Edu", "Đã bật Thông báo Đẩy thành công trên thiết bị này!", "/");
+    }
+  };
+
   useEffect(() => {
     void loadNotifications();
     if (!accessToken || !user) return;
@@ -108,28 +146,52 @@ export function Navbar() {
         }
         if (ev.type === "notification") {
           const isDanger = ev.notif_type === "safety_alert" || ev.notif_type === "warning";
+          const nTitle = String(ev.title || "Thông báo mới");
+          const nMsg = String(ev.message || "");
+          const nLink = String(ev.link || "/cong-dong");
           setLiveToast({
             danger: isDanger,
-            title: String(ev.title || "Thông báo mới"),
-            message: String(ev.message || ""),
-            link: String(ev.link || "/cong-dong"),
+            title: nTitle,
+            message: nMsg,
+            link: nLink,
           });
+          showNativePush(nTitle, nMsg, nLink);
           void loadNotifications();
           setTimeout(() => setLiveToast(null), isDanger ? 9000 : 5000);
         } else if (ev.type === "chat_notify") {
           if (!pathname.startsWith("/tin-nhan")) {
+            const cTitle = `Tin nhắn mới từ ${String(ev.from_name || "Thành viên")}`;
+            const cMsg = String(ev.preview || "");
+            const cLink = `/tin-nhan?peer=${encodeURIComponent(String(ev.from_id || ""))}`;
             setLiveToast({
-              title: `Tin nhắn mới từ ${String(ev.from_name || "Thành viên")}`,
-              message: String(ev.preview || ""),
-              link: `/tin-nhan?peer=${encodeURIComponent(String(ev.from_id || ""))}`,
+              title: cTitle,
+              message: cMsg,
+              link: cLink,
             });
+            showNativePush(cTitle, cMsg, cLink);
             setTimeout(() => setLiveToast(null), 5000);
           }
         }
       },
     });
-    return () => conn.close();
-  }, [accessToken, user, pathname, loadNotifications, logout]);
+    const feedConn = connectRealtimeChannel("social:feed", accessToken, {
+      onEvent: (ev) => {
+        if (ev.type === "push_broadcast") {
+          const bTitle = String(ev.title || "Thông báo từ Owlie Edu");
+          const bMsg = String(ev.message || "");
+          const bLink = String(ev.link || "/");
+          setLiveToast({ title: bTitle, message: bMsg, link: bLink });
+          showNativePush(bTitle, bMsg, bLink);
+          void loadNotifications();
+          setTimeout(() => setLiveToast(null), 7000);
+        }
+      },
+    });
+    return () => {
+      conn.close();
+      feedConn.close();
+    };
+  }, [accessToken, user, pathname, loadNotifications, logout, showNativePush]);
 
   const markAllRead = async () => {
     if (!accessToken) return;
@@ -312,7 +374,13 @@ export function Navbar() {
                   <div className="absolute right-0 z-20 mt-2 w-80 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
                     <div className="flex items-center justify-between border-b border-slate-100 px-4 py-2.5">
                       <p className="text-xs font-extrabold text-slate-900">Thông báo &amp; Cảnh báo</p>
-                      <span className="text-[10px] text-slate-400">{notifications.length} gần nhất</span>
+                      <button
+                        type="button"
+                        onClick={() => void handleQuickEnablePush()}
+                        className="rounded-lg bg-amber-100 px-2 py-0.5 text-[10px] font-extrabold text-amber-800 hover:bg-amber-200"
+                      >
+                        Bật Push
+                      </button>
                     </div>
                     <div className="max-h-80 divide-y divide-slate-100 overflow-y-auto">
                       {notifications.length === 0 ? (

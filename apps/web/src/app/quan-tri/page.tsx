@@ -42,6 +42,7 @@ import { SafetyCenterPanel } from "@/components/cms/SafetyCenterPanel";
 import { ExamLevelControlPanel } from "@/components/cms/ExamLevelControlPanel";
 import { TeacherVerificationPanel } from "@/components/cms/TeacherVerificationPanel";
 import { StorageQuotaPanel, StorageStatsPayload } from "@/components/cms/StorageQuotaPanel";
+import { AdminOpsPanel } from "@/components/cms/AdminOpsPanel";
 import { CuBongLogoMark } from "@/components/BrandLogo";
 import {
   createEmptyDraftQuestion,
@@ -96,6 +97,7 @@ type DashboardTab =
   | "verifications"
   | "safety"
   | "storage"
+  | "ops"
   | "community"
   | "users";
 
@@ -143,6 +145,10 @@ const TAB_META: Record<DashboardTab, { title: string; subtitle: string }> = {
   storage: {
     title: "Kho Lưu trữ & Dung lượng Tài liệu",
     subtitle: "Theo dõi dung lượng thực tế (khóa trần an toàn 0đ), kiểm soát tệp đề thi PDF/Word/Ảnh và xóa giải phóng bộ nhớ.",
+  },
+  ops: {
+    title: "Nhật ký Quản trị, Sao lưu & Tên miền",
+    subtitle: "Tra cứu Audit Log, chạy & tải bản sao lưu tự động 02:00 sáng hàng ngày, cấu hình Tên miền riêng / Email Quên mật khẩu và phát sóng Thông báo Đẩy.",
   },
   community: {
     title: "Kiểm duyệt Mạng Xã Hội Giáo Viên",
@@ -639,6 +645,12 @@ export default function CMSAdminPage() {
                   ? `${storageSummary.used_mb} MB / ${storageSummary.safety_cap_gb} GB`
                   : "Theo dõi hạn mức 0đ & tệp",
                 icon: Database,
+              },
+              {
+                id: "ops" as DashboardTab,
+                label: "Nhật ký, Sao lưu & Tên miền",
+                desc: "Audit Log • Backup • Push • Email",
+                icon: ClipboardCheck,
               },
               {
                 id: "community" as DashboardTab,
@@ -1649,6 +1661,11 @@ export default function CMSAdminPage() {
               onToast={showToast}
               onStatsLoaded={setStorageSummary}
             />
+          )}
+
+          {/* === TAB 6A3: NHẬT KÝ QUẢN TRỊ, SAO LƯU TỰ ĐỘNG, TÊN MIỀN & PUSH === */}
+          {activeTab === "ops" && isAdmin && (
+            <AdminOpsPanel accessToken={accessToken} onToast={showToast} />
           )}
 
           {/* === TAB 6B: KIỂM DUYỆT MẠNG XÃ HỘI GIÁO VIÊN (ADMIN) === */}

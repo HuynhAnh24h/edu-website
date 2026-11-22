@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
+  BellRing,
   BookOpen,
   CheckCircle2,
   Code2,
@@ -13,7 +14,10 @@ import {
   ShieldCheck,
   Smartphone,
   Sparkles,
+  Store,
 } from "lucide-react";
+import { CORE_API_URL } from "@/lib/api";
+import { useAuth } from "@/context/AuthContext";
 import { CuBongLogoMark } from "@/components/BrandLogo";
 
 interface BeforeInstallPromptEvent extends Event {
@@ -22,16 +26,24 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 export default function DownloadAppPage() {
+  const { accessToken } = useAuth();
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [installed, setInstalled] = useState(false);
   const [installMsg, setInstallMsg] = useState("");
   const [origin, setOrigin] = useState("https://owlie.eduk12-scale.workers.dev");
+  const [pushState, setPushState] = useState<"default" | "granted" | "denied" | "unsupported">("default");
+  const [pushMsg, setPushMsg] = useState("");
 
   useEffect(() => {
     if (typeof window !== "undefined") {
       setOrigin(window.location.origin);
       if (window.matchMedia("(display-mode: standalone)").matches) {
         setInstalled(true);
+      }
+      if (!("Notification" in window)) {
+        setPushState("unsupported");
+      } else {
+        setPushState(Notification.permission as "default" | "granted" | "denied");
       }
     }
 
@@ -67,6 +79,48 @@ export default function DownloadAppPage() {
         "Trên Chrome Android: bấm dấu 3 chấm (⋮) góc trên phải → chọn 'Cài đặt ứng dụng' hoặc 'Thêm vào màn hình chính' là xong trong 3 giây!"
       );
     }
+  };
+
+  const handleEnablePush = async () => {
+    if (typeof window === "undefined" || !("Notification" in window)) {
+      setPushMsg("Trình duyệt hiện tại chưa hỗ trợ Thông báo Đẩy.");
+      return;
+    }
+    const perm = await Notification.requestPermission();
+    setPushState(perm as "default" | "granted" | "denied");
+    if (perm !== "granted") {
+      setPushMsg("Bạn đã từ chối quyền thông báo. Có thể bật lại trong phần Cài đặt trang web trên trình duyệt.");
+      return;
+    }
+
+    if (accessToken) {
+      await fetch(`${CORE_API_URL}/api/v1/push/subscribe`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          device_label: navigator.userAgent.slice(0, 80),
+          platform: /android/i.test(navigator.userAgent)
+            ? "android-pwa"
+            : /iphone|ipad/i.test(navigator.userAgent)
+              ? "ios-pwa"
+              : "desktop-web",
+        }),
+      }).catch(() => {});
+    }
+
+    if ("serviceWorker" in navigator) {
+      const reg = await navigator.serviceWorker.ready.catch(() => null);
+      reg?.active?.postMessage({
+        type: "SHOW_NOTIFICATION",
+        title: "🦉 Owlie Edu — Đã bật Thông báo Đẩy!",
+        body: "Bạn sẽ nhận ngay thông báo lịch mở phòng thi, điểm số mới, tin nhắn thầy cô và lớp Live.",
+        link: "/tai-app",
+      });
+    }
+    setPushMsg("Đã bật Thông báo Đẩy thành công! Hãy kiểm tra thông báo chào mừng vừa hiện trên thiết bị.");
   };
 
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
@@ -282,13 +336,73 @@ export default function DownloadAppPage() {
 
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4 text-xs text-slate-500">
           <span>
-            Bản tải trực tiếp dùng thử miễn phí 100% — bản chính thức trên <strong>CH Play &amp; App Store</strong> sẽ được cập nhật sớm!
+            Bản tải trực tiếp dùng thử miễn phí 100% — đầy đủ tiêu chuẩn phát hành lên <strong>CH Play &amp; Apple App Store</strong>!
           </span>
           <Link href="/dang-nhap" className="font-bold text-indigo-600 hover:underline">
             Đăng nhập tài khoản học sinh →
           </Link>
         </div>
       </section>
+
+      {/* Khối Thông báo Đẩy (Push Notification) & Tiêu chuẩn Lên Store (#13) */}
+      <div className="grid gap-6 md:grid-cols-2">
+        <section className="rounded-2xl border border-amber-200 bg-amber-50/50 p-6 shadow-xs space-y-3.5">
+          <div className="flex items-center justify-between">
+            <h2 className="flex items-center gap-2 text-base font-extrabold text-slate-900">
+              <BellRing className="h-5 w-5 text-amber-600" /> Thông báo Đẩy (Push Notification)
+            </h2>
+            <span
+              className={`rounded-full px-2.5 py-0.5 text-[10px] font-extrabold ${
+                pushState === "granted"
+                  ? "bg-emerald-100 text-emerald-700"
+                  : "bg-amber-100 text-amber-800"
+              }`}
+            >
+              {pushState === "granted" ? "ĐANG BẬT" : "CHƯA BẬT"}
+            </span>
+          </div>
+          <p className="text-xs leading-relaxed text-slate-600">
+            Nhận thông báo tức thì trên màn hình khóa điện thoại hoặc máy tính khi thầy cô mở Lớp Live, Admin mở kỳ thi thử, có tin nhắn mới hoặc điểm chấm bài.
+          </p>
+          <button
+            type="button"
+            onClick={() => void handleEnablePush()}
+            className="inline-flex items-center gap-2 rounded-xl bg-amber-500 px-5 py-2.5 text-xs font-extrabold text-slate-950 shadow hover:bg-amber-400 transition"
+          >
+            <BellRing className="h-4 w-4" />
+            {pushState === "granted" ? "Gửi thử Thông báo Đẩy ngay" : "Bật Thông báo Đẩy trên thiết bị này"}
+          </button>
+          {pushMsg && (
+            <p className="rounded-xl bg-white px-3.5 py-2 text-[11px] font-bold text-emerald-800 ring-1 ring-emerald-200">
+              {pushMsg}
+            </p>
+          )}
+        </section>
+
+        <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs space-y-3">
+          <h2 className="flex items-center gap-2 text-base font-extrabold text-slate-900">
+            <Store className="h-5 w-5 text-indigo-600" /> Tiêu chuẩn Sẵn sàng lên CH Play &amp; App Store
+          </h2>
+          <ul className="space-y-2 text-xs text-slate-700">
+            <li className="flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" />
+              <span>Đóng gói tự động file Android (.APK) qua GitHub Actions Capacitor</span>
+            </li>
+            <li className="flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" />
+              <span>Trang Chính sách Bảo mật (/chinh-sach-bao-mat) &amp; Điều khoản (/dieu-khoan)</span>
+            </li>
+            <li className="flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" />
+              <span>Tính năng Tự xóa tài khoản chuẩn Apple 5.1.1(v) &amp; Google Play Data Safety</span>
+            </li>
+            <li className="flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" />
+              <span>Service Worker Push Notification + Adaptive App Icons chú cú Owlie</span>
+            </li>
+          </ul>
+        </section>
+      </div>
     </div>
   );
 }

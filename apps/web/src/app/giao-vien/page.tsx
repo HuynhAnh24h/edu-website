@@ -50,6 +50,10 @@ interface TeacherProfilePayload {
     course_count: number;
     avg_rating: number;
     review_count: number;
+    total_clones?: number;
+    reputation_score?: number;
+    reputation_tier?: string;
+    reputation_label?: string;
     is_following: boolean;
   };
   posts: {
@@ -336,6 +340,12 @@ function TeacherProfileInner() {
                   ) : (
                     <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-[11px] font-bold text-slate-500">
                       {teacher.verification_status === "pending" ? "Đang chờ duyệt Tích xanh" : "Chưa xác minh Tích xanh"}
+                    </span>
+                  )}
+                  {stats.reputation_label && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-extrabold text-amber-800 ring-1 ring-amber-200">
+                      <Award className="h-3.5 w-3.5 text-amber-500" />
+                      {stats.reputation_label} ({stats.reputation_score ?? 0} điểm uy tín)
                     </span>
                   )}
                 </div>

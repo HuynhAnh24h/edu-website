@@ -16,6 +16,7 @@ import { handleSafetyAndChatRoutes } from "./safety";
 import { handleCourseRoutes } from "./courses";
 import { handleTeachersAndFilesRoutes } from "./teachers-files";
 import { handlePortfolioAndParentRoutes } from "./portfolio-parent";
+import { handleAdminOpsAndPushRoutes, recordAuditLog, runFullDatabaseBackup } from "./admin-ops";
 import { pushRealtimeEvent, RealtimeHub } from "./realtime";
 
 export { RealtimeHub };
@@ -32,6 +33,8 @@ export interface Env {
   GOOGLE_CLIENT_SECRET?: string;
   FACEBOOK_APP_ID?: string;
   FACEBOOK_APP_SECRET?: string;
+  RESEND_API_KEY?: string;
+  FROM_EMAIL?: string;
 }
 
 interface QuestionRow {
@@ -304,6 +307,29 @@ export default {
         forwardUrl.searchParams.set("name", claims?.name || "Khách");
         forwardUrl.searchParams.set("role", claims?.role || "guest");
         return stub.fetch(new Request(forwardUrl.toString(), request));
+      }
+
+      // === NHẬT KÝ QUẢN TRỊ, SAO LƯU TỰ ĐỘNG, QUÊN MẬT KHẨU EMAIL, TÊN MIỀN & PUSH (#11, #12, #13) ===
+      if (
+        path === "/api/v1/auth/forgot-password" ||
+        path === "/api/v1/auth/reset-password" ||
+        path.startsWith("/api/v1/push") ||
+        path.startsWith("/api/v1/admin/push") ||
+        path.startsWith("/api/v1/admin/audit-logs") ||
+        path.startsWith("/api/v1/admin/backups") ||
+        path.startsWith("/api/v1/admin/domain-email-config")
+      ) {
+        const claims = await getClaims(request, env);
+        const opsResp = await handleAdminOpsAndPushRoutes(
+          request,
+          env,
+          path,
+          method,
+          claims,
+          jsonRes,
+          CORS_HEADERS
+        );
+        if (opsResp) return opsResp;
       }
 
       // === HỒ SƠ GIÁO VIÊN TÍCH XANH & UPLOAD TỆP HỌC LIỆU THẬT (R2 10GB FREE / KV) ===
@@ -784,6 +810,16 @@ function gradeToLevel(gradeId: number): "primary" | "middle" | "high" {
           level,
           is_unlocked: nextUnlocked === 1,
         });
+        await recordAuditLog(
+          env.DB,
+          claims,
+          nextUnlocked === 1 ? "unlock_exam_level" : "lock_exam_level",
+          "exam_level",
+          level,
+          `${nextUnlocked === 1 ? "Mở khóa" : "Khóa tạm thời"} kỳ thi ${String(current.label)}`,
+          { announcement: nextAnnouncement },
+          request
+        );
 
         return jsonRes({
           ok: true,
@@ -1349,6 +1385,16 @@ function gradeToLevel(gradeId: number): "primary" | "middle" | "high" {
           if (claims.role !== "super_admin") return jsonRes({ error: "Chỉ Super Admin" }, 403);
           const b = (await request.json()) as { role?: string };
           await env.DB.prepare("UPDATE users SET role = ? WHERE id = ?").bind(b.role || "student", roleMatch[1]).run();
+          await recordAuditLog(
+            env.DB,
+            claims,
+            "update_user_role",
+            "user",
+            roleMatch[1],
+            `Thay đổi quyền tài khoản ${roleMatch[1]} thành ${b.role || "student"}`,
+            { new_role: b.role || "student" },
+            request
+          );
           return jsonRes({ status: "updated" });
         }
       }
@@ -1495,5 +1541,24 @@ function gradeToLevel(gradeId: number): "primary" | "middle" | "high" {
     } catch (err) {
       return jsonRes({ error: err instanceof Error ? err.message : "Lỗi máy chủ Edge" }, 500);
     }
+  },
+
+  // Sao lưu dữ liệu tự động hàng ngày qua Cloudflare Cron Trigger (02:00 sáng VN = 19:00 UTC)
+  async scheduled(_controller: ScheduledController, env: Env, ctx: ExecutionContext): Promise<void> {
+    ctx.waitUntil(
+      (async () => {
+        await ensureSeeded(env.DB);
+        const backup = await runFullDatabaseBackup(env.DB, env.EDU_KV, "cron_daily", "Cloudflare Cron Tự động");
+        await recordAuditLog(
+          env.DB,
+          null,
+          "cron_daily_backup",
+          "system_backup",
+          backup.backup_code,
+          `Sao lưu tự động hàng ngày thành công (${backup.backup_code} — ${Math.round(backup.size_bytes / 1024)} KB)`,
+          backup.tables_summary
+        );
+      })()
+    );
   },
 } satisfies ExportedHandler<Env>;

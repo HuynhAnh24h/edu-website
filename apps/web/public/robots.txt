@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /quan-tri/
+
+Sitemap: https://owlie.eduk12-scale.workers.dev/sitemap.xml

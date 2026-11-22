@@ -1,4 +1,4 @@
-import { bindings, defineConfig, exports } from "cf/config";
+import { bindings, defineConfig, exports, triggers } from "cf/config";
 
 export default defineConfig({
   accountId: "90c67c01376ba41cb059c6fa7cb9d70e",
@@ -20,6 +20,7 @@ export default defineConfig({
     exports: {
       RealtimeHub: exports.durableObject({ storage: "sqlite" }),
     },
+    triggers: [triggers.scheduled({ schedule: "0 19 * * *" })],
     env: {
       DB: bindings.d1({ name: "eduk12-db" }),
       EDU_KV: bindings.kv({ id: "2b8ecb1e3b5e4467a54ca879fa921af0" }),

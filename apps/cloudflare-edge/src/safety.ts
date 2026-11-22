@@ -1090,7 +1090,7 @@ export async function handleSafetyAndChatRoutes(
     if (!inc) return jsonRes({ error: "Không tìm thấy hồ sơ vi phạm" }, 404);
 
     const body = (await request.json().catch(() => ({}))) as {
-      action?: "warn" | "remove_lesson" | "revoke_impersonator" | "notify_and_lock" | "escalate_police" | "dismiss";
+      action?: "warn" | "remove_lesson" | "revoke_impersonator" | "notify_and_lock" | "escalate_police" | "unlock_account" | "dismiss";
       admin_note?: string;
     };
     const action = body.action || "warn";

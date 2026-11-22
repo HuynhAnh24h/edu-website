@@ -2,6 +2,7 @@ import { JwtClaims } from "./crypto";
 import { SUBJECT_NAMES } from "./seed";
 import { createSafetyIncident, notifyUser, scanContentWithHybridAI } from "./safety";
 import { pushRealtimeEvent } from "./realtime";
+import { computeTeacherReputation } from "./admin-ops";
 
 type JsonFn = (data: unknown, status?: number, extraHeaders?: Record<string, string>) => Response;
 
@@ -87,43 +88,97 @@ export async function handleSocialRoutes(
         specialty: string;
       }>();
 
-    const [postCounts, followerCounts, classCounts, myFollows] = await Promise.all([
-      db
-        .prepare("SELECT author_id, COUNT(*) as cnt FROM teacher_posts WHERE status = 'published' GROUP BY author_id")
-        .all<{ author_id: string; cnt: number }>(),
-      db
-        .prepare("SELECT teacher_id, COUNT(*) as cnt FROM teacher_follows GROUP BY teacher_id")
-        .all<{ teacher_id: string; cnt: number }>(),
-      db
-        .prepare("SELECT teacher_id, COUNT(*) as cnt FROM classrooms GROUP BY teacher_id")
-        .all<{ teacher_id: string; cnt: number }>(),
-      claims
-        ? db
-            .prepare("SELECT teacher_id FROM teacher_follows WHERE follower_id = ?")
-            .bind(claims.uid)
-            .all<{ teacher_id: string }>()
-        : Promise.resolve({ results: [] as { teacher_id: string }[] }),
-    ]);
+    const [postCounts, followerCounts, classCounts, likesByAuthor, clonesByAuthor, courseRatings, safetyPenalties, myFollows] =
+      await Promise.all([
+        db
+          .prepare("SELECT author_id, COUNT(*) as cnt FROM teacher_posts WHERE status = 'published' GROUP BY author_id")
+          .all<{ author_id: string; cnt: number }>(),
+        db
+          .prepare("SELECT teacher_id, COUNT(*) as cnt FROM teacher_follows GROUP BY teacher_id")
+          .all<{ teacher_id: string; cnt: number }>(),
+        db
+          .prepare("SELECT teacher_id, COUNT(*) as cnt FROM classrooms GROUP BY teacher_id")
+          .all<{ teacher_id: string; cnt: number }>(),
+        db
+          .prepare(
+            `SELECT p.author_id, COUNT(*) as cnt
+             FROM teacher_post_likes l JOIN teacher_posts p ON p.id = l.post_id
+             GROUP BY p.author_id`
+          )
+          .all<{ author_id: string; cnt: number }>(),
+        db
+          .prepare(
+            `SELECT p.author_id, COUNT(*) as cnt
+             FROM teacher_post_clones cl JOIN teacher_posts p ON p.id = cl.post_id
+             GROUP BY p.author_id`
+          )
+          .all<{ author_id: string; cnt: number }>(),
+        db
+          .prepare(
+            `SELECT c.teacher_id, AVG(r.rating) as avg_r, COUNT(*) as cnt
+             FROM course_reviews r JOIN courses c ON c.id = r.course_id
+             GROUP BY c.teacher_id`
+          )
+          .all<{ teacher_id: string; avg_r: number; cnt: number }>(),
+        db
+          .prepare(
+            "SELECT suspect_user_id, COUNT(*) as cnt FROM safety_incidents WHERE status IN ('warned', 'locked', 'escalated_police') GROUP BY suspect_user_id"
+          )
+          .all<{ suspect_user_id: string; cnt: number }>(),
+        claims
+          ? db
+              .prepare("SELECT teacher_id FROM teacher_follows WHERE follower_id = ?")
+              .bind(claims.uid)
+              .all<{ teacher_id: string }>()
+          : Promise.resolve({ results: [] as { teacher_id: string }[] }),
+      ]);
 
     const pMap = new Map(postCounts.results.map((r) => [r.author_id, r.cnt]));
     const fMap = new Map(followerCounts.results.map((r) => [r.teacher_id, r.cnt]));
     const cMap = new Map(classCounts.results.map((r) => [r.teacher_id, r.cnt]));
+    const lMap = new Map(likesByAuthor.results.map((r) => [r.author_id, r.cnt]));
+    const clMap = new Map(clonesByAuthor.results.map((r) => [r.author_id, r.cnt]));
+    const rMap = new Map(courseRatings.results.map((r) => [r.teacher_id, { avg: Number(r.avg_r || 0), cnt: Number(r.cnt || 0) }]));
+    const penMap = new Map(safetyPenalties.results.map((r) => [r.suspect_user_id, r.cnt]));
     const followingSet = new Set(myFollows.results.map((r) => r.teacher_id));
 
     const teachers = users.results
-      .map((u) => ({
-        id: u.id,
-        full_name: u.full_name,
-        role: u.role,
-        school_name: u.school_name || "Cộng đồng EduK12",
-        specialty: u.specialty || "",
-        is_verified: Number(u.is_verified || 0) === 1,
-        post_count: pMap.get(u.id) || 0,
-        follower_count: fMap.get(u.id) || 0,
-        classroom_count: cMap.get(u.id) || 0,
-        is_following: followingSet.has(u.id),
-      }))
-      .sort((a, b) => b.post_count + b.follower_count - (a.post_count + a.follower_count));
+      .map((u) => {
+        const verified = Number(u.is_verified || 0) === 1;
+        const postCount = pMap.get(u.id) || 0;
+        const followerCount = fMap.get(u.id) || 0;
+        const likesReceived = lMap.get(u.id) || 0;
+        const clonesReceived = clMap.get(u.id) || 0;
+        const ratingInfo = rMap.get(u.id) || { avg: 0, cnt: 0 };
+        const rep = computeTeacherReputation({
+          is_verified: verified,
+          post_count: postCount,
+          likes_received: likesReceived,
+          clones_received: clonesReceived,
+          follower_count: followerCount,
+          avg_rating: ratingInfo.avg,
+          review_count: ratingInfo.cnt,
+          safety_penalties: penMap.get(u.id) || 0,
+        });
+        return {
+          id: u.id,
+          full_name: u.full_name,
+          role: u.role,
+          school_name: u.school_name || "Cộng đồng Owlie Edu",
+          specialty: u.specialty || "",
+          is_verified: verified,
+          post_count: postCount,
+          follower_count: followerCount,
+          classroom_count: cMap.get(u.id) || 0,
+          total_clones: clonesReceived,
+          avg_course_rating: Math.round(ratingInfo.avg * 10) / 10,
+          reputation_score: rep.score,
+          reputation_tier: rep.tier,
+          reputation_label: rep.label,
+          is_following: followingSet.has(u.id),
+        };
+      })
+      .sort((a, b) => b.reputation_score - a.reputation_score);
 
     return jsonRes({ teachers });
   }
@@ -251,10 +306,25 @@ export async function handleSocialRoutes(
       commentsByPost.set(c.post_id, list);
     }
 
+    const sortMode = url.searchParams.get("sort") || "top";
+
     const posts = filtered.map((p) => {
       const id = String(p.id);
       const authorId = String(p.author_id);
       const cmts = commentsByPost.get(id) || [];
+      const likesCnt = likeMap.get(id) || 0;
+      const clonesCnt = cloneMap.get(id) || 0;
+      const verified = Number(p.author_verified || 0) === 1;
+      const hasAttachment = Boolean(String(p.attachment_url || "").trim());
+      const pinned = Number(p.is_pinned || 0) === 1;
+      const qualityScore =
+        (verified ? 40 : 0) +
+        likesCnt * 3 +
+        clonesCnt * 10 +
+        cmts.length * 2 +
+        (hasAttachment ? 15 : 0) +
+        (pinned ? 200 : 0);
+
       let tags: string[] = [];
       try {
         tags = JSON.parse(String(p.tags_json || "[]"));
@@ -267,7 +337,7 @@ export async function handleSocialRoutes(
         author_name: String(p.author_name),
         author_role: String(p.author_role || "teacher"),
         author_school: String(p.author_school || ""),
-        author_verified: Number(p.author_verified || 0) === 1,
+        author_verified: verified,
         category: String(p.category || "lesson_share"),
         grade_id: Number(p.grade_id || 0),
         subject_code: String(p.subject_code || "chung"),
@@ -277,18 +347,24 @@ export async function handleSocialRoutes(
         attachment_label: String(p.attachment_label || ""),
         attachment_url: String(p.attachment_url || ""),
         tags,
-        is_pinned: Number(p.is_pinned || 0) === 1,
+        is_pinned: pinned,
         status: String(p.status || "published"),
         created_at: String(p.created_at),
-        likes_count: likeMap.get(id) || 0,
+        likes_count: likesCnt,
         comments_count: cmts.length,
-        clones_count: cloneMap.get(id) || 0,
+        clones_count: clonesCnt,
+        quality_score: qualityScore,
+        is_featured_lesson: qualityScore >= 55 && (p.category === "lesson_share" || p.category === "exam_share"),
         liked_by_me: myLikeSet.has(id),
         saved_by_me: mySaveSet.has(id),
         following_author: myFollowSet.has(authorId),
         comments: cmts.slice(-5),
       };
     });
+
+    if (sortMode === "top") {
+      posts.sort((a, b) => Number(b.is_pinned) - Number(a.is_pinned) || b.quality_score - a.quality_score);
+    }
 
     return jsonRes({ posts });
   }

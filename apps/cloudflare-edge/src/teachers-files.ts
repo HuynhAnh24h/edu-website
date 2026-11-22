@@ -1,6 +1,7 @@
 import { JwtClaims } from "./crypto";
 import { notifyAdmins, notifyUser } from "./safety";
 import { pushRealtimeEvent } from "./realtime";
+import { computeTeacherReputation, recordAuditLog } from "./admin-ops";
 
 type JsonFn = (data: unknown, status?: number, extraHeaders?: Record<string, string>) => Response;
 
@@ -126,6 +127,7 @@ export async function handleTeachersAndFilesRoutes(
       kv.delete(`file:${fileId}`).catch(() => {}),
       db.prepare("DELETE FROM uploaded_files WHERE id = ?").bind(fileId).run(),
     ]);
+    await recordAuditLog(db, claims, "delete_file", "uploaded_file", fileId, `Xóa tệp lưu trữ ${fileId}`, {}, request);
     return jsonRes({ ok: true, message: "Đã xóa tệp và giải phóng dung lượng kho tài liệu!" });
   }
 
@@ -294,7 +296,7 @@ export async function handleTeachersAndFilesRoutes(
       }>();
     if (!u) return jsonRes({ error: "Không tìm thấy hồ sơ giáo viên" }, 404);
 
-    const [tp, followersCnt, isFollowingRow, postsRes, coursesRes, reviewsRes] = await Promise.all([
+    const [tp, followersCnt, isFollowingRow, postsRes, coursesRes, reviewsRes, likesCntRow, clonesCntRow] = await Promise.all([
       db.prepare("SELECT * FROM teacher_profiles WHERE user_id = ?").bind(teacherId).first<Record<string, unknown>>(),
       db
         .prepare("SELECT COUNT(*) as cnt FROM teacher_follows WHERE teacher_id = ?")
@@ -325,6 +327,14 @@ export async function handleTeachersAndFilesRoutes(
         )
         .bind(teacherId)
         .all<Record<string, unknown>>(),
+      db
+        .prepare("SELECT COUNT(*) as cnt FROM teacher_post_likes l JOIN teacher_posts p ON p.id = l.post_id WHERE p.author_id = ?")
+        .bind(teacherId)
+        .first<{ cnt: number }>(),
+      db
+        .prepare("SELECT COUNT(*) as cnt FROM teacher_post_clones cl JOIN teacher_posts p ON p.id = cl.post_id WHERE p.author_id = ?")
+        .bind(teacherId)
+        .first<{ cnt: number }>(),
     ]);
 
     const reviewList = reviewsRes.results;
@@ -333,6 +343,16 @@ export async function handleTeachersAndFilesRoutes(
         ? Math.round((reviewList.reduce((acc, r) => acc + Number(r.rating || 0), 0) / reviewList.length) * 10) / 10
         : 0;
 
+    const reputation = computeTeacherReputation({
+      is_verified: Number(tp?.is_verified || 0) === 1,
+      post_count: postsRes.results.length,
+      likes_received: Number(likesCntRow?.cnt || 0),
+      clones_received: Number(clonesCntRow?.cnt || 0),
+      follower_count: followersCnt?.cnt || 0,
+      avg_rating: avgRating,
+      review_count: reviewList.length,
+    });
+
     const isOwnerOrAdmin = claims && (claims.uid === teacherId || isAdminRole(claims.role));
 
     return jsonRes({
@@ -340,13 +360,13 @@ export async function handleTeachersAndFilesRoutes(
         id: u.id,
         full_name: u.full_name,
         role: u.role,
-        school_name: u.school_name || "Cộng đồng EduK12 Open",
+        school_name: u.school_name || "Cộng đồng Owlie Edu",
         created_at: u.created_at,
         is_active: Number(u.is_active ?? 1) === 1,
         is_verified: Number(tp?.is_verified || 0) === 1,
         verification_status: String(tp?.verification_status || "none"),
         specialty: String(tp?.specialty || "Giáo dục Phổ thông & Cộng đồng"),
-        bio: String(tp?.bio || "Giáo viên cộng đồng chia sẻ kiến thức miễn phí trên EduK12 Open."),
+        bio: String(tp?.bio || "Giáo viên cộng đồng chia sẻ kiến thức miễn phí trên Owlie Edu."),
         years_exp: Number(tp?.years_exp || 1),
         verified_at: tp?.verified_at ? String(tp.verified_at) : null,
         admin_review_note: isOwnerOrAdmin ? String(tp?.admin_review_note || "") : "",
@@ -358,6 +378,10 @@ export async function handleTeachersAndFilesRoutes(
         course_count: coursesRes.results.length,
         avg_rating: avgRating,
         review_count: reviewList.length,
+        total_clones: Number(clonesCntRow?.cnt || 0),
+        reputation_score: reputation.score,
+        reputation_tier: reputation.tier,
+        reputation_label: reputation.label,
         is_following: Boolean(isFollowingRow),
       },
       posts: postsRes.results.map((p) => {

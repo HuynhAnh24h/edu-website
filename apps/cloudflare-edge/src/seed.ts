@@ -75,6 +75,11 @@ export async function ensureSeeded(db: D1Database): Promise<void> {
     db.prepare(`CREATE TABLE IF NOT EXISTS parent_student_links (parent_id TEXT NOT NULL, student_id TEXT NOT NULL, relation_label TEXT DEFAULT 'Phụ huynh', linked_at TEXT NOT NULL DEFAULT (datetime('now')), PRIMARY KEY (parent_id, student_id))`),
     db.prepare(`CREATE TABLE IF NOT EXISTS student_link_codes (student_id TEXT PRIMARY KEY, link_code TEXT UNIQUE NOT NULL, created_at TEXT NOT NULL DEFAULT (datetime('now')))`),
     db.prepare(`CREATE TABLE IF NOT EXISTS teacher_post_clones (post_id TEXT NOT NULL, teacher_id TEXT NOT NULL, classroom_id TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT (datetime('now')), PRIMARY KEY (post_id, classroom_id))`),
+    db.prepare(`CREATE TABLE IF NOT EXISTS admin_audit_logs (id TEXT PRIMARY KEY, actor_id TEXT NOT NULL, actor_name TEXT NOT NULL, actor_email TEXT DEFAULT '', actor_role TEXT DEFAULT 'admin', action TEXT NOT NULL, target_type TEXT DEFAULT '', target_id TEXT DEFAULT '', summary TEXT NOT NULL, metadata_json TEXT DEFAULT '{}', ip_address TEXT DEFAULT '', created_at TEXT NOT NULL DEFAULT (datetime('now')))`),
+    db.prepare(`CREATE TABLE IF NOT EXISTS system_backups (id TEXT PRIMARY KEY, backup_code TEXT UNIQUE NOT NULL, trigger_type TEXT NOT NULL DEFAULT 'manual', actor_name TEXT NOT NULL, tables_summary_json TEXT NOT NULL DEFAULT '{}', size_bytes INTEGER NOT NULL DEFAULT 0, kv_key TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT (datetime('now')))`),
+    db.prepare(`CREATE TABLE IF NOT EXISTS password_reset_tokens (token TEXT PRIMARY KEY, user_id TEXT NOT NULL, email TEXT NOT NULL, code_6 TEXT NOT NULL, expires_at TEXT NOT NULL, used_at TEXT, created_at TEXT NOT NULL DEFAULT (datetime('now')))`),
+    db.prepare(`CREATE TABLE IF NOT EXISTS site_settings (key TEXT PRIMARY KEY, value TEXT NOT NULL, updated_by TEXT DEFAULT '', updated_at TEXT NOT NULL DEFAULT (datetime('now')))`),
+    db.prepare(`CREATE TABLE IF NOT EXISTS push_subscriptions (id TEXT PRIMARY KEY, user_id TEXT NOT NULL, endpoint TEXT NOT NULL, device_label TEXT DEFAULT '', platform TEXT DEFAULT 'web-pwa', permission_status TEXT NOT NULL DEFAULT 'granted', created_at TEXT NOT NULL DEFAULT (datetime('now')), updated_at TEXT NOT NULL DEFAULT (datetime('now')))`),
   ]);
 
   // Nâng cấp cột đính kèm tệp cho direct_messages an toàn nếu bảng cũ chưa có

@@ -82,6 +82,16 @@ function AuthPageInner() {
   const [twoFaTempToken, setTwoFaTempToken] = useState("");
   const [twoFaCode, setTwoFaCode] = useState("");
 
+  // Quên mật khẩu qua Email (#12)
+  const [forgotOpen, setForgotOpen] = useState(false);
+  const [forgotStep, setForgotStep] = useState<"email" | "reset">("email");
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [resetCode, setResetCode] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [forgotMsg, setForgotMsg] = useState("");
+  const [forgotErr, setForgotErr] = useState("");
+  const [forgotBusy, setForgotBusy] = useState(false);
+
   // OAuth Provider Config
   const [providers, setProviders] = useState<OAuthProvidersState | null>(null);
 
@@ -271,6 +281,58 @@ function AuthPageInner() {
       setInfo("Đã tắt bảo mật 2 lớp (2FA).");
     } else {
       setError(d.error || "Mã 2FA chưa chính xác");
+    }
+  };
+
+  const handleRequestPasswordReset = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setForgotErr("");
+    setForgotMsg("");
+    setForgotBusy(true);
+    try {
+      const res = await fetch(`${CORE_API_URL}/api/v1/auth/forgot-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: forgotEmail }),
+      });
+      const d = await res.json();
+      if (!res.ok) {
+        setForgotErr(d.error || "Không thể gửi mã khôi phục");
+      } else {
+        setForgotMsg(d.message || "Đã gửi mã xác nhận 6 chữ số tới Email của bạn!");
+        if (d.demo_code) setResetCode(String(d.demo_code));
+        setForgotStep("reset");
+      }
+    } finally {
+      setForgotBusy(false);
+    }
+  };
+
+  const handleConfirmPasswordReset = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setForgotErr("");
+    setForgotMsg("");
+    setForgotBusy(true);
+    try {
+      const res = await fetch(`${CORE_API_URL}/api/v1/auth/reset-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: forgotEmail, code: resetCode, new_password: newPassword }),
+      });
+      const d = await res.json();
+      if (!res.ok) {
+        setForgotErr(d.error || "Đặt lại mật khẩu chưa thành công");
+      } else {
+        setEmail(forgotEmail);
+        setPassword(newPassword);
+        setForgotOpen(false);
+        setForgotStep("email");
+        setResetCode("");
+        setNewPassword("");
+        setInfo(d.message || "Đã đổi mật khẩu thành công! Bạn có thể bấm Đăng nhập ngay.");
+      }
+    } finally {
+      setForgotBusy(false);
     }
   };
 
@@ -678,7 +740,23 @@ function AuthPageInner() {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700">Mật khẩu</label>
+            <div className="flex items-center justify-between">
+              <label className="block text-xs font-semibold text-slate-700">Mật khẩu</label>
+              {tab === "login" && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setForgotOpen((v) => !v);
+                    setForgotEmail(email);
+                    setForgotErr("");
+                    setForgotMsg("");
+                  }}
+                  className="text-[11px] font-bold text-indigo-600 hover:underline"
+                >
+                  Quên mật khẩu?
+                </button>
+              )}
+            </div>
             <input
               type="password"
               required
@@ -687,6 +765,12 @@ function AuthPageInner() {
               className="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm focus:border-indigo-500 focus:outline-none"
             />
           </div>
+
+          {info && (
+            <p className="rounded-xl bg-emerald-50 px-3.5 py-2.5 text-xs font-semibold text-emerald-800">
+              {info}
+            </p>
+          )}
 
           {error && (
             <p className="rounded-xl bg-rose-50 px-3.5 py-2.5 text-xs font-semibold text-rose-700">
@@ -706,6 +790,88 @@ function AuthPageInner() {
                 : "Hoàn tất đăng ký miễn phí"}
           </button>
         </form>
+
+        {/* Khối Quên mật khẩu qua Email (#12) */}
+        {forgotOpen && (
+          <div className="rounded-2xl border border-indigo-200 bg-indigo-50/50 p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-extrabold text-indigo-900">Khôi phục Mật khẩu qua Email (OTP 6 số)</p>
+              <button
+                type="button"
+                onClick={() => setForgotOpen(false)}
+                className="text-[11px] font-bold text-slate-400 hover:text-slate-700"
+              >
+                Đóng
+              </button>
+            </div>
+
+            {forgotMsg && (
+              <p className="rounded-xl bg-emerald-50 px-3 py-2 text-[11px] font-bold text-emerald-800 ring-1 ring-emerald-200">
+                {forgotMsg}
+              </p>
+            )}
+            {forgotErr && (
+              <p className="rounded-xl bg-rose-50 px-3 py-2 text-[11px] font-bold text-rose-700 ring-1 ring-rose-200">
+                {forgotErr}
+              </p>
+            )}
+
+            {forgotStep === "email" ? (
+              <form onSubmit={handleRequestPasswordReset} className="space-y-2.5">
+                <input
+                  type="email"
+                  required
+                  value={forgotEmail}
+                  onChange={(e) => setForgotEmail(e.target.value)}
+                  placeholder="Nhập Email tài khoản của bạn..."
+                  className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs"
+                />
+                <button
+                  type="submit"
+                  disabled={forgotBusy}
+                  className="rounded-xl bg-indigo-600 px-4 py-2 text-xs font-bold text-white hover:bg-indigo-500 disabled:opacity-50"
+                >
+                  {forgotBusy ? "Đang gửi mã..." : "Gửi mã xác nhận 6 số"}
+                </button>
+              </form>
+            ) : (
+              <form onSubmit={handleConfirmPasswordReset} className="space-y-2.5">
+                <input
+                  required
+                  value={resetCode}
+                  onChange={(e) => setResetCode(e.target.value)}
+                  placeholder="Nhập mã xác nhận 6 chữ số"
+                  className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 font-mono text-xs font-bold"
+                />
+                <input
+                  type="password"
+                  required
+                  minLength={6}
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Nhập mật khẩu mới (>= 6 ký tự)"
+                  className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs"
+                />
+                <div className="flex gap-2">
+                  <button
+                    type="submit"
+                    disabled={forgotBusy}
+                    className="rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white hover:bg-emerald-500 disabled:opacity-50"
+                  >
+                    {forgotBusy ? "Đang cập nhật..." : "Đặt lại Mật khẩu mới"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setForgotStep("email")}
+                    className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-600"
+                  >
+                    Gửi lại mã
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Tài khoản Demo test nhanh phân quyền + 2FA */}
