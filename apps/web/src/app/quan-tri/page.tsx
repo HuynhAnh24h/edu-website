@@ -16,6 +16,7 @@ import {
   LayoutDashboard,
   Lock,
   LogOut,
+  Mail,
   Menu,
   Paperclip,
   Plus,
@@ -43,6 +44,7 @@ import { ExamLevelControlPanel } from "@/components/cms/ExamLevelControlPanel";
 import { TeacherVerificationPanel } from "@/components/cms/TeacherVerificationPanel";
 import { StorageQuotaPanel, StorageStatsPayload } from "@/components/cms/StorageQuotaPanel";
 import { AdminOpsPanel } from "@/components/cms/AdminOpsPanel";
+import { EmailMarketingPanel } from "@/components/cms/EmailMarketingPanel";
 import { CuBongLogoMark } from "@/components/BrandLogo";
 import {
   createEmptyDraftQuestion,
@@ -97,6 +99,7 @@ type DashboardTab =
   | "verifications"
   | "safety"
   | "storage"
+  | "mail"
   | "ops"
   | "community"
   | "users";
@@ -145,6 +148,10 @@ const TAB_META: Record<DashboardTab, { title: string; subtitle: string }> = {
   storage: {
     title: "Kho Lưu trữ & Dung lượng Tài liệu",
     subtitle: "Theo dõi dung lượng thực tế (khóa trần an toàn 0đ), kiểm soát tệp đề thi PDF/Word/Ảnh và xóa giải phóng bộ nhớ.",
+  },
+  mail: {
+    title: "Host Mail & Chiến dịch Email (Khai giảng / Ưu đãi)",
+    subtitle: "Gửi email thông báo khai giảng khóa học mới, chương trình giảm giá học bổng và quản lý danh sách người đăng ký nhận tin.",
   },
   ops: {
     title: "Nhật ký Quản trị, Sao lưu & Tên miền",
@@ -645,6 +652,12 @@ export default function CMSAdminPage() {
                   ? `${storageSummary.used_mb} MB / ${storageSummary.safety_cap_gb} GB`
                   : "Theo dõi hạn mức 0đ & tệp",
                 icon: Database,
+              },
+              {
+                id: "mail" as DashboardTab,
+                label: "Host Mail & Gửi Email",
+                desc: "Khai giảng • Giảm giá • Tin tức",
+                icon: Mail,
               },
               {
                 id: "ops" as DashboardTab,
@@ -1661,6 +1674,11 @@ export default function CMSAdminPage() {
               onToast={showToast}
               onStatsLoaded={setStorageSummary}
             />
+          )}
+
+          {/* === TAB 6A2B: HOST MAIL & GỬI EMAIL CHIẾN DỊCH (KHAI GIẢNG / GIẢM GIÁ) === */}
+          {activeTab === "mail" && isAdmin && (
+            <EmailMarketingPanel accessToken={accessToken} onToast={showToast} />
           )}
 
           {/* === TAB 6A3: NHẬT KÝ QUẢN TRỊ, SAO LƯU TỰ ĐỘNG, TÊN MIỀN & PUSH === */}

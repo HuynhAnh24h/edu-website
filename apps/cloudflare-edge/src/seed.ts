@@ -80,6 +80,8 @@ export async function ensureSeeded(db: D1Database): Promise<void> {
     db.prepare(`CREATE TABLE IF NOT EXISTS password_reset_tokens (token TEXT PRIMARY KEY, user_id TEXT NOT NULL, email TEXT NOT NULL, code_6 TEXT NOT NULL, expires_at TEXT NOT NULL, used_at TEXT, created_at TEXT NOT NULL DEFAULT (datetime('now')))`),
     db.prepare(`CREATE TABLE IF NOT EXISTS site_settings (key TEXT PRIMARY KEY, value TEXT NOT NULL, updated_by TEXT DEFAULT '', updated_at TEXT NOT NULL DEFAULT (datetime('now')))`),
     db.prepare(`CREATE TABLE IF NOT EXISTS push_subscriptions (id TEXT PRIMARY KEY, user_id TEXT NOT NULL, endpoint TEXT NOT NULL, device_label TEXT DEFAULT '', platform TEXT DEFAULT 'web-pwa', permission_status TEXT NOT NULL DEFAULT 'granted', created_at TEXT NOT NULL DEFAULT (datetime('now')), updated_at TEXT NOT NULL DEFAULT (datetime('now')))`),
+    db.prepare(`CREATE TABLE IF NOT EXISTS email_campaigns (id TEXT PRIMARY KEY, title TEXT NOT NULL, subject TEXT NOT NULL, audience_role TEXT NOT NULL DEFAULT 'all', template_type TEXT NOT NULL DEFAULT 'course_launch', highlight_badge TEXT DEFAULT '', body_text TEXT NOT NULL, cta_label TEXT DEFAULT '', cta_url TEXT DEFAULT '', recipient_count INTEGER NOT NULL DEFAULT 0, sent_count INTEGER NOT NULL DEFAULT 0, failed_count INTEGER NOT NULL DEFAULT 0, provider_used TEXT NOT NULL DEFAULT 'preview', status TEXT NOT NULL DEFAULT 'sent', created_by TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT (datetime('now')))`),
+    db.prepare(`CREATE TABLE IF NOT EXISTS newsletter_subscribers (email TEXT PRIMARY KEY, full_name TEXT DEFAULT '', source TEXT DEFAULT 'footer', subscribed_at TEXT NOT NULL DEFAULT (datetime('now')))`),
   ]);
 
   // Nâng cấp cột đính kèm tệp cho direct_messages an toàn nếu bảng cũ chưa có

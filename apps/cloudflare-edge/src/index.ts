@@ -34,6 +34,7 @@ export interface Env {
   FACEBOOK_APP_ID?: string;
   FACEBOOK_APP_SECRET?: string;
   RESEND_API_KEY?: string;
+  BREVO_API_KEY?: string;
   FROM_EMAIL?: string;
 }
 
@@ -309,12 +310,14 @@ export default {
         return stub.fetch(new Request(forwardUrl.toString(), request));
       }
 
-      // === NHẬT KÝ QUẢN TRỊ, SAO LƯU TỰ ĐỘNG, QUÊN MẬT KHẨU EMAIL, TÊN MIỀN & PUSH (#11, #12, #13) ===
+      // === NHẬT KÝ QUẢN TRỊ, SAO LƯU TỰ ĐỘNG, QUÊN MẬT KHẨU EMAIL, HOST MAIL, TÊN MIỀN & PUSH ===
       if (
         path === "/api/v1/auth/forgot-password" ||
         path === "/api/v1/auth/reset-password" ||
+        path === "/api/v1/newsletter/subscribe" ||
         path.startsWith("/api/v1/push") ||
         path.startsWith("/api/v1/admin/push") ||
+        path.startsWith("/api/v1/admin/mail") ||
         path.startsWith("/api/v1/admin/audit-logs") ||
         path.startsWith("/api/v1/admin/backups") ||
         path.startsWith("/api/v1/admin/domain-email-config")

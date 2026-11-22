@@ -8,13 +8,11 @@ import {
   BookOpen,
   Check,
   CheckCircle2,
-  ChevronDown,
   Copy,
   Eye,
   EyeOff,
   GraduationCap,
   HeartHandshake,
-  KeyRound,
   Lock,
   LogIn,
   LogOut,
@@ -31,37 +29,6 @@ import {
 import { CORE_API_URL } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 import { CuBongLogoMark } from "@/components/BrandLogo";
-
-const DEMO_ACCOUNTS = [
-  {
-    role: "Học sinh",
-    desc: "Lớp 1–12, Luyện Code & Học bạ Số",
-    email: "hocsinh@eduk12.vn",
-    pass: "Student@123",
-    badge: "bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100/70",
-  },
-  {
-    role: "Giáo viên",
-    desc: "MXH Giáo viên, Lớp Live & Soạn đề",
-    email: "giaovien@eduk12.vn",
-    pass: "Teacher@123",
-    badge: "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100/70",
-  },
-  {
-    role: "Phụ huynh",
-    desc: "Theo dõi Điểm số & An toàn của Con",
-    email: "phuhuynh@eduk12.vn",
-    pass: "Parent@123",
-    badge: "bg-amber-50 text-amber-800 border-amber-200 hover:bg-amber-100/70",
-  },
-  {
-    role: "Admin",
-    desc: "Quản trị Hệ thống, Duyệt Tích xanh & An toàn",
-    email: "admin@eduk12.vn",
-    pass: "Admin@123",
-    badge: "bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100/70",
-  },
-];
 
 function getLandingRouteByRole(role?: string): string {
   if (role === "super_admin" || role === "content_admin") return "/quan-tri";
@@ -94,7 +61,6 @@ function AuthPageInner() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [info, setInfo] = useState("");
-  const [demoOpen, setDemoOpen] = useState(false);
 
   // 2FA Login Challenge State
   const [twoFaTempToken, setTwoFaTempToken] = useState("");
@@ -1023,44 +989,17 @@ function AuthPageInner() {
             )}
           </div>
 
-          {/* Mục Tài khoản Demo gập gọn ở đáy để không làm rối màn hình đăng nhập thật */}
-          <div className="border-t border-slate-100 pt-4">
-            <button
-              type="button"
-              onClick={() => setDemoOpen((v) => !v)}
-              className="flex w-full items-center justify-between rounded-xl bg-slate-50 px-3.5 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 transition"
-            >
-              <span className="inline-flex items-center gap-1.5">
-                <KeyRound className="h-3.5 w-3.5 text-indigo-500" />
-                Dùng thử nhanh Tài khoản Demo (Học sinh / Giáo viên / Phụ huynh / Admin)
-              </span>
-              <ChevronDown className={`h-4 w-4 text-slate-400 transition ${demoOpen ? "rotate-180" : ""}`} />
-            </button>
-
-            {demoOpen && (
-              <div className="mt-2.5 grid gap-2 sm:grid-cols-2">
-                {DEMO_ACCOUNTS.map((acc) => (
-                  <button
-                    key={acc.email}
-                    type="button"
-                    onClick={() => {
-                      setTab("login");
-                      setEmail(acc.email);
-                      setPassword(acc.pass);
-                      setError("");
-                    }}
-                    className={`rounded-xl border p-2.5 text-left transition ${acc.badge}`}
-                  >
-                    <p className="text-xs font-extrabold">{acc.role}</p>
-                    <p className="text-[10px] opacity-85">{acc.desc}</p>
-                    <p className="mt-1 font-mono text-[10px] font-bold opacity-90">
-                      {acc.email} / {acc.pass}
-                    </p>
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+          <p className="border-t border-slate-100 pt-4 text-center text-[11px] text-slate-400">
+            Bằng việc tiếp tục, bạn đồng ý với{" "}
+            <Link href="/dieu-khoan" className="font-semibold text-slate-600 hover:text-indigo-600 hover:underline">
+              Điều khoản sử dụng
+            </Link>{" "}
+            và{" "}
+            <Link href="/chinh-sach-bao-mat" className="font-semibold text-slate-600 hover:text-indigo-600 hover:underline">
+              Chính sách bảo mật
+            </Link>{" "}
+            của Owlie Edu.
+          </p>
         </div>
       </div>
     </div>

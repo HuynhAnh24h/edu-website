@@ -8,7 +8,143 @@ export interface OpsEnv {
   EDU_KV: KVNamespace;
   REALTIME_HUB?: DurableObjectNamespace;
   RESEND_API_KEY?: string;
+  BREVO_API_KEY?: string;
   FROM_EMAIL?: string;
+}
+
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function parseFromHeader(fromRaw: string): { name: string; email: string } {
+  const m = fromRaw.match(/^(.*)<([^>]+)>$/);
+  if (m) {
+    return { name: m[1].trim() || "Owlie Edu", email: m[2].trim() };
+  }
+  return { name: "Owlie Edu", email: fromRaw.trim() || "onboarding@resend.dev" };
+}
+
+async function sendTransactionalEmail(
+  env: OpsEnv,
+  fromRaw: string,
+  toEmail: string,
+  subject: string,
+  html: string
+): Promise<{ ok: boolean; provider: "brevo" | "resend" | "none"; error?: string }> {
+  const sender = parseFromHeader(fromRaw);
+
+  // Ưu tiên 1: Brevo (Sendinblue) — 300 email/ngày miễn phí, gửi được từ Gmail cá nhân mà chưa cần mua tên miền riêng
+  if (env.BREVO_API_KEY) {
+    try {
+      const r = await fetch("https://api.brevo.com/v3/smtp/email", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "api-key": env.BREVO_API_KEY,
+        },
+        body: JSON.stringify({
+          sender: { name: sender.name, email: sender.email },
+          to: [{ email: toEmail }],
+          subject,
+          htmlContent: html,
+        }),
+      });
+      if (r.ok) return { ok: true, provider: "brevo" };
+      const errTxt = await r.text().catch(() => "");
+      return { ok: false, provider: "brevo", error: `Brevo ${r.status}: ${errTxt.slice(0, 180)}` };
+    } catch (e) {
+      return { ok: false, provider: "brevo", error: e instanceof Error ? e.message : "Brevo network error" };
+    }
+  }
+
+  // Ưu tiên 2: Resend — 3.000 email/tháng miễn phí, siêu nhanh & chuẩn deliverability
+  if (env.RESEND_API_KEY) {
+    try {
+      const r = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${env.RESEND_API_KEY}`,
+        },
+        body: JSON.stringify({
+          from: fromRaw,
+          to: [toEmail],
+          subject,
+          html,
+        }),
+      });
+      if (r.ok) return { ok: true, provider: "resend" };
+      const errTxt = await r.text().catch(() => "");
+      return { ok: false, provider: "resend", error: `Resend ${r.status}: ${errTxt.slice(0, 180)}` };
+    } catch (e) {
+      return { ok: false, provider: "resend", error: e instanceof Error ? e.message : "Resend network error" };
+    }
+  }
+
+  return { ok: false, provider: "none", error: "Chưa gắn BREVO_API_KEY hoặc RESEND_API_KEY trên Cloudflare Worker." };
+}
+
+function buildCampaignHtml(params: {
+  templateType: string;
+  title: string;
+  highlightBadge: string;
+  bodyText: string;
+  ctaLabel: string;
+  ctaUrl: string;
+}): string {
+  const accent =
+    params.templateType === "discount_promo"
+      ? { bg: "#e11d48", light: "#fff1f2", text: "#9f1239", label: "CHƯƠNG TRÌNH ƯU ĐÃI & HỌC BỔNG" }
+      : params.templateType === "exam_event"
+        ? { bg: "#059669", light: "#ecfdf5", text: "#065f46", label: "THÔNG BÁO KỲ THI & SỰ KIỆN" }
+        : { bg: "#4f46e5", light: "#eef2ff", text: "#3730a3", label: "KHAI GIẢNG KHÓA HỌC MỚI" };
+
+  const paragraphs = params.bodyText
+    .split(/\n+/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => `<p style="margin:0 0 12px;font-size:14px;line-height:1.65;color:#334155;">${escapeHtml(line)}</p>`)
+    .join("");
+
+  const safeUrl = params.ctaUrl.startsWith("http")
+    ? params.ctaUrl
+    : `https://owlie.eduk12-scale.workers.dev${params.ctaUrl.startsWith("/") ? "" : "/"}${params.ctaUrl}`;
+
+  return `<!DOCTYPE html>
+<html lang="vi">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:24px 12px;background:#f1f5f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;">
+  <div style="max-width:580px;margin:0 auto;background:#ffffff;border-radius:20px;overflow:hidden;border:1px solid #e2e8f0;box-shadow:0 10px 30px rgba(15,23,42,0.06);">
+    <div style="background:${accent.bg};padding:28px 32px;color:#ffffff;">
+      <div style="font-size:11px;font-weight:800;letter-spacing:1.2px;opacity:0.9;">🦉 OWLIE EDU • ${accent.label}</div>
+      <h1 style="margin:10px 0 0;font-size:22px;line-height:1.3;font-weight:900;">${escapeHtml(params.title)}</h1>
+    </div>
+    <div style="padding:28px 32px;">
+      ${
+        params.highlightBadge
+          ? `<div style="margin:0 0 18px;padding:14px 18px;border-radius:14px;background:${accent.light};border:1px dashed ${accent.bg};color:${accent.text};font-size:14px;font-weight:800;text-align:center;">✨ ${escapeHtml(params.highlightBadge)}</div>`
+          : ""
+      }
+      ${paragraphs}
+      ${
+        params.ctaLabel
+          ? `<div style="margin:24px 0 8px;text-align:center;">
+               <a href="${escapeHtml(safeUrl)}" style="display:inline-block;padding:13px 28px;border-radius:14px;background:${accent.bg};color:#ffffff;text-decoration:none;font-weight:800;font-size:14px;">${escapeHtml(params.ctaLabel)} →</a>
+             </div>`
+          : ""
+      }
+    </div>
+    <div style="padding:18px 32px;background:#f8fafc;border-top:1px solid #e2e8f0;font-size:12px;color:#64748b;text-align:center;">
+      <strong>Owlie Edu</strong> — Nền tảng Học Phổ thông 1–12, Khóa học 5★ &amp; Lập trình Cộng đồng<br/>
+      <a href="https://owlie.eduk12-scale.workers.dev" style="color:#4f46e5;text-decoration:none;">owlie.eduk12-scale.workers.dev</a>
+    </div>
+  </div>
+</body>
+</html>`;
 }
 
 function isAdminRole(role?: string): boolean {
@@ -231,53 +367,43 @@ export async function handleAdminOpsAndPushRoutes(
       .bind(token, user.id, user.email, code6, expiresIso)
       .run();
 
-    // Kiểm tra xem Admin đã gắn RESEND_API_KEY để gửi Email thật chưa
     const senderSetting = await db
       .prepare("SELECT value FROM site_settings WHERE key = 'sender_email'")
       .first<{ value: string }>();
     const fromEmail = env.FROM_EMAIL || senderSetting?.value || "Owlie Edu <onboarding@resend.dev>";
 
-    if (env.RESEND_API_KEY) {
-      try {
-        const mailRes = await fetch("https://api.resend.com/emails", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${env.RESEND_API_KEY}`,
-          },
-          body: JSON.stringify({
-            from: fromEmail,
-            to: [user.email],
-            subject: `[Owlie Edu] Mã xác nhận đặt lại mật khẩu: ${code6}`,
-            html: `
-              <div style="font-family:Arial,sans-serif;max-width:520px;margin:0 auto;padding:24px;border:1px solid #e2e8f0;border-radius:16px">
-                <h2 style="color:#4f46e5;margin:0 0 12px">🦉 Owlie Edu — Khôi phục Mật khẩu</h2>
-                <p>Xin chào <strong>${user.full_name}</strong>,</p>
-                <p>Mã xác nhận 6 chữ số để đặt lại mật khẩu của bạn là:</p>
-                <div style="font-size:32px;font-weight:900;letter-spacing:8px;color:#0f172a;background:#f1f5f9;padding:16px;text-align:center;border-radius:12px;margin:16px 0">${code6}</div>
-                <p style="font-size:13px;color:#64748b">Mã có hiệu lực trong <strong>15 phút</strong>. Nếu bạn không yêu cầu đổi mật khẩu, vui lòng bỏ qua email này.</p>
-              </div>
-            `,
-          }),
-        });
-        if (mailRes.ok) {
-          return jsonRes({
-            ok: true,
-            delivery_mode: "email_sent",
-            message: `Đã gửi mã xác nhận 6 chữ số tới hộp thư ${user.email}. Vui lòng kiểm tra Email (kể cả mục Spam/Quảng cáo).`,
-          });
-        }
-      } catch {
-        // fallback bên dưới nếu Resend lỗi mạng tạm thời
-      }
+    const resetHtml = `
+      <div style="font-family:Arial,sans-serif;max-width:520px;margin:0 auto;padding:24px;border:1px solid #e2e8f0;border-radius:16px">
+        <h2 style="color:#4f46e5;margin:0 0 12px">🦉 Owlie Edu — Khôi phục Mật khẩu</h2>
+        <p>Xin chào <strong>${escapeHtml(user.full_name)}</strong>,</p>
+        <p>Mã xác nhận 6 chữ số để đặt lại mật khẩu của bạn là:</p>
+        <div style="font-size:32px;font-weight:900;letter-spacing:8px;color:#0f172a;background:#f1f5f9;padding:16px;text-align:center;border-radius:12px;margin:16px 0">${code6}</div>
+        <p style="font-size:13px;color:#64748b">Mã có hiệu lực trong <strong>15 phút</strong>. Nếu bạn không yêu cầu đổi mật khẩu, vui lòng bỏ qua email này.</p>
+      </div>
+    `;
+
+    const mailAttempt = await sendTransactionalEmail(
+      env,
+      fromEmail,
+      user.email,
+      `[Owlie Edu] Mã xác nhận đặt lại mật khẩu: ${code6}`,
+      resetHtml
+    );
+    if (mailAttempt.ok) {
+      return jsonRes({
+        ok: true,
+        delivery_mode: "email_sent",
+        provider: mailAttempt.provider,
+        message: `Đã gửi mã xác nhận 6 chữ số tới hộp thư ${user.email}. Vui lòng kiểm tra Email (kể cả mục Spam/Quảng cáo).`,
+      });
     }
 
-    // Chế độ thử nghiệm khi chưa gắn RESEND_API_KEY (cho phép test trọn vẹn luồng khôi phục ngay lập tức)
+    // Chế độ thử nghiệm khi chưa gắn BREVO_API_KEY / RESEND_API_KEY
     return jsonRes({
       ok: true,
       delivery_mode: "demo_preview",
       demo_code: code6,
-      message: `Hệ thống đang ở chế độ chưa gắn khóa Resend Email. Mã xác nhận thử nghiệm 15 phút của bạn là: ${code6}`,
+      message: `Hệ thống chưa gắn khóa Host Mail (Brevo/Resend). Mã xác nhận thử nghiệm 15 phút của bạn là: ${code6}`,
     });
   }
 
@@ -606,6 +732,320 @@ export async function handleAdminOpsAndPushRoutes(
     }
 
     return jsonRes({ ok: true, message: "Đã lưu cấu hình Tên miền, Email & SEO thành công!" });
+  }
+
+  // -----------------------------------------------------------------------
+  // 5. ĐĂNG KÝ NHẬN TIN KHAI GIẢNG & ƯU ĐÃI (NEWSLETTER CÔNG KHAI)
+  // -----------------------------------------------------------------------
+  if (path === "/api/v1/newsletter/subscribe" && method === "POST") {
+    const body = (await request.json().catch(() => ({}))) as {
+      email?: string;
+      full_name?: string;
+      source?: string;
+    };
+    const email = (body.email || "").trim().toLowerCase();
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return jsonRes({ error: "Vui lòng nhập địa chỉ Email hợp lệ." }, 400);
+    }
+    await db
+      .prepare(
+        `INSERT INTO newsletter_subscribers (email, full_name, source)
+         VALUES (?, ?, ?)
+         ON CONFLICT(email) DO UPDATE SET full_name = CASE WHEN excluded.full_name != '' THEN excluded.full_name ELSE newsletter_subscribers.full_name END`
+      )
+      .bind(email, (body.full_name || "").trim().slice(0, 120), (body.source || "footer").slice(0, 40))
+      .run();
+    return jsonRes(
+      { ok: true, message: "Đăng ký thành công! Bạn sẽ nhận sớm nhất thông báo khai giảng khóa học mới & ưu đãi học bổng." },
+      201
+    );
+  }
+
+  // -----------------------------------------------------------------------
+  // 6. HOST MAIL & GỬI CHIẾN DỊCH EMAIL (KHAI GIẢNG / GIẢM GIÁ / SỰ KIỆN)
+  // -----------------------------------------------------------------------
+  if (path === "/api/v1/admin/mail/campaigns" && method === "GET") {
+    if (!claims || !isAdminRole(claims.role)) {
+      return jsonRes({ error: "Chỉ Quản trị viên mới được truy cập Trung tâm Host Mail." }, 403);
+    }
+
+    const [
+      senderRow,
+      allUsersCnt,
+      studentCnt,
+      teacherCnt,
+      parentCnt,
+      newsletterCnt,
+      campaignsRes,
+      subscribersRes,
+    ] = await Promise.all([
+      db.prepare("SELECT value FROM site_settings WHERE key = 'sender_email'").first<{ value: string }>(),
+      db.prepare("SELECT COUNT(*) as cnt FROM users WHERE is_active = 1").first<{ cnt: number }>(),
+      db.prepare("SELECT COUNT(*) as cnt FROM users WHERE is_active = 1 AND role = 'student'").first<{ cnt: number }>(),
+      db.prepare("SELECT COUNT(*) as cnt FROM users WHERE is_active = 1 AND role = 'teacher'").first<{ cnt: number }>(),
+      db.prepare("SELECT COUNT(*) as cnt FROM users WHERE is_active = 1 AND role = 'parent'").first<{ cnt: number }>(),
+      db.prepare("SELECT COUNT(*) as cnt FROM newsletter_subscribers").first<{ cnt: number }>(),
+      db.prepare("SELECT * FROM email_campaigns ORDER BY created_at DESC LIMIT 30").all<Record<string, unknown>>(),
+      db.prepare("SELECT email, full_name, source, subscribed_at FROM newsletter_subscribers ORDER BY subscribed_at DESC LIMIT 30").all<Record<string, unknown>>(),
+    ]);
+
+    const activeProvider = env.BREVO_API_KEY
+      ? "brevo"
+      : env.RESEND_API_KEY
+        ? "resend"
+        : "none";
+
+    return jsonRes({
+      mail_host: {
+        active_provider: activeProvider,
+        brevo_configured: Boolean(env.BREVO_API_KEY),
+        resend_configured: Boolean(env.RESEND_API_KEY),
+        sender_email: env.FROM_EMAIL || senderRow?.value || "Owlie Edu <huynhanh4096it@gmail.com>",
+      },
+      audience_counts: {
+        all: Number(allUsersCnt?.cnt || 0),
+        student: Number(studentCnt?.cnt || 0),
+        teacher: Number(teacherCnt?.cnt || 0),
+        parent: Number(parentCnt?.cnt || 0),
+        newsletter: Number(newsletterCnt?.cnt || 0),
+      },
+      campaigns: campaignsRes.results,
+      subscribers: subscribersRes.results,
+    });
+  }
+
+  if (path === "/api/v1/admin/mail/test" && method === "POST") {
+    if (!claims || !isAdminRole(claims.role)) {
+      return jsonRes({ error: "Chỉ Quản trị viên mới được gửi thử Email." }, 403);
+    }
+    const body = (await request.json().catch(() => ({}))) as { to_email?: string; sender_email?: string };
+    const toEmail = (body.to_email || "").trim().toLowerCase();
+    if (!toEmail || !toEmail.includes("@")) {
+      return jsonRes({ error: "Vui lòng nhập Email người nhận thử nghiệm hợp lệ." }, 400);
+    }
+    const senderRow = await db.prepare("SELECT value FROM site_settings WHERE key = 'sender_email'").first<{ value: string }>();
+    const fromEmail = (body.sender_email || "").trim() || env.FROM_EMAIL || senderRow?.value || "Owlie Edu <onboarding@resend.dev>";
+
+    const html = buildCampaignHtml({
+      templateType: "course_launch",
+      title: "Kiểm tra kết nối Host Mail Owlie Edu thành công!",
+      highlightBadge: "Hệ thống gửi Email Khai giảng & Ưu đãi đã sẵn sàng 100%",
+      bodyText:
+        "Xin chào Quản trị viên,\nĐây là thư kiểm tra gửi trực tiếp từ Host Mail của nền tảng Owlie Edu.\nTừ giờ bạn có thể gửi thông báo khai giảng khóa học mới, chương trình giảm giá học bổng và mã quên mật khẩu thẳng vào hộp thư học viên & phụ huynh!",
+      ctaLabel: "Mở Trang Quản trị Owlie Edu",
+      ctaUrl: "/quan-tri",
+    });
+
+    const sent = await sendTransactionalEmail(
+      env,
+      fromEmail,
+      toEmail,
+      "[Owlie Edu] Kiểm tra Host Mail gửi thành công!",
+      html
+    );
+
+    if (!sent.ok) {
+      return jsonRes({ ok: false, error: sent.error || "Chưa kết nối được Host Mail.", provider: sent.provider }, 400);
+    }
+
+    await recordAuditLog(
+      db,
+      claims,
+      "test_mail_host",
+      "mail_host",
+      toEmail,
+      `Gửi email thử nghiệm thành công tới ${toEmail} qua ${sent.provider}`,
+      { provider: sent.provider },
+      request
+    );
+    return jsonRes({
+      ok: true,
+      provider: sent.provider,
+      message: `Đã gửi thành công email thử nghiệm tới ${toEmail} qua ${sent.provider.toUpperCase()}! Hãy kiểm tra hộp thư đến.`,
+    });
+  }
+
+  if (path === "/api/v1/admin/mail/campaigns/send" && method === "POST") {
+    if (!claims || !isAdminRole(claims.role)) {
+      return jsonRes({ error: "Chỉ Quản trị viên mới được gửi chiến dịch Email." }, 403);
+    }
+    const body = (await request.json().catch(() => ({}))) as {
+      title?: string;
+      subject?: string;
+      audience_role?: "all" | "student" | "teacher" | "parent" | "newsletter" | "custom";
+      custom_emails?: string;
+      template_type?: "course_launch" | "discount_promo" | "exam_event";
+      highlight_badge?: string;
+      body_text?: string;
+      cta_label?: string;
+      cta_url?: string;
+      sender_email?: string;
+    };
+
+    const title = (body.title || "").trim().slice(0, 160);
+    const subject = (body.subject || title).trim().slice(0, 180);
+    const bodyText = (body.body_text || "").trim().slice(0, 4000);
+    const audience = body.audience_role || "all";
+    const templateType = body.template_type || "course_launch";
+    const highlightBadge = (body.highlight_badge || "").trim().slice(0, 180);
+    const ctaLabel = (body.cta_label || "Khám phá ngay").trim().slice(0, 80);
+    const ctaUrl = (body.cta_url || "/khoa-hoc").trim().slice(0, 240);
+
+    if (!title || !bodyText) {
+      return jsonRes({ error: "Vui lòng nhập Tiêu đề và Nội dung email chiến dịch." }, 400);
+    }
+
+    // Lưu sender_email mới nếu Admin cập nhật ngay trong form
+    const senderRow = await db.prepare("SELECT value FROM site_settings WHERE key = 'sender_email'").first<{ value: string }>();
+    const fromEmail = (body.sender_email || "").trim() || env.FROM_EMAIL || senderRow?.value || "Owlie Edu <onboarding@resend.dev>";
+    if (body.sender_email && body.sender_email.trim()) {
+      await db
+        .prepare(
+          `INSERT INTO site_settings (key, value, updated_by, updated_at)
+           VALUES ('sender_email', ?, ?, datetime('now'))
+           ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_by = excluded.updated_by, updated_at = datetime('now')`
+        )
+        .bind(body.sender_email.trim().slice(0, 140), claims.name || claims.email)
+        .run();
+    }
+
+    // Thu thập danh sách email người nhận theo đối tượng
+    const recipientSet = new Set<string>();
+    if (audience === "custom") {
+      const parts = (body.custom_emails || "")
+        .split(/[\s,;]+/)
+        .map((x) => x.trim().toLowerCase())
+        .filter((x) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(x));
+      for (const e of parts) recipientSet.add(e);
+    } else if (audience === "newsletter") {
+      const rows = await db.prepare("SELECT email FROM newsletter_subscribers LIMIT 150").all<{ email: string }>();
+      for (const r of rows.results) recipientSet.add(r.email.toLowerCase());
+    } else {
+      const sql =
+        audience === "all"
+          ? "SELECT email FROM users WHERE is_active = 1 LIMIT 150"
+          : "SELECT email FROM users WHERE is_active = 1 AND role = ? LIMIT 150";
+      const rows =
+        audience === "all"
+          ? await db.prepare(sql).all<{ email: string }>()
+          : await db.prepare(sql).bind(audience).all<{ email: string }>();
+      for (const r of rows.results) {
+        if (r.email && !r.email.endsWith("@facebook.eduk12.vn")) {
+          recipientSet.add(r.email.toLowerCase());
+        }
+      }
+      if (audience === "all") {
+        const subs = await db.prepare("SELECT email FROM newsletter_subscribers LIMIT 150").all<{ email: string }>();
+        for (const s of subs.results) recipientSet.add(s.email.toLowerCase());
+      }
+    }
+
+    const recipients = [...recipientSet];
+    if (recipients.length === 0) {
+      return jsonRes({ error: "Không có địa chỉ email người nhận nào thuộc nhóm đã chọn." }, 400);
+    }
+
+    const html = buildCampaignHtml({
+      templateType,
+      title,
+      highlightBadge,
+      bodyText,
+      ctaLabel,
+      ctaUrl,
+    });
+
+    const hasMailHost = Boolean(env.BREVO_API_KEY || env.RESEND_API_KEY);
+    let sentCount = 0;
+    let failedCount = 0;
+    let providerUsed = "preview_no_key";
+    let lastError = "";
+
+    if (hasMailHost) {
+      // Gửi từng lô song song 5 email để vừa nhanh vừa không chạm giới hạn kết nối Cloudflare
+      for (let i = 0; i < recipients.length; i += 5) {
+        const chunk = recipients.slice(i, i + 5);
+        const resChunk = await Promise.all(
+          chunk.map((to) => sendTransactionalEmail(env, fromEmail, to, subject, html))
+        );
+        for (const r of resChunk) {
+          providerUsed = r.provider;
+          if (r.ok) sentCount++;
+          else {
+            failedCount++;
+            if (r.error) lastError = r.error;
+          }
+        }
+      }
+    }
+
+    const campId = `camp-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+    const status = !hasMailHost
+      ? "saved_draft_no_key"
+      : sentCount > 0
+        ? "sent"
+        : "failed";
+
+    await db
+      .prepare(
+        `INSERT INTO email_campaigns
+         (id, title, subject, audience_role, template_type, highlight_badge, body_text, cta_label, cta_url, recipient_count, sent_count, failed_count, provider_used, status, created_by)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      )
+      .bind(
+        campId,
+        title,
+        subject,
+        audience,
+        templateType,
+        highlightBadge,
+        bodyText,
+        ctaLabel,
+        ctaUrl,
+        recipients.length,
+        sentCount,
+        failedCount,
+        providerUsed,
+        status,
+        claims.name || claims.email
+      )
+      .run();
+
+    await recordAuditLog(
+      db,
+      claims,
+      "send_email_campaign",
+      "email_campaign",
+      campId,
+      `Chiến dịch email "${title}" tới ${recipients.length} người (Thành công: ${sentCount}, Lỗi: ${failedCount}, Provider: ${providerUsed})`,
+      { audience, templateType, sentCount, failedCount },
+      request
+    );
+
+    if (!hasMailHost) {
+      return jsonRes({
+        ok: true,
+        campaign_id: campId,
+        status,
+        recipient_count: recipients.length,
+        sent_count: 0,
+        message: `Đã lưu mẫu chiến dịch (${recipients.length} người nhận). Hãy gắn BREVO_API_KEY (miễn phí 300 thư/ngày) hoặc RESEND_API_KEY vào Cloudflare Secret để bắt đầu gửi thư thật!`,
+      });
+    }
+
+    return jsonRes({
+      ok: sentCount > 0,
+      campaign_id: campId,
+      status,
+      provider: providerUsed,
+      recipient_count: recipients.length,
+      sent_count: sentCount,
+      failed_count: failedCount,
+      error: sentCount === 0 ? lastError : undefined,
+      message:
+        sentCount > 0
+          ? `Đã gửi thành công ${sentCount}/${recipients.length} email qua ${providerUsed.toUpperCase()}!`
+          : `Gửi chưa thành công (${lastError}). Kiểm tra lại Email gửi (From) đã được xác minh trên ${providerUsed.toUpperCase()} chưa nhé!`,
+    });
   }
 
   return null;
